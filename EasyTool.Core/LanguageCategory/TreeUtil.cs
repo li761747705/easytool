@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -168,10 +168,10 @@ namespace EasyTool
         /// </summary>
         /// <param name="node">节点</param>
         /// <returns>下一个兄弟节点</returns>
-        public TreeNode<T, D> GetNextSibling(TreeNode<T, D> node)
+        public TreeNode<T, D>? GetNextSibling(TreeNode<T, D> node)
         {
             var siblings = GetSiblings(node);
-            var index = siblings.FindIndex(n => n.Id.Equals(node.Id));
+            var index = siblings.FindIndex(n => n.Id!.Equals(node.Id));
             return index + 1 < siblings.Count ? siblings[index + 1] : null;
         }
 
@@ -180,10 +180,10 @@ namespace EasyTool
         /// </summary>
         /// <param name="node">节点</param>
         /// <returns>上一个兄弟节点</returns>
-        public TreeNode<T, D> GetPreviousSibling(TreeNode<T, D> node)
+        public TreeNode<T, D>? GetPreviousSibling(TreeNode<T, D> node)
         {
             var siblings = GetSiblings(node);
-            var index = siblings.FindIndex(n => n.Id.Equals(node.Id));
+            var index = siblings.FindIndex(n => n.Id!.Equals(node.Id));
             return index - 1 >= 0 ? siblings[index - 1] : null;
         }
 
@@ -192,7 +192,7 @@ namespace EasyTool
         /// </summary>
         /// <param name="node">节点</param>
         /// <returns>首个子节点</returns>
-        public TreeNode<T, D> GetFirstChild(TreeNode<T, D> node)
+        public TreeNode<T, D>? GetFirstChild(TreeNode<T, D> node)
         {
             return node.Children.Count > 0 ? node.Children[0] : null;
         }
@@ -202,7 +202,7 @@ namespace EasyTool
         /// </summary>
         /// <param name="node">节点</param>
         /// <returns>最后一个子节点</returns>
-        public TreeNode<T, D> GetLastChild(TreeNode<T, D> node)
+        public TreeNode<T, D>? GetLastChild(TreeNode<T, D> node)
         {
             return node.Children.Count > 0 ? node.Children[node.Children.Count - 1] : null;
         }
@@ -296,6 +296,7 @@ namespace EasyTool
             this.Name = name;
             this.Weight = weight;
             this.Data = data;
+            this.Children = new List<TreeNode<T, D>>();
         }
     }
 }

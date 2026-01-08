@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
@@ -21,7 +21,7 @@ namespace EasyTool
         /// <typeparam name="T">导出部件的类型</typeparam>
         /// <param name="directory">目录路径</param>
         /// <returns>导出部件的列表</returns>
-        public static IEnumerable<T> LoadExportParts<T>(string directory = null)
+        public static IEnumerable<T> LoadExportParts<T>(string? directory = null)
         {
             // 如果目录为空，则使用默认目录
             directory ??= DefaultDirectory;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
@@ -52,7 +52,7 @@ namespace EasyTool
         /// <param name="name">元素的名称。</param>
         /// <param name="value">元素的值。</param>
         /// <returns>新创建的XML元素。</returns>
-        public static XmlElement CreateXmlElement(string name, string value = null)
+        public static XmlElement CreateXmlElement(string name, string? value = null)
         {
             var document = new XmlDocument();
             var element = document.CreateElement(name);

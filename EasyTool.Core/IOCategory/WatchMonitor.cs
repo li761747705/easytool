@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -132,8 +132,8 @@ namespace EasyTool
     /// </summary>
     public class FileEventArgs : EventArgs
     {
-        public string FilePath { get; }
-        public Exception Exception { get; }
+        public string? FilePath { get; }
+        public Exception? Exception { get; }
 
         public FileEventArgs(string path)
         {

@@ -1,7 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 using System.Text;
 
 namespace EasyTool
@@ -72,6 +75,9 @@ namespace EasyTool
         /// 获取当前系统的物理内存总量
         /// </summary>
         /// <returns>物理内存总量（字节）</returns>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static long GetTotalPhysicalMemory()
         {
             PerformanceCounter pc = new PerformanceCounter("Memory", "Available Bytes");
@@ -82,6 +88,9 @@ namespace EasyTool
         /// 获取当前系统的可用物理内存量
         /// </summary>
         /// <returns>可用物理内存量（字节）</returns>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static float GetAvailablePhysicalMemory()
         {
             PerformanceCounter pc = new PerformanceCounter("Memory", "Available Bytes");
@@ -92,6 +101,9 @@ namespace EasyTool
         /// 获取当前系统的虚拟内存总量
         /// </summary>
         /// <returns>虚拟内存总量（字节）</returns>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static long GetTotalVirtualMemory()
         {
             PerformanceCounter pc = new PerformanceCounter("Memory", "Committed Bytes");
@@ -102,6 +114,9 @@ namespace EasyTool
         /// 获取当前系统的可用虚拟内存量
         /// </summary>
         /// <returns>可用虚拟内存量（字节）</returns>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static float GetAvailableVirtualMemory()
         {
             PerformanceCounter pc = new PerformanceCounter("Memory", "Committed Bytes");
@@ -116,6 +131,9 @@ namespace EasyTool
         /// 获取当前系统的实际物理内存总量
         /// </summary>
         /// <returns>实际物理内存总量（字节）</returns>
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static long GetRealTotalPhysicalMemory()
         {
             GetPhysicallyInstalledSystemMemory(out long memoryInBytes);

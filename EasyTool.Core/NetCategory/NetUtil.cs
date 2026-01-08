@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Net;
@@ -38,7 +39,7 @@ namespace EasyTool
 
         // Resolve the IP address of a host
         // 获取指定主机的IP地址
-        public static IPAddress GetIpAddress(string host)
+        public static IPAddress? GetIpAddress(string host)
         {
             try
             {
@@ -91,13 +92,14 @@ namespace EasyTool
 
         // Send an HTTP GET request and return the response
         // 发送HTTP GET请求并返回响应
-        [Obsolete("建议使用HttpClient替代此方法")]
-        public static string HttpGet(string url)
+        public static string? HttpGet(string url)
         {
             try
             {
-                WebClient client = new WebClient();
-                return client.DownloadString(url);
+                using (HttpClient client = new HttpClient())
+                {
+                    return client.GetStringAsync(url).GetAwaiter().GetResult();
+                }
             }
             catch
             {
@@ -107,15 +109,16 @@ namespace EasyTool
 
         // Send an HTTP POST request and return the response
         // 发送HTTP POST请求并返回响应
-        [Obsolete("建议使用HttpClient替代此方法")]
-        public static string HttpPost(string url, string data)
+        public static string? HttpPost(string url, string data)
         {
             try
             {
-                WebClient client = new WebClient();
-                // 设置请求头的内容类型
-                client.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                return client.UploadString(url, data);
+                using (HttpClient client = new HttpClient())
+                {
+                    StringContent content = new StringContent(data, Encoding.UTF8, "application/x-www-form-urlencoded");
+                    HttpResponseMessage response = client.PostAsync(url, content).GetAwaiter().GetResult();
+                    return response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                }
             }
             catch
             {

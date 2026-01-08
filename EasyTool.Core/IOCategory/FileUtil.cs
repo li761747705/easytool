@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Web;
 
@@ -884,7 +885,7 @@ namespace EasyTool
         /// </summary>
         /// <param name="file">文件</param>
         /// <returns>文件名</returns>
-        public static string GetFilePrefix(FileInfo file)
+        public static string? GetFilePrefix(FileInfo file)
         {
             if (file == null)
             {
@@ -921,7 +922,7 @@ namespace EasyTool
         /// </summary>
         /// <param name="file">文件</param>
         /// <returns>类型，文件的扩展名，未找到为null</returns>
-        public static string GetType(FileInfo file)
+        public static string? GetType(FileInfo file)
         {
             return FileTypeUtil.GetType(file);
         }
@@ -954,7 +955,7 @@ namespace EasyTool
         /// <param name="file">文件</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>BOM输入流</returns>
-        public static StreamReader GetBOMInputStream(FileInfo file, Encoding encoding = null)
+        public static StreamReader GetBOMInputStream(FileInfo file, Encoding? encoding = null)
         {
             if (encoding == null)
             {
@@ -998,7 +999,7 @@ namespace EasyTool
         /// <param name="file">文件</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>文件读取流</returns>
-        public static StreamReader GetReader(FileInfo file, Encoding encoding = null)
+        public static StreamReader GetReader(FileInfo file, Encoding? encoding = null)
         {
             if (encoding == null)
             {
@@ -1078,7 +1079,7 @@ namespace EasyTool
         /// <param name="file">文件</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>内容</returns>
-        public static string ReadString(FileInfo file, Encoding encoding = null)
+        public static string ReadString(FileInfo file, Encoding? encoding = null)
         {
 
             if (encoding == null)
@@ -1101,7 +1102,7 @@ namespace EasyTool
         /// <param name="path">文件路径</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>内容</returns>
-        public static string ReadString(string path, Encoding encoding = null)
+        public static string ReadString(string path, Encoding? encoding = null)
         {
             return ReadString(new FileInfo(path), encoding); // 直接调用另一个重载方法
         }
@@ -1113,7 +1114,7 @@ namespace EasyTool
         /// <param name="url">网络文件地址</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>内容</returns>
-        public static string ReadString(Uri url, Encoding encoding = null)
+        public static string ReadString(Uri url, Encoding? encoding = null)
         {
             // 如果未指定编码格式，则默认为UTF-8
             if (encoding == null)
@@ -1124,11 +1125,12 @@ namespace EasyTool
             string result;
             try
             {
-                // 创建WebClient对象
-                using (WebClient client = new WebClient())
+                // 创建HttpClient对象
+                using (HttpClient client = new HttpClient())
                 {
                     // 下载指定地址的文件，并转换为字节数组
-                    byte[] data = client.DownloadData(url);
+                    // 注意：为了保持同步方法签名，这里使用了同步等待，这在某些上下文中可能会导致死锁
+                    byte[] data = client.GetByteArrayAsync(url).GetAwaiter().GetResult();
                     // 将字节数组转换为字符串，并使用指定编码格式解码
                     result = encoding.GetString(data);
                 }
@@ -1148,7 +1150,7 @@ namespace EasyTool
         /// <param name="path">文件路径</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns></returns>
-        public static string[] ReadAllLines(string path, Encoding encoding = null)
+        public static string[] ReadAllLines(string path, Encoding? encoding = null)
         {
             // 如果未指定编码格式，则默认为 UTF-8
             if (encoding == null)
@@ -1206,7 +1208,7 @@ namespace EasyTool
         /// <param name="path">文件路径</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>文件信息</returns>
-        public static FileInfo WriteString(string content, string path, Encoding encoding = null)
+        public static FileInfo WriteString(string content, string path, Encoding? encoding = null)
         {
             if (encoding == null)
             {
@@ -1274,7 +1276,7 @@ namespace EasyTool
         /// <param name="path">文件路径</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>文件信息</returns>
-        public static FileInfo AppendLines(List<string> list, string path, Encoding encoding = null)
+        public static FileInfo AppendLines(List<string> list, string path, Encoding? encoding = null)
         {
             if (encoding == null)
             {

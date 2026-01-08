@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +14,7 @@ namespace EasyTool.Extension
         /// <param name="key">要获取值的键</param>
         /// <param name="defaultValue">如果字典中不存在该键，则返回的默认值</param>
         /// <returns>指定键的值，如果字典中不存在该键，则返回默认值</returns>
-        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue = default)
+        public static TValue? GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue? defaultValue = default)
         {
             if (dictionary.TryGetValue(key, out TValue value))
             {

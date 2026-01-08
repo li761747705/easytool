@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -197,9 +197,9 @@ namespace EasyTool
         /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">枚举值</param>
         /// <returns>与值对应的名称，如果值不存在，则返回null</returns>
-        public static string GetNameByValue<TEnum>(TEnum value)
+        public static string? GetNameByValue<TEnum>(TEnum value)
         {
-            return Enum.GetName(typeof(TEnum), value);
+            return Enum.GetName(typeof(TEnum), value!);
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace EasyTool
         /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">枚举值</param>
         /// <returns>与值对应的注释，如果值不存在或未设置注释，则返回null</returns>
-        public static string GetDescriptionByValue<TEnum>(TEnum value)
+        public static string? GetDescriptionByValue<TEnum>(TEnum value)
         {
             var name = GetNameByValue(value);
             if (string.IsNullOrEmpty(name))
@@ -216,7 +216,7 @@ namespace EasyTool
                 return null;
             }
 
-            return GetDescription(GetValueByName<TEnum>(name));
+            return GetDescription(GetValueByName<TEnum>(name!));
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace EasyTool
         /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">枚举值</param>
         /// <returns>与值对应的Display名称，如果值不存在或未设置Display名称，则返回null</returns>
-        public static string GetDisplayNameByValue<TEnum>(TEnum value)
+        public static string? GetDisplayNameByValue<TEnum>(TEnum value)
         {
             var name = GetNameByValue(value);
             if (string.IsNullOrEmpty(name))
@@ -233,7 +233,7 @@ namespace EasyTool
                 return null;
             }
 
-            return GetDisplayName(GetValueByName<TEnum>(name));
+            return GetDisplayName(GetValueByName<TEnum>(name!));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -22,7 +22,7 @@ namespace EasyTool
         /// <summary>
         /// 检查对象是否为 null
         /// </summary>
-        public static bool IsNull(object obj)
+        public static bool IsNull(object? obj)
         {
             return obj == null;
         }
@@ -30,7 +30,7 @@ namespace EasyTool
         /// <summary>
         /// 检查对象是否不为 null
         /// </summary>
-        public static bool IsNotNull(object obj)
+        public static bool IsNotNull(object? obj)
         {
             return obj != null;
         }
@@ -38,7 +38,7 @@ namespace EasyTool
         /// <summary>
         /// 检查对象是否为空（null 或者 空字符串或空白字符）
         /// </summary>
-        public static bool IsNullOrEmpty(object obj)
+        public static bool IsNullOrEmpty(object? obj)
         {
             if (IsNull(obj))
             {
@@ -61,7 +61,7 @@ namespace EasyTool
         /// <summary>
         /// 检查对象是否不为空（非 null 且 非空字符串 或者 非空集合）
         /// </summary>
-        public static bool IsNotNullOrEmpty(object obj)
+        public static bool IsNotNullOrEmpty(object? obj)
         {
             return !IsNullOrEmpty(obj);
         }
@@ -103,7 +103,7 @@ namespace EasyTool
         /// <summary>
         /// 将对象转换为指定类型
         /// </summary>
-        public static object Convert(object obj, Type targetType)
+        public static object? Convert(object obj, Type targetType)
         {
             if (IsNull(obj))
             {
@@ -136,7 +136,7 @@ namespace EasyTool
         /// <summary>
         /// 获取对象的属性值
         /// </summary>
-        public static object GetPropertyValue(object obj, string propertyName)
+        public static object? GetPropertyValue(object obj, string propertyName)
         {
             return obj.GetType().GetProperty(propertyName)?.GetValue(obj);
         }
@@ -144,7 +144,7 @@ namespace EasyTool
         /// <summary>
         /// 设置对象的属性值
         /// </summary>
-        public static void SetPropertyValue(object obj, string propertyName, object value)
+        public static void SetPropertyValue(object obj, string propertyName, object? value)
         {
             obj.GetType().GetProperty(propertyName)?.SetValue(obj, value);
         }
@@ -160,7 +160,7 @@ namespace EasyTool
         /// <summary>
         /// 获取对象的字段值
         /// </summary>
-        public static object GetFieldValue(object obj, string fieldName)
+        public static object? GetFieldValue(object obj, string fieldName)
         {
             return obj.GetType().GetField(fieldName)?.GetValue(obj);
         }
@@ -168,7 +168,7 @@ namespace EasyTool
         /// <summary>
         /// 设置对象的字段值
         /// </summary>
-        public static void SetFieldValue(object obj, string fieldName, object value)
+        public static void SetFieldValue(object obj, string fieldName, object? value)
         {
             obj.GetType().GetField(fieldName)?.SetValue(obj, value);
         }
@@ -307,7 +307,7 @@ namespace EasyTool
         /// <summary>
         /// 将对象序列化为 JSON 字符串
         /// </summary>
-        public static string ToJson(object obj)
+        public static string? ToJson(object obj)
         {
             if (IsNull(obj))
             {
@@ -342,7 +342,7 @@ namespace EasyTool
         /// <summary>
         /// 将对象序列化为 XML 字符串
         /// </summary>
-        public static string ToXml(object obj)
+        public static string? ToXml(object obj)
         {
             if (IsNull(obj))
             {
@@ -377,7 +377,7 @@ namespace EasyTool
         /// <summary>
         /// 将对象转换为字典
         /// </summary>
-        public static Dictionary<string, object> ToDictionary(object obj)
+        public static Dictionary<string, object>? ToDictionary(object obj)
         {
             if (IsNull(obj))
             {
@@ -488,7 +488,7 @@ namespace EasyTool
         /// <summary>
         /// 深拷贝对象
         /// </summary>
-        public static T DeepClone<T>(T obj)
+        public static T? DeepClone<T>(T obj)
         {
             if (IsNull(obj))
             {
@@ -546,7 +546,7 @@ namespace EasyTool
         /// <summary>
         /// 深度复制对象
         /// </summary>
-        public static object DeepCopy(object obj)
+        public static object? DeepCopy(object obj)
         {
             if (obj == null)
             {
@@ -837,7 +837,7 @@ namespace EasyTool
         /// <summary>
         /// 获取指定类型的默认值
         /// </summary>
-        public static object GetDefault(Type type)
+        public static object? GetDefault(Type type)
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
@@ -961,7 +961,7 @@ namespace EasyTool
         /// <summary>
         /// 将对象转换为动态扩展对象
         /// </summary>
-        public static dynamic ToDynamic(object obj)
+        public static dynamic? ToDynamic(object obj)
         {
             if (obj == null)
             {
@@ -1027,7 +1027,7 @@ namespace EasyTool
         /// <summary>
         /// 将 XML 字符串反序列化为指定类型的对象
         /// </summary>
-        public static object DeserializeFromXml(string xml, Type type)
+        public static object? DeserializeFromXml(string xml, Type type)
         {
             XmlSerializer serializer = new XmlSerializer(type);
 
@@ -1040,8 +1040,10 @@ namespace EasyTool
         /// <summary>
         /// 将对象序列化为二进制数据
         /// </summary>
+        [Obsolete("BinaryFormatter is obsolete and unsafe. Use SerializeToJson or SerializeToXml instead.")]
         public static byte[] SerializeToBinary(object obj)
         {
+#pragma warning disable SYSLIB0011 // 类型或成员已过时
             BinaryFormatter formatter = new BinaryFormatter();
 
             using (MemoryStream stream = new MemoryStream())
@@ -1049,19 +1051,23 @@ namespace EasyTool
                 formatter.Serialize(stream, obj);
                 return stream.ToArray();
             }
+#pragma warning restore SYSLIB0011 // 类型或成员已过时
         }
 
         /// <summary>
         /// 将二进制数据反序列化为指定类型的对象
         /// </summary>
+        [Obsolete("BinaryFormatter is obsolete and unsafe. Use DeserializeFromJson or DeserializeFromXml instead.")]
         public static object DeserializeFromBinary(byte[] data, Type type)
         {
+#pragma warning disable SYSLIB0011 // 类型或成员已过时
             BinaryFormatter formatter = new BinaryFormatter();
 
             using (MemoryStream stream = new MemoryStream(data))
             {
                 return formatter.Deserialize(stream);
             }
+#pragma warning restore SYSLIB0011 // 类型或成员已过时
         }
     }
 }

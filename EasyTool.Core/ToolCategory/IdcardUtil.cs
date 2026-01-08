@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -378,7 +378,7 @@ namespace EasyTool
         /// <param name="idcard">身份证号码</param>
         /// <param name="gender">新的性别</param>
         /// <returns>新的身份证号码</returns>
-        public static string ReplaceGender(string idcard, Gender gender)
+        public static string? ReplaceGender(string idcard, Gender gender)
         {
             if (string.IsNullOrEmpty(idcard))
             {

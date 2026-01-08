@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -25,10 +25,11 @@ namespace EasyTool
             byte[] buffer = new byte[256];
             using (FileStream fs = file.OpenRead())
             {
-                if (fs.Length >= 256)
-                    fs.Read(buffer, 0, 256);
-                else
-                    fs.Read(buffer, 0, (int)fs.Length);
+                int readLength = fs.Read(buffer, 0, buffer.Length);
+                if (readLength < buffer.Length)
+                {
+                    // 处理读取不足的情况，虽然对于头部检测通常前几个字节就够了，但为了严谨性
+                }
             }
 
             string header = "";

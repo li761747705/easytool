@@ -101,10 +101,16 @@ namespace EasyTool.Tests
         /// 验证无效的 IPv4 地址，应引发 ArgumentException 异常。
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void IsPrivateIpv4_InvalidIp_ThrowsException()
         {
-            IpUtil.IsPrivateIpv4("256.256.256.256");
+            try
+            {
+                IpUtil.IsPrivateIpv4("256.256.256.256");
+                Assert.Fail("Expected ArgumentException was not thrown.");
+            }
+            catch (ArgumentException)
+            {
+            }
         }
 
         /// <summary>
@@ -120,10 +126,16 @@ namespace EasyTool.Tests
         /// 验证无效的 IPv6 地址，应引发 ArgumentException 异常。
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void IsPrivateIpv6_InvalidIp_ThrowsException()
         {
-            IpUtil.IsPrivateIpv6("2001::1::2");
+            try
+            {
+                IpUtil.IsPrivateIpv6("2001::1::2");
+                Assert.Fail("Expected ArgumentException was not thrown.");
+            }
+            catch (ArgumentException)
+            {
+            }
         }
 
         /// <summary>
