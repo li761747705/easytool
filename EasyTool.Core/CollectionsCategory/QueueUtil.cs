@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.CollectionsCategory
 {
     /// <summary>
     /// 队列工具类
     /// </summary>
-    public class QueueUtil
+    public static class QueueUtil
     {
         /// <summary>
         /// 将指定元素添加到队列的末尾。

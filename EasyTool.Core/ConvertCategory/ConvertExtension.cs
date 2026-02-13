@@ -218,27 +218,6 @@ namespace EasyTool.ConvertCategory
         #region ==字节转换==
 
         /// <summary>
-        /// 转换为16进制
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="lowerCase">是否小写</param>
-        /// <returns></returns>
-        public static string ToHex(this byte[] bytes, bool lowerCase = true)
-        {
-            if (bytes == null)
-                return string.Empty;
-
-            var result = new StringBuilder();
-            var format = lowerCase ? "x2" : "X2";
-            for (var i = 0; i < bytes.Length; i++)
-            {
-                result.Append(bytes[i].ToString(format));
-            }
-
-            return result.ToString();
-        }
-
-        /// <summary>
         /// 16进制转字节数组
         /// </summary>
         /// <param name="s"></param>
@@ -256,6 +235,32 @@ namespace EasyTool.ConvertCategory
             }
 
             return bytes;
+        }
+
+        /// <summary>
+        /// 转换为16进制
+        /// </summary>
+        /// <remarks>
+        /// 已过时：请使用 <see cref="ByteExtension.ToHex(byte[], bool)"/> 替代
+        /// 此方法与 ByteExtension.ToHex 存在命名冲突，已标记为过时
+        /// </remarks>
+        /// <param name="bytes"></param>
+        /// <param name="lowerCase">是否小写</param>
+        /// <returns></returns>
+        [Obsolete("请使用 ByteExtension.ToHex(byte[], bool) 替代")]
+        public static string ToHexLegacy(this byte[] bytes, bool lowerCase = true)
+        {
+            if (bytes == null)
+                return string.Empty;
+
+            var result = new StringBuilder();
+            var format = lowerCase ? "x2" : "X2";
+            for (var i = 0; i < bytes.Length; i++)
+            {
+                result.Append(bytes[i].ToString(format));
+            }
+
+            return result.ToString();
         }
 
 

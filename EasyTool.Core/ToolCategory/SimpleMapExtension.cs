@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,7 +7,8 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
 
-namespace EasyTool;
+namespace EasyTool.ToolCategory
+{
 /// <summary>
 /// 简单实体转化拓展类
 /// </summary>
@@ -92,7 +93,6 @@ public static class SimpleMapExtension
                     }
                 }
             }
-
             if (expr == null) continue;
             assignments.Add(Expression.Bind(destinationProp, expr));
         }
@@ -105,6 +105,7 @@ public static class SimpleMapExtension
 
         return Expression.Lambda(bodyExpr, srcExpr).Compile();
     }
+
     /// <summary>
     /// 简单实体转化
     /// 目标泛型需要默认构造函数
@@ -120,8 +121,9 @@ public static class SimpleMapExtension
 
         return mapper(source);
     }
+
     /// <summary>
-    /// 集合实体转化，需要目标泛型具有默认构造函数
+    /// 融合实体转化，需要目标泛型具有默认构造函数
     /// </summary>
     /// <typeparam name="TSource">源泛型</typeparam>
     /// <typeparam name="TDestination">目标泛型</typeparam>
@@ -131,6 +133,7 @@ public static class SimpleMapExtension
     {
         if (!sources.Any())
             return Enumerable.Empty<TDestination>();
+
         var mapper = (Func<TSource, TDestination>)mapDelegateCache.GetOrAdd(new(typeof(TSource), typeof(TDestination)), static key => BuildSimpleMapDelegate(key.SrcType, key.DestType));
 
         List<TDestination> result = new();
@@ -140,4 +143,5 @@ public static class SimpleMapExtension
         }
         return result;
     }
+}
 }

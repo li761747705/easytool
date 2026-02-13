@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Web;
 
-namespace EasyTool
+namespace EasyTool.NetCategory
 {
     /// <summary>
     /// URL工具类
     /// </summary>
-    public class URLUtil
+    public static class URLUtil
     {
         /// <summary>
         /// 解析URL并返回其组成部分。

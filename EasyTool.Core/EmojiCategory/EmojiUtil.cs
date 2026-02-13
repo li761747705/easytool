@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EasyTool
+namespace EasyTool.EmojiCategory
 {
-    public class EmojiUtil
+    public static class EmojiUtil
     {
         // Unicode 区间：Emoji 表情符号的 Unicode 区间
         private const string EmojiRanges = "[\u1F600-\u1F64F\u1F910-\u1F96B\u1F980-\u1F9E0]";

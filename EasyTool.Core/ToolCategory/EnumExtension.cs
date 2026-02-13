@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace EasyTool.Extension
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// Enum 枚举扩展方法

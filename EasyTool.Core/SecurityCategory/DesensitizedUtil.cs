@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EasyTool
+namespace EasyTool.SecurityCategory
 {
     /// <summary>
     /// 信息脱敏工具类
     /// </summary>
-    public class DesensitizedUtil
+    public static class DesensitizedUtil
     {
         private static readonly Regex IdcardRegex = new Regex(@"^\d{15}(\d{2}[0-9xX])?$");
         private static readonly Regex MobileRegex = new Regex(@"^(13\d|14[5-9]|15[^4\D]|16\d|17[0-8]|18\d|19[0-3,5-9])\d{8}$");

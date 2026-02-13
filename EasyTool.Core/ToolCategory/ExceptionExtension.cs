@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace EasyTool.Extension
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// Exception 异常扩展方法

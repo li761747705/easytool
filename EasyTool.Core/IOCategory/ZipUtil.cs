@@ -4,12 +4,12 @@ using System.IO.Compression;
 using System.IO;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.IOCategory
 {
     /// <summary>
     /// 压缩工具
     /// </summary>
-    public class ZipUtil
+    public static class ZipUtil
     {
         /// <summary>
         /// 压缩文件或目录

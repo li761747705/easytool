@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EasyTool
+namespace EasyTool.SystemCategory
 {
     /// <summary>
     /// 系统工具类，提供系统、进程、内存、网络等相关功能

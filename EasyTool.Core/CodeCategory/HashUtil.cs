@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,8 +14,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint AdditiveHash(string str)
+        public static uint AdditiveHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 0;
             foreach (char c in str)
             {
@@ -30,8 +33,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint RotatingHash(string str)
+        public static uint RotatingHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = (uint)str.Length;
             foreach (char c in str)
             {
@@ -46,8 +52,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint OneByOneHash(string str)
+        public static uint OneByOneHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 0;
             foreach (char c in str)
             {
@@ -67,8 +76,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint Bernstein(string str)
+        public static uint Bernstein(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 5381;
             foreach (char c in str)
             {
@@ -86,8 +98,15 @@ namespace EasyTool
         /// <param name="num_buckets">哈希桶的数量</param>
         /// <param name="a">a的取值范围为[1, prime - 1]</param>
         /// <param name="b">b的取值范围</param>
-        public static uint Universal(string str, uint prime, uint num_buckets, uint a, uint b)
+        public static uint Universal(string? str, uint prime, uint num_buckets, uint a, uint b)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+            if (prime == 0)
+                throw new ArgumentException("Prime must be greater than 0", nameof(prime));
+            if (num_buckets == 0)
+                throw new ArgumentException("Number of buckets must be greater than 0", nameof(num_buckets));
+
             uint hash = a;
             foreach (char c in str)
             {
@@ -104,12 +123,18 @@ namespace EasyTool
         /// <param name="str">要进行hash的字符串</param>
         /// <param name="table">随机数表</param>
         /// <returns>返回hash值</returns>
-        public static uint Zobrist(string str, uint[] table)
+        public static uint Zobrist(string? str, uint[]? table)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+            if (table == null || table.Length == 0)
+                throw new ArgumentException("Table cannot be null or empty", nameof(table));
+
             uint hash = 0;
             for (int i = 0; i < str.Length; i++)
             {
-                hash ^= table[str[i]];
+                int index = Math.Min(str[i], table.Length - 1);
+                hash ^= table[index];
             }
 
             return hash;
@@ -120,8 +145,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint FnvHash(string str)
+        public static uint FnvHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             const uint fnv_prime = 0x811C9DC5;
             uint hash = 0;
             foreach (char c in str)
@@ -156,8 +184,13 @@ namespace EasyTool
         /// <param name="b">b的取值范围为[1, 255]</param>
         /// <param name="a">a的取值范围为[1, b-1]</param>
         /// <returns>返回hash值</returns>
-        public static uint RsHash(string str, uint b, uint a)
+        public static uint RsHash(string? str, uint b, uint a)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+            if (b == 0)
+                throw new ArgumentException("b must be greater than 0", nameof(b));
+
             uint hash = 0;
             foreach (char c in str)
             {
@@ -173,8 +206,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint JsHash(string str)
+        public static uint JsHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 1315423911;
             foreach (char c in str)
             {
@@ -189,8 +225,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint PjwHash(string str)
+        public static uint PjwHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 0;
             const uint BitsInUnsignedInt = (uint)(sizeof(uint) * 8);
             const uint ThreeQuarters = (uint)((BitsInUnsignedInt * 3) / 4);
@@ -214,8 +253,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint ElfHash(string str)
+        public static uint ElfHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 0;
             uint x = 0;
             foreach (char c in str)
@@ -239,8 +281,13 @@ namespace EasyTool
         /// <param name="str">要进行hash的字符串</param>
         /// <param name="seed">种子值</param>
         /// <returns>返回hash值</returns>
-        public static uint BkdrHash(string str, uint seed)
+        public static uint BkdrHash(string? str, uint seed)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+            if (seed == 0)
+                throw new ArgumentException("Seed must be greater than 0", nameof(seed));
+
             uint hash = 0;
             foreach (char c in str)
             {
@@ -255,8 +302,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint SdbmHash(string str)
+        public static uint SdbmHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 0;
             foreach (char c in str)
             {
@@ -271,8 +321,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint DjbHash(string str)
+        public static uint DjbHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 5381;
             foreach (char c in str)
             {
@@ -287,8 +340,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint DekHash(string str)
+        public static uint DekHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = (uint)str.Length;
             foreach (char c in str)
             {
@@ -303,8 +359,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint ApHash(string str)
+        public static uint ApHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 0;
             int i;
             for (i = 0; i < str.Length; i++)
@@ -328,13 +387,16 @@ namespace EasyTool
         /// <param name="str">要进行hash的字符串</param>
         /// <param name="len">hash表的长度</param>
         /// <returns>返回hash值</returns>
-        public static uint TianlHash(string str, uint len)
+        public static uint TianlHash(string? str, uint len)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+            if (len == 0)
+                throw new ArgumentException("Length must be greater than 0", nameof(len));
+
             uint hash = 0;
             uint[] w = new uint[64];
             uint[] v = new uint[8];
-
-            if (str.Length == 0) return 0;
 
             if (str.Length <= 64)
             {
@@ -403,8 +465,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static uint JavaDefaultHash(string str)
+        public static uint JavaDefaultHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint hash = 0;
             uint h = hash;
             foreach (char c in str)
@@ -421,8 +486,11 @@ namespace EasyTool
         /// </summary>
         /// <param name="str">要进行hash的字符串</param>
         /// <returns>返回hash值</returns>
-        public static ulong MixHash(string str)
+        public static ulong MixHash(string? str)
         {
+            if (string.IsNullOrEmpty(str))
+                return 0;
+
             uint seed = 131; // 31 131 1313 13131 131313 etc..
             ulong hash1 = 0;
             ulong hash2 = 0;

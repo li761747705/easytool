@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EasyTool
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// 字符串处理工具类
     /// </summary>
-    public class StrUtil
+    public static class StrUtil
     {
         /// <summary>
         /// 移除字符串中的所有空格

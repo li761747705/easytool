@@ -2,12 +2,12 @@ using System;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace EasyTool
+namespace EasyTool.NetCategory
 {
     /// <summary>
     /// IP地址工具类
     /// </summary>
-    public class IpUtil
+    public static class IpUtil
     {
         /// <summary>
         /// 判断是否是ipv4格式

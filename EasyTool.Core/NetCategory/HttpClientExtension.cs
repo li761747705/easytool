@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EasyTool.Extension
+namespace EasyTool.NetCategory
 {
     /// <summary>
     /// 扩展HttpClient中一些缺少的请求方式

@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EasyTool.Extension
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// Delegate 委托扩展方法

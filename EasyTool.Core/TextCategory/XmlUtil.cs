@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
-namespace EasyTool
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// XML工具类
     /// </summary>
-    public class XmlUtil
+    public static class XmlUtil
     {
         /// <summary>
         /// 解析XML字符串。

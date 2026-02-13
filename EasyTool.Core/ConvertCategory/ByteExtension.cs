@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 
-namespace EasyTool.Extension
+namespace EasyTool.ConvertCategory
 {
     /// <summary>
     /// Byte 字节扩展方法

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.CodeCategory
 {
     /// <summary>
     /// 编码工具类，提供各种编码格式的转换功能
@@ -40,8 +40,9 @@ namespace EasyTool
             int index = 0;
             for (int i = 0; i < length; i += 5)
             {
-                int val = (bytes[i] << 24) + ((i + 1 < length ? bytes[i + 1] : 0) << 16) +
-                          ((i + 2 < length ? bytes[i + 2] : 0) << 8) + ((i + 3 < length ? bytes[i + 3] : 0) << 0);
+                int val = (bytes[i] << 32) + ((i + 1 < length ? bytes[i + 1] : 0) << 24) +
+                          ((i + 2 < length ? bytes[i + 2] : 0) << 16) + ((i + 3 < length ? bytes[i + 3] : 0) << 8) +
+                          ((i + 4 < length ? bytes[i + 4] : 0) << 0);
                 chars[index++] = BASE32_CHARS[(val >> 35) & 0x1F];
                 chars[index++] = BASE32_CHARS[(val >> 30) & 0x1F];
                 chars[index++] = BASE32_CHARS[(val >> 25) & 0x1F];
@@ -158,9 +159,14 @@ namespace EasyTool
         // 解码 Base32 字符
         private static int DecodeBase32Char(char c)
         {
+            // 支持大小写
             if (c >= 'A' && c <= 'Z')
             {
                 return c - 'A';
+            }
+            if (c >= 'a' && c <= 'z')
+            {
+                return c - 'a';
             }
             if (c >= '2' && c <= '7')
             {
@@ -321,6 +327,21 @@ namespace EasyTool
             {' ', " "}
         };
 
+        // Morse 反向电码表，用于解码优化性能
+        private static readonly Dictionary<string, char> MORSE_REVERSE_TABLE;
+
+        static EncodingUtil()
+        {
+            MORSE_REVERSE_TABLE = new Dictionary<string, char>();
+            foreach (var kvp in MORSE_TABLE)
+            {
+                if (!string.IsNullOrEmpty(kvp.Value))
+                {
+                    MORSE_REVERSE_TABLE[kvp.Value] = kvp.Key;
+                }
+            }
+        }
+
         /// <summary>
         /// 将给定的字符串转换为 Morse 电码字符串
         /// </summary>
@@ -357,19 +378,15 @@ namespace EasyTool
             }
 
             string[] codes = morseCode.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            List<char> chars = new List<char>();
+            StringBuilder result = new StringBuilder(codes.Length);
             foreach (string code in codes)
             {
-                foreach (KeyValuePair<char, string> kvp in MORSE_TABLE)
+                if (MORSE_REVERSE_TABLE.TryGetValue(code, out char c))
                 {
-                    if (kvp.Value == code)
-                    {
-                        chars.Add(kvp.Key);
-                        break;
-                    }
+                    result.Append(c);
                 }
             }
-            return new string(chars.ToArray());
+            return result.ToString();
         }
 
         #endregion

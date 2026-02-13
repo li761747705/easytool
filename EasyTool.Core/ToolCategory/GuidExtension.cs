@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace EasyTool.Extension
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// Guid 扩展方法

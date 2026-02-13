@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.MathCategory
 {
-    public class RandomUtil
+    public static class RandomUtil
     {
         private static readonly Random random = new Random();
 

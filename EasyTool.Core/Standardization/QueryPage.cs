@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.Standardization
 {
     /*
      * 标准化查询参数，减少前后端对接工作

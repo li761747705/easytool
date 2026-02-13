@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace EasyTool
+namespace EasyTool.DateTimeCategory
 {
     /// <summary>
     /// 农历日期工具类
     /// </summary>
-    public class LunarCalendarUtil
+    public static class LunarCalendarUtil
     {
 
         #region 基础数据

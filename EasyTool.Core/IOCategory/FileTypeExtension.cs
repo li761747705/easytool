@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace EasyTool.Extension
+namespace EasyTool.IOCategory
 {
     /// <summary>
     /// 文件类型扩展方法

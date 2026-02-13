@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.MathCategory
 {
     /// <summary>
     /// 预测数据类
     /// </summary>
-    public class PredictUtil
+    public static class PredictUtil
     {
         /// <summary>
         /// 线性回归预测

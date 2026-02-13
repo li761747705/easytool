@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 
 
-namespace EasyTool
+namespace EasyTool.Standardization
 {
 
 #if NET6_0_OR_GREATER

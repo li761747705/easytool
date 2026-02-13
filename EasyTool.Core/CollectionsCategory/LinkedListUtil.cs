@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.CollectionsCategory
 {
     /// <summary>
     /// 双向链表工具类
     /// </summary>
-    public class LinkedListUtil
+    public static class LinkedListUtil
     {
         /// <summary>
         /// 将指定元素添加到双向链表的结尾处。

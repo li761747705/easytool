@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EasyTool
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// 正则工具
     /// </summary>
-    public class RegexUtil
+    public static class RegexUtil
     {
         /// <summary>
         /// 验证字符串是否与指定的正则表达式匹配，并返回匹配结果

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace EasyTool.Extension
+namespace EasyTool.DateTimeCategory
 {
     /// <summary>
     /// 提供各种日期操作和计算的工具类。

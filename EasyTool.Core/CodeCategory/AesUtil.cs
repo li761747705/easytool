@@ -168,5 +168,130 @@ namespace EasyTool.CodeCategory
             return keyLength == 16 || keyLength == 24 || keyLength == 32;
         }
         private static bool IvIsLegalSize(string iv) => iv.Length == 16;
+
+        /// <summary>
+        /// AES 加密（字节数组版本）
+        /// </summary>
+        /// <param name="data">需要加密的数据</param>
+        /// <param name="key">加密key</param>
+        /// <param name="iv">向量iv</param>
+        /// <param name="cipher">默认CBC</param>
+        /// <param name="padding">默认PKCS7</param>
+        /// <returns>加密后的数据</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static byte[] Encrypt(byte[] data, byte[] key, byte[]? iv = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
+        {
+            if (data == null || data.Length == 0)
+                return Array.Empty<byte>();
+            if (key == null || key.Length == 0)
+                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+            if (!KeyIsLegalSizeBytes(key))
+                throw new ArgumentException("不合规的秘钥，请确认秘钥为16、24、32位");
+            if (iv != null && iv.Length != 16)
+                throw new ArgumentException("不合规的iv，请确认iv为16位");
+
+            using var symmetricKey = Aes.Create();
+            symmetricKey.Mode = cipher;
+            symmetricKey.Padding = padding;
+            using var encryptor = symmetricKey.CreateEncryptor(key, iv);
+            using var memoryStream = new MemoryStream();
+            using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
+
+            cryptoStream.Write(data, 0, data.Length);
+            cryptoStream.FlushFinalBlock();
+            return memoryStream.ToArray();
+        }
+
+        /// <summary>
+        /// AES 解密（字节数组版本）
+        /// </summary>
+        /// <param name="data">需要解密的数据</param>
+        /// <param name="key">解密key</param>
+        /// <param name="iv">向量iv</param>
+        /// <param name="cipher">默认CBC</param>
+        /// <param name="padding">默认PKCS7</param>
+        /// <returns>解密后的数据</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static byte[] Decrypt(byte[] data, byte[] key, byte[]? iv = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
+        {
+            if (data == null || data.Length == 0)
+                return Array.Empty<byte>();
+            if (key == null || key.Length == 0)
+                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+            if (!KeyIsLegalSizeBytes(key))
+                throw new ArgumentException("不合规的秘钥，请确认秘钥为16、24、32位");
+            if (iv != null && iv.Length != 16)
+                throw new ArgumentException("不合规的iv，请确认iv为16位");
+
+            using var symmetricKey = Aes.Create();
+            symmetricKey.Mode = cipher;
+            symmetricKey.Padding = padding;
+            using var decryptor = symmetricKey.CreateDecryptor(key, iv);
+            using var memoryStream = new MemoryStream(data);
+            using var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read);
+            using var resultStream = new MemoryStream();
+            cryptoStream.CopyTo(resultStream);
+            return resultStream.ToArray();
+        }
+
+        private static bool KeyIsLegalSizeBytes(byte[] key)
+        {
+            int keyLength = key.Length;
+            return keyLength == 16 || keyLength == 24 || keyLength == 32;
+        }
+
+        /// <summary>
+        /// 创建加密流
+        /// </summary>
+        /// <param name="outputStream">输出流</param>
+        /// <param name="key">加密key</param>
+        /// <param name="iv">向量iv</param>
+        /// <param name="cipher">默认CBC</param>
+        /// <param name="padding">默认PKCS7</param>
+        /// <returns>加密流</returns>
+        public static CryptoStream CreateEncryptingStream(Stream outputStream, byte[] key, byte[]? iv = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
+        {
+            if (outputStream == null)
+                throw new ArgumentNullException(nameof(outputStream));
+            if (key == null || key.Length == 0)
+                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+            if (!KeyIsLegalSizeBytes(key))
+                throw new ArgumentException("不合规的秘钥，请确认秘钥为16、24、32位");
+            if (iv != null && iv.Length != 16)
+                throw new ArgumentException("不合规的iv，请确认iv为16位");
+
+            var aes = Aes.Create();
+            aes.Mode = cipher;
+            aes.Padding = padding;
+            var encryptor = aes.CreateEncryptor(key, iv);
+            return new CryptoStream(outputStream, encryptor, CryptoStreamMode.Write);
+        }
+
+        /// <summary>
+        /// 创建解密流
+        /// </summary>
+        /// <param name="inputStream">输入流</param>
+        /// <param name="key">解密key</param>
+        /// <param name="iv">向量iv</param>
+        /// <param name="cipher">默认CBC</param>
+        /// <param name="padding">默认PKCS7</param>
+        /// <returns>解密流</returns>
+        public static CryptoStream CreateDecryptingStream(Stream inputStream, byte[] key, byte[]? iv = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
+        {
+            if (inputStream == null)
+                throw new ArgumentNullException(nameof(inputStream));
+            if (key == null || key.Length == 0)
+                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+            if (!KeyIsLegalSizeBytes(key))
+                throw new ArgumentException("不合规的秘钥，请确认秘钥为16、24、32位");
+            if (iv != null && iv.Length != 16)
+                throw new ArgumentException("不合规的iv，请确认iv为16位");
+
+            var aes = Aes.Create();
+            aes.Mode = cipher;
+            aes.Padding = padding;
+            var decryptor = aes.CreateDecryptor(key, iv);
+            return new CryptoStream(inputStream, decryptor, CryptoStreamMode.Read);
+        }
     }
 }

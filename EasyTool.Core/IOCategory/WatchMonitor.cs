@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.IOCategory
 {
     /// <summary>
     /// 文件监听工具类

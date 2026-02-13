@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace EasyTool
+namespace EasyTool.ReflectCategory
 {
     /// <summary>
     /// 反射工具类，提供类型、属性、字段、方法的反射操作

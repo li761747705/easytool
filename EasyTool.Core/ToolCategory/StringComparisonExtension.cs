@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace EasyTool.Extension
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// String 字符串比较扩展方法

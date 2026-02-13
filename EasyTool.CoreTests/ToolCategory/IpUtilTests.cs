@@ -1,6 +1,6 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EasyTool;
+using EasyTool.NetCategory;
 
 namespace EasyTool.Tests
 {

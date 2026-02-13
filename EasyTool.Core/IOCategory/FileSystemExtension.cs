@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using EasyTool.ConvertCategory;
 
-namespace EasyTool.Extension
+namespace EasyTool.IOCategory
 {
     /// <summary>
     /// 文件系统扩展方法

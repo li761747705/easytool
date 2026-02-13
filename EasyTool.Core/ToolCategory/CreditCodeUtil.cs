@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// 社会信用代码工具
     /// </summary>
-    public class CreditCodeUtil
+    public static class CreditCodeUtil
     {
         private const string BaseCode = "0123456789ABCDEFGHJKLMNPQRTUWXY"; // 社会信用代码中的基础字符集
         private const int Modulo = 31; // 校验码计算中的模数
@@ -68,7 +68,7 @@ namespace EasyTool
         {
             string orgCode = "911101"; // 默认的组织机构代码
             string entType = "00"; // 默认的企业类型
-            string regNum = RandomUtil.RandomNumberString(10); // 生成随机的注册号
+            string regNum = EasyTool.MathCategory.RandomUtil.RandomNumberString(10); // 生成随机的注册号
             string code = orgCode + entType + regNum;
 
             // 计算出校验码并添加到社会信用代码中

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EasyTool
+namespace EasyTool.TextCategory
 {
-    public class StrSplitter
+    public static class StrSplitter
     {
         /// <summary>
         /// 使用指定的分隔符将输入字符串分割成字符串数组。

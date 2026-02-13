@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-namespace EasyTool
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// uuid生成风格
@@ -27,7 +27,7 @@ namespace EasyTool
     /// <summary>
     /// 唯一ID工具
     /// </summary>
-    public class IdUtil
+    public static class IdUtil
     {
         private static readonly DateTime epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static int objectIdCounter = 0;

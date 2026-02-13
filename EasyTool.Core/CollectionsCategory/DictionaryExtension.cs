@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EasyTool.Extension
+namespace EasyTool.CollectionsCategory
 {
     public static class DictionaryExtension
     {

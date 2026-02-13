@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.MathCategory
 {
     /// <summary>
     /// 数学工具类，提供数字计算和数学运算方法

@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EasyTool.Extension
+namespace EasyTool.IOCategory
 {
     /// <summary>
     /// Stream 扩展方法

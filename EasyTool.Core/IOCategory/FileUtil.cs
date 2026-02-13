@@ -6,54 +6,19 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web;
-using EasyTool.Extension;
+using EasyTool.IOCategory;
 
-namespace EasyTool
+namespace EasyTool.IOCategory
 {
     /// <summary>
     /// 文件操作类
     /// </summary>
-    public class FileUtil
+    public static class FileUtil
     {
 
         /// <summary>
         /// 判断当前操作系统是否为 Windows
         /// </summary>
-        public static bool IsWindows()
-        {
-            // 判断当前操作系统的 PlatformID 是否为 Win32S、Win32Windows、Win32NT 或 WinCE
-            return Environment.OSVersion.Platform == PlatformID.Win32S
-                || Environment.OSVersion.Platform == PlatformID.Win32Windows
-                || Environment.OSVersion.Platform == PlatformID.Win32NT
-                || Environment.OSVersion.Platform == PlatformID.WinCE;
-        }
-
-        /// <summary>
-        /// 判断当前操作系统是否为 Unix
-        /// </summary>
-        public static bool IsUnix()
-        {
-            // 判断当前操作系统的 PlatformID 是否为 Unix
-            return Environment.OSVersion.Platform == PlatformID.Unix;
-        }
-
-        /// <summary>
-        /// 判断当前操作系统是否为 Xbox
-        /// </summary>
-        public static bool IsXbox()
-        {
-            // 判断当前操作系统的 PlatformID 是否为 Xbox
-            return Environment.OSVersion.Platform == PlatformID.Xbox;
-        }
-
-        /// <summary>
-        /// 判断当前操作系统是否为 macOS
-        /// </summary>
-        public static bool IsMacOSX()
-        {
-            // 判断当前操作系统的 PlatformID 是否为 macOSX
-            return Environment.OSVersion.Platform == PlatformID.MacOSX;
-        }
 
         /// <summary>
         /// 判断文件或目录是否为空

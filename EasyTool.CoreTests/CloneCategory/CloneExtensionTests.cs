@@ -1,4 +1,4 @@
-﻿using EasyTool.Extension;
+﻿using EasyTool.ToolCategory;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EasyTool.Tests

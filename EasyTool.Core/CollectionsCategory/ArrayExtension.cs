@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EasyTool.Extension
+namespace EasyTool.CollectionsCategory
 {
     /// <summary>
     /// 数组扩展方法

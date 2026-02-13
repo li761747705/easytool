@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace EasyTool
+namespace EasyTool.IOCategory
 {
     /// <summary>
     /// 文件跟随工具类
