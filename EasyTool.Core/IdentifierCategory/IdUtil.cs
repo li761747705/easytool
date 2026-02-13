@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-namespace EasyTool.DataCategory
+namespace EasyTool.IdentifierCategory
 {
     /// <summary>
     /// uuid生成风格

@@ -13,8 +13,9 @@ namespace EasyTool.ConvertCategory
         #region 单字节转换
 
         /// <summary>
-        /// 将字节转换为16进制字符串
+        /// 将字节转换为16进制字符串（已移除，使用 CodeCategory/HexUtil.ToHex）
         /// </summary>
+        [Obsolete("请使用 CodeCategory.HexUtil.ToHex 方法", true)]
         public static string ToHex(this byte value)
         {
             return value.ToString("X2");
@@ -23,6 +24,7 @@ namespace EasyTool.ConvertCategory
         /// <summary>
         /// 将字节转换为16进制字符串（小写）
         /// </summary>
+        [Obsolete("请使用 CodeCategory.HexUtil.ToHexLower 方法", true)]
         public static string ToHexLower(this byte value)
         {
             return value.ToString("x2");

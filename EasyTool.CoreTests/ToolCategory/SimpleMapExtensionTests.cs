@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EasyTool.DataCategory;
+using EasyTool.ToolCategory;
 
 using System;
 using System.Collections.Generic;
