@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace EasyTool.ToolCategory
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// StringBuilder 扩展方法

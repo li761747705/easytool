@@ -1,6 +1,6 @@
 using System;
 
-namespace EasyTool.ConvertCategory
+namespace EasyTool.MathCategory
 {
     /// <summary>
     /// 数字类型扩展方法

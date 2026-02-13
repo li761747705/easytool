@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using EasyTool.ConvertCategory;
+using EasyTool.MathCategory;
 
 namespace EasyTool.IOCategory
 {
