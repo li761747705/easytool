@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EasyTool.SecurityCategory
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// 信息脱敏工具类

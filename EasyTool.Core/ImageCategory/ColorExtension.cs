@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 
-namespace EasyTool.ConvertCategory
+namespace EasyTool.ImageCategory
 {
     /// <summary>
     /// Color 颜色扩展方法
