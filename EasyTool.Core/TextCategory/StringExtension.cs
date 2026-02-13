@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EasyTool.ToolCategory
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// 字符串扩展方法

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.CodeCategory
 {
     /// <summary>
     /// hash算法工具类

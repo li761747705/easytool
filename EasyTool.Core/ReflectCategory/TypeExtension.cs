@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace EasyTool.ToolCategory
+namespace EasyTool.ReflectCategory
 {
     /// <summary>
     /// Type 类型扩展方法
