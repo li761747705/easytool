@@ -42,8 +42,10 @@ namespace EasyTool
 
         /// <summary>
         /// 创建一个新的 Stopwatch 并启动计时。
+        /// [Obsolete("请直接使用 Stopwatch.StartNew()")]
         /// </summary>
         /// <returns>一个新的 Stopwatch。</returns>
+        [Obsolete("请直接使用 Stopwatch.StartNew()", false)]
         public static Stopwatch StartNew()
         {
             Stopwatch stopwatch = new Stopwatch();
@@ -100,8 +102,10 @@ namespace EasyTool
 
         /// <summary>
         /// 等待指定的时间
+        /// [Obsolete("请直接使用 Thread.Sleep(milliseconds)")]
         /// </summary>
         /// <param name="milliseconds">要等待的毫秒数。</param>
+        [Obsolete("请直接使用 Thread.Sleep(milliseconds)", false)]
         public static void Wait(int milliseconds)
         {
             System.Threading.Thread.Sleep(milliseconds);

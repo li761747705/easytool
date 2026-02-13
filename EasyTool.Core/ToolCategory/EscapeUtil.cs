@@ -94,9 +94,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将URL中的特殊字符进行转义
+        /// [Obsolete("请直接使用 Uri.EscapeDataString(url)")]
         /// </summary>
         /// <param name="url">需要转义的URL</param>
         /// <returns>转义后的URL</returns>
+        [Obsolete("请直接使用 Uri.EscapeDataString(url)", false)]
         public static string UrlEncode(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -109,9 +111,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将URL中的转义字符还原成特殊字符
+        /// [Obsolete("请直接使用 Uri.UnescapeDataString(url)")]
         /// </summary>
         /// <param name="url">需要还原的URL</param>
         /// <returns>还原后的URL</returns>
+        [Obsolete("请直接使用 Uri.UnescapeDataString(url)", false)]
         public static string UrlDecode(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -124,9 +128,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将HTML字符串进行转义，将特殊字符替换成HTML实体
+        /// [Obsolete("请直接使用 System.Net.WebUtility.HtmlEncode(html)")]
         /// </summary>
         /// <param name="html">需要转义的HTML字符串</param>
         /// <returns>转义后的HTML字符串</returns>
+        [Obsolete("请直接使用 System.Net.WebUtility.HtmlEncode(html)", false)]
         public static string HtmlEncode(string html)
         {
             if (string.IsNullOrEmpty(html))
@@ -139,9 +145,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将HTML字符串中的HTML实体还原成特殊字符
+        /// [Obsolete("请直接使用 System.Net.WebUtility.HtmlDecode(html)")]
         /// </summary>
         /// <param name="html">需要还原的HTML字符串</param>
         /// <returns>还原后的HTML字符串</returns>
+        [Obsolete("请直接使用 System.Net.WebUtility.HtmlDecode(html)", false)]
         public static string HtmlDecode(string html)
         {
             if (string.IsNullOrEmpty(html))
@@ -154,9 +162,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将XML字符串进行转义，将特殊字符替换成XML实体
+        /// [Obsolete("请直接使用 System.Security.SecurityElement.Escape(xml)")]
         /// </summary>
         /// <param name="xml">需要转义的XML字符串</param>
         /// <returns>转义后的XML字符串</returns>
+        [Obsolete("请直接使用 System.Security.SecurityElement.Escape(xml)", false)]
         public static string XmlEncode(string xml)
         {
             if (string.IsNullOrEmpty(xml))

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -16,7 +16,7 @@ namespace EasyTool
         private readonly Timer timer; // 定时器，用于定期检查文件是否有新内容
 
         // 定义事件，用于通知外部监听器
-        public event EventHandler<string> NewLine;
+        public event EventHandler<string>? NewLine;
 
         // 构造函数，初始化文件路径、StreamReader 和定时器
         public Tailer(string filePath)
@@ -48,7 +48,7 @@ namespace EasyTool
                 return;
 
             // 逐行读取文件内容
-            string line;
+            string? line;
             while ((line = reader.ReadLine()) != null)
             {
                 // 如果有新行，触发 NewLine 事件

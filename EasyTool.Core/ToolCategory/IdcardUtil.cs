@@ -241,7 +241,7 @@ namespace EasyTool
         /// </summary>
         /// <param name="idcard">身份证号码</param>
         /// <returns>省份</returns>
-        public static string GetProvince(string idcard)
+        public static string? GetProvince(string? idcard)
         {
             if (string.IsNullOrEmpty(idcard))
             {
@@ -345,7 +345,7 @@ namespace EasyTool
         /// <param name="idcard">身份证号码</param>
         /// <param name="birthday">新的生日日期</param>
         /// <returns>新的身份证号码</returns>
-        public static string ReplaceBirthday(string idcard, DateTime birthday)
+        public static string? ReplaceBirthday(string? idcard, DateTime birthday)
         {
             if (string.IsNullOrEmpty(idcard))
             {

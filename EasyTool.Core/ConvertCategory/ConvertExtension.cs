@@ -5,9 +5,9 @@ using System.Text;
 namespace EasyTool.ConvertCategory
 {
     /// <summary>
-    /// 数据类型转化
+    /// 数据类型转化扩展
     /// </summary>
-    public static partial class Extension
+    public static class ConvertExtension
     {
 
         #region ==数据转换扩展==
@@ -205,9 +205,9 @@ namespace EasyTool.ConvertCategory
 
         /// <summary>
         /// 布尔值转换为整数1或者0
+        /// [Obsolete("请直接使用 Convert.ToInt32(b)")]
         /// </summary>
-        /// <param name="b"></param>
-        /// <returns></returns>
+        [Obsolete("请直接使用 Convert.ToInt32(b)", false)]
         public static int ToInt(this bool b)
         {
             return b ? 1 : 0;
@@ -270,9 +270,11 @@ namespace EasyTool.ConvertCategory
 
         /// <summary>
         /// 转换为Base64
+        /// [Obsolete("请直接使用 Convert.ToBase64String(bytes)")]
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
+        [Obsolete("请直接使用 Convert.ToBase64String(bytes)", false)]
         public static string ToBase64(this byte[] bytes)
         {
             if (bytes == null)
@@ -313,10 +315,11 @@ namespace EasyTool.ConvertCategory
 
         /// <summary>
         /// 字符串转Guid
+        /// [Obsolete("请直接使用 Guid.TryParse(guid, out var result) 或 new Guid(guid)")]
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-
+        [Obsolete("请直接使用 Guid.TryParse(guid, out var result)", false)]
         public static Guid? ToGuid(this string guid)
         {
             try

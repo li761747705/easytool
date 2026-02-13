@@ -13,9 +13,11 @@ namespace EasyTool
     {
         /// <summary>
         /// 判断类型是否是可空类型
+        /// [Obsolete("请直接使用 Nullable.GetUnderlyingType(typeof(T)) != null")]
         /// </summary>
         /// <typeparam name="T">要判断的类型</typeparam>
         /// <returns>是否是可空类型</returns>
+        [Obsolete("请直接使用 Nullable.GetUnderlyingType(typeof(T)) != null", false)]
         public static bool IsNullable<T>() where T : struct
         {
             return Nullable.GetUnderlyingType(typeof(T)) != null;
@@ -23,9 +25,11 @@ namespace EasyTool
 
         /// <summary>
         /// 判断类型是否是枚举类型
+        /// [Obsolete("请直接使用 typeof(T).IsEnum")]
         /// </summary>
         /// <typeparam name="T">要判断的类型</typeparam>
         /// <returns>是否是枚举类型</returns>
+        [Obsolete("请直接使用 typeof(T).IsEnum", false)]
         public static bool IsEnum<T>()
         {
             return typeof(T).IsEnum;
@@ -33,9 +37,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取泛型类型的参数类型
+        /// [Obsolete("请直接使用 typeof(T).GetGenericArguments()")]
         /// </summary>
         /// <typeparam name="T">要获取参数类型的泛型类型</typeparam>
         /// <returns>泛型类型的参数类型数组</returns>
+        [Obsolete("请直接使用 typeof(T).GetGenericArguments()", false)]
         public static Type[] GetGenericArguments<T>()
         {
             return typeof(T).GetGenericArguments();
@@ -43,9 +49,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有属性
+        /// [Obsolete("请直接使用 typeof(T).GetProperties()")]
         /// </summary>
         /// <typeparam name="T">要获取属性的类型</typeparam>
         /// <returns>属性数组</returns>
+        [Obsolete("请直接使用 typeof(T).GetProperties()", false)]
         public static PropertyInfo[] GetProperties<T>()
         {
             return typeof(T).GetProperties();
@@ -53,9 +61,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有字段
+        /// [Obsolete("请直接使用 typeof(T).GetFields()")]
         /// </summary>
         /// <typeparam name="T">要获取字段的类型</typeparam>
         /// <returns>字段数组</returns>
+        [Obsolete("请直接使用 typeof(T).GetFields()", false)]
         public static FieldInfo[] GetFields<T>()
         {
             return typeof(T).GetFields();
@@ -63,9 +73,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有方法
+        /// [Obsolete("请直接使用 typeof(T).GetMethods()")]
         /// </summary>
         /// <typeparam name="T">要获取方法的类型</typeparam>
         /// <returns>方法数组</returns>
+        [Obsolete("请直接使用 typeof(T).GetMethods()", false)]
         public static MethodInfo[] GetMethods<T>()
         {
             return typeof(T).GetMethods();
@@ -73,9 +85,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有事件
+        /// [Obsolete("请直接使用 typeof(T).GetEvents()")]
         /// </summary>
         /// <typeparam name="T">要获取事件的类型</typeparam>
         /// <returns>事件数组</returns>
+        [Obsolete("请直接使用 typeof(T).GetEvents()", false)]
         public static EventInfo[] GetEvents<T>()
         {
             return typeof(T).GetEvents();
@@ -83,9 +97,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有属性、字段、方法和事件
+        /// [Obsolete("请直接使用 typeof(T).GetMembers()")]
         /// </summary>
         /// <typeparam name="T">要获取成员的类型</typeparam>
         /// <returns>成员数组</returns>
+        [Obsolete("请直接使用 typeof(T).GetMembers()", false)]
         public static MemberInfo[] GetMembers<T>()
         {
             return typeof(T).GetMembers();
@@ -93,9 +109,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有构造函数
+        /// [Obsolete("请直接使用 typeof(T).GetConstructors()")]
         /// </summary>
         /// <typeparam name="T">要获取构造函数的类型</typeparam>
         /// <returns>构造函数数组</returns>
+        [Obsolete("请直接使用 typeof(T).GetConstructors()", false)]
         public static ConstructorInfo[] GetConstructors<T>()
         {
             return typeof(T).GetConstructors();
@@ -114,10 +132,12 @@ namespace EasyTool
 
         /// <summary>
         /// 判断类型是否继承了指定的基类
+        /// [Obsolete("请直接使用 typeof(T).IsSubclassOf(typeof(TBase))")]
         /// </summary>
         /// <typeparam name="T">要判断的类型</typeparam>
         /// <typeparam name="TBase">要判断的基类类型</typeparam>
         /// <returns>是否继承了指定的基类</returns>
+        [Obsolete("请直接使用 typeof(T).IsSubclassOf(typeof(TBase))", false)]
         public static bool InheritsFrom<T, TBase>()
         {
             return typeof(T).IsSubclassOf(typeof(TBase));
@@ -125,9 +145,11 @@ namespace EasyTool
 
         /// <summary>
         /// 创建指定类型的实例
+        /// [Obsolete("请直接使用 (T)Activator.CreateInstance(typeof(T))")]
         /// </summary>
         /// <typeparam name="T">要创建实例的类型</typeparam>
         /// <returns>类型的实例</returns>
+        [Obsolete("请直接使用 (T)Activator.CreateInstance(typeof(T))", false)]
         public static T CreateInstance<T>()
         {
             return (T)Activator.CreateInstance(typeof(T));
@@ -135,10 +157,12 @@ namespace EasyTool
 
         /// <summary>
         /// 创建指定类型的实例
+        /// [Obsolete("请直接使用 (T)Activator.CreateInstance(typeof(T), args)")]
         /// </summary>
         /// <typeparam name="T">要创建实例的类型</typeparam>
         /// <param name="args">构造函数的参数</param>
         /// <returns>类型的实例</returns>
+        [Obsolete("请直接使用 (T)Activator.CreateInstance(typeof(T), args)", false)]
         public static T CreateInstance<T>(params object[] args)
         {
             return (T)Activator.CreateInstance(typeof(T), args);
@@ -161,10 +185,12 @@ namespace EasyTool
 
         /// <summary>
         /// 将字符串转换为指定类型的值
+        /// [Obsolete("请直接使用 (T)Convert.ChangeType(value, typeof(T))")]
         /// </summary>
         /// <typeparam name="T">要转换的类型</typeparam>
         /// <param name="value">要转换的字符串</param>
         /// <returns>转换后的值</returns>
+        [Obsolete("请直接使用 (T)Convert.ChangeType(value, typeof(T))", false)]
         public static T ConvertFromString<T>(string value)
         {
             return (T)Convert.ChangeType(value, typeof(T));
@@ -172,10 +198,12 @@ namespace EasyTool
 
         /// <summary>
         /// 将值转换为指定类型的字符串
+        /// [Obsolete("请直接使用 Convert.ToString(value)")]
         /// </summary>
         /// <typeparam name="T">要转换的类型</typeparam>
         /// <param name="value">要转换的值</param>
         /// <returns>转换后的字符串</returns>
+        [Obsolete("请直接使用 Convert.ToString(value)", false)]
         public static string ConvertToString<T>(T value)
         {
             return Convert.ToString(value);

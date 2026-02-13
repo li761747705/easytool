@@ -35,9 +35,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取环境变量值
+        /// [Obsolete("请直接使用 Environment.GetEnvironmentVariable(name)")]
         /// </summary>
         /// <param name="name">环境变量名称</param>
         /// <returns>环境变量值</returns>
+        [Obsolete("请直接使用 Environment.GetEnvironmentVariable(name)", false)]
         public static string GetEnvironmentVariable(string name)
         {
             return Environment.GetEnvironmentVariable(name);
@@ -45,9 +47,11 @@ namespace EasyTool
 
         /// <summary>
         /// 设置环境变量值
+        /// [Obsolete("请直接使用 Environment.SetEnvironmentVariable(name, value)")]
         /// </summary>
         /// <param name="name">环境变量名称</param>
         /// <param name="value">环境变量值</param>
+        [Obsolete("请直接使用 Environment.SetEnvironmentVariable(name, value)", false)]
         public static void SetEnvironmentVariable(string name, string value)
         {
             Environment.SetEnvironmentVariable(name, value);
@@ -127,8 +131,10 @@ namespace EasyTool
 
         /// <summary>
         /// 创建文件
+        /// [Obsolete("请直接使用 File.Create(path)")]
         /// </summary>
         /// <param name="path">文件路径</param>
+        [Obsolete("请直接使用 File.Create(path)", false)]
         public static void CreateFile(string path)
         {
             File.Create(path);
@@ -136,8 +142,10 @@ namespace EasyTool
 
         /// <summary>
         /// 删除文件
+        /// [Obsolete("请直接使用 File.Delete(path)")]
         /// </summary>
         /// <param name="path">文件路径</param>
+        [Obsolete("请直接使用 File.Delete(path)", false)]
         public static void DeleteFile(string path)
         {
             File.Delete(path);
@@ -145,8 +153,10 @@ namespace EasyTool
 
         /// <summary>
         /// 创建目录
+        /// [Obsolete("请直接使用 Directory.CreateDirectory(path)")]
         /// </summary>
         /// <param name="path">目录路径</param>
+        [Obsolete("请直接使用 Directory.CreateDirectory(path)", false)]
         public static void CreateDirectory(string path)
         {
             Directory.CreateDirectory(path);
@@ -154,8 +164,10 @@ namespace EasyTool
 
         /// <summary>
         /// 删除目录
+        /// [Obsolete("请直接使用 Directory.Delete(path, true)")]
         /// </summary>
         /// <param name="path">目录路径</param>
+        [Obsolete("请直接使用 Directory.Delete(path, true)", false)]
         public static void DeleteDirectory(string path)
         {
             Directory.Delete(path, true);
@@ -163,9 +175,11 @@ namespace EasyTool
 
         /// <summary>
         /// 检查目录是否存在
+        /// [Obsolete("请直接使用 Directory.Exists(path)")]
         /// </summary>
         /// <param name="path">目录路径</param>
         /// <returns>目录是否存在</returns>
+        [Obsolete("请直接使用 Directory.Exists(path)", false)]
         public static bool DirectoryExists(string path)
         {
             return Directory.Exists(path);
@@ -173,9 +187,11 @@ namespace EasyTool
 
         /// <summary>
         /// 检查文件是否存在
+        /// [Obsolete("请直接使用 File.Exists(path)")]
         /// </summary>
         /// <param name="path">文件路径</param>
         /// <returns>文件是否存在</returns>
+        [Obsolete("请直接使用 File.Exists(path)", false)]
         public static bool FileExists(string path)
         {
             return File.Exists(path);
@@ -216,10 +232,12 @@ namespace EasyTool
 
         /// <summary>
         /// 复制文件
+        /// [Obsolete("请直接使用 File.Copy(sourcePath, destinationPath, overwrite)")]
         /// </summary>
         /// <param name="sourcePath">源文件路径</param>
         /// <param name="destinationPath">目标文件路径</param>
         /// <param name="overwrite">是否覆盖已有文件</param>
+        [Obsolete("请直接使用 File.Copy(sourcePath, destinationPath, overwrite)", false)]
         public static void CopyFile(string sourcePath, string destinationPath, bool overwrite)
         {
             File.Copy(sourcePath, destinationPath, overwrite);
@@ -227,9 +245,11 @@ namespace EasyTool
 
         /// <summary>
         /// 移动文件
+        /// [Obsolete("请直接使用 File.Move(sourcePath, destinationPath)")]
         /// </summary>
         /// <param name="sourcePath">源文件路径</param>
         /// <param name="destinationPath">目标文件路径</param>
+        [Obsolete("请直接使用 File.Move(sourcePath, destinationPath)", false)]
         public static void MoveFile(string sourcePath, string destinationPath)
         {
             File.Move(sourcePath, destinationPath);

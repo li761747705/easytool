@@ -140,9 +140,11 @@ namespace EasyTool
 
         /// <summary>
         /// 从URL中提取域名。
+        /// [Obsolete("请直接使用 new Uri(url).Host")]
         /// </summary>
         /// <param name="url">要提取域名的URL。</param>
         /// <returns>URL中的域名。</returns>
+        [Obsolete("请直接使用 new Uri(url).Host", false)]
         public static string ExtractDomain(string url)
         {
             var uri = new Uri(url);
@@ -151,9 +153,11 @@ namespace EasyTool
 
         /// <summary>
         /// 从URL中提取路径。
+        /// [Obsolete("请直接使用 new Uri(url).AbsolutePath")]
         /// </summary>
         /// <param name="url">要提取路径的URL。</param>
         /// <returns>URL中的路径。</returns>
+        [Obsolete("请直接使用 new Uri(url).AbsolutePath", false)]
         public static string ExtractPath(string url)
         {
             var uri = new Uri(url);
@@ -173,9 +177,11 @@ namespace EasyTool
 
         /// <summary>
         /// 从URL中提取查询字符串。
+        /// [Obsolete("请直接使用 new Uri(url).Query")]
         /// </summary>
         /// <param name="url">要提取查询字符串的URL。</param>
         /// <returns>URL中的查询字符串。</returns>
+        [Obsolete("请直接使用 new Uri(url).Query", false)]
         public static string ExtractQueryString(string url)
         {
             var uri = new Uri(url);
@@ -184,9 +190,11 @@ namespace EasyTool
 
         /// <summary>
         /// 从URL中提取片段。
+        /// [Obsolete("请直接使用 new Uri(url).Fragment")]
         /// </summary>
         /// <param name="url">要提取片段的URL。</param>
         /// <returns>URL中的片段。</returns>
+        [Obsolete("请直接使用 new Uri(url).Fragment", false)]
         public static string ExtractFragment(string url)
         {
             var uri = new Uri(url);

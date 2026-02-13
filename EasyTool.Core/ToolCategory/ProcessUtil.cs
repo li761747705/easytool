@@ -29,9 +29,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取进程的所有线程
+        /// [Obsolete("请直接使用 process.Threads")]
         /// </summary>
         /// <param name="process">进程</param>
         /// <returns>线程集合</returns>
+        [Obsolete("请直接使用 process.Threads", false)]
         public static ProcessThreadCollection GetProcessThreads(Process process)
         {
             return process.Threads;
@@ -39,9 +41,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取进程的主窗口句柄
+        /// [Obsolete("请直接使用 process.MainWindowHandle")]
         /// </summary>
         /// <param name="process">进程</param>
         /// <returns>窗口句柄</returns>
+        [Obsolete("请直接使用 process.MainWindowHandle", false)]
         public static IntPtr GetMainWindowHandle(Process process)
         {
             return process.MainWindowHandle;
@@ -49,9 +53,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取进程的主窗口标题
+        /// [Obsolete("请直接使用 process.MainWindowTitle")]
         /// </summary>
         /// <param name="process">进程</param>
         /// <returns>窗口标题</returns>
+        [Obsolete("请直接使用 process.MainWindowTitle", false)]
         public static string GetMainWindowTitle(Process process)
         {
             return process.MainWindowTitle;
@@ -59,9 +65,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取进程的所有模块
+        /// [Obsolete("请直接使用 process.Modules")]
         /// </summary>
         /// <param name="process">进程</param>
         /// <returns>模块集合</returns>
+        [Obsolete("请直接使用 process.Modules", false)]
         public static ProcessModuleCollection GetProcessModules(Process process)
         {
             return process.Modules;
@@ -69,8 +77,10 @@ namespace EasyTool
 
         /// <summary>
         /// 关闭进程
+        /// [Obsolete("请直接使用 process.Kill()")]
         /// </summary>
         /// <param name="process">进程</param>
+        [Obsolete("请直接使用 process.Kill()", false)]
         public static void KillProcess(Process process)
         {
             process.Kill();
@@ -88,9 +98,11 @@ namespace EasyTool
 
         /// <summary>
         /// 启动新进程
+        /// [Obsolete("请直接使用 Process.Start(fileName)")]
         /// </summary>
         /// <param name="fileName">文件名</param>
         /// <returns>新进程</returns>
+        [Obsolete("请直接使用 Process.Start(fileName)", false)]
         public static Process StartProcess(string fileName)
         {
             return Process.Start(fileName);
@@ -118,9 +130,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取进程使用的内存大小
+        /// [Obsolete("请直接使用 process.WorkingSet64")]
         /// </summary>
         /// <param name="process">进程</param>
         /// <returns>内存大小（字节）</returns>
+        [Obsolete("请直接使用 process.WorkingSet64", false)]
         public static long GetProcessMemorySize(Process process)
         {
             return process.WorkingSet64;

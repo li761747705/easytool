@@ -13,11 +13,11 @@ namespace EasyTool
         private readonly FileSystemWatcher watcher;
 
         // 定义事件，用于通知外部监听器
-        public event EventHandler<FileEventArgs> FileChanged;
-        public event EventHandler<FileEventArgs> FileCreated;
-        public event EventHandler<FileEventArgs> FileDeleted;
-        public event EventHandler<FileEventArgs> FileMissing;
-        public event EventHandler<FileEventArgs> FileError;
+        public event EventHandler<FileEventArgs>? FileChanged;
+        public event EventHandler<FileEventArgs>? FileCreated;
+        public event EventHandler<FileEventArgs>? FileDeleted;
+        public event EventHandler<FileEventArgs>? FileMissing;
+        public event EventHandler<FileEventArgs>? FileError;
 
         /// <summary>
         /// 构造函数，初始化 FileSystemWatcher 实例
@@ -109,7 +109,7 @@ namespace EasyTool
         {
             if (FileError != null)
             {
-                FileError(this, new FileEventArgs(e.GetException()));
+                FileError(this, new FileEventArgs(e.GetException()!));
             }
         }
 

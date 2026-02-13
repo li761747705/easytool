@@ -16,8 +16,10 @@ namespace EasyTool
     {
         /// <summary>
         /// 获取当前运行的 .NET 版本
+        /// [Obsolete("请直接使用 Environment.Version.ToString()")]
         /// </summary>
         /// <returns>.NET 版本</returns>
+        [Obsolete("请直接使用 Environment.Version.ToString()", false)]
         public static string GetDotNetVersion()
         {
             return Environment.Version.ToString();
@@ -25,8 +27,10 @@ namespace EasyTool
 
         /// <summary>
         /// 获取当前操作系统版本
+        /// [Obsolete("请直接使用 Environment.OSVersion.ToString()")]
         /// </summary>
         /// <returns>操作系统版本</returns>
+        [Obsolete("请直接使用 Environment.OSVersion.ToString()", false)]
         public static string GetOSVersion()
         {
             return Environment.OSVersion.ToString();

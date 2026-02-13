@@ -21,9 +21,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取数组的长度
+        /// [Obsolete("请直接使用 array?.Length ?? 0")]
         /// </summary>
         /// <param name="array">要获取长度的数组</param>
         /// <returns>返回数组的长度</returns>
+        [Obsolete("请直接使用 array?.Length ?? 0", false)]
         public static int Length(Array array)
         {
             if (array == null)
@@ -36,9 +38,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取数组中的最大值
+        /// [Obsolete("请直接使用 array.Max() (LINQ)")]
         /// </summary>
         /// <param name="array">要获取最大值的数组</param>
         /// <returns>返回数组中的最大值</returns>
+        [Obsolete("请直接使用 array.Max() (LINQ)", false)]
         public static T Max<T>(T[] array) where T : IComparable<T>
         {
             if (IsEmpty(array))
@@ -60,9 +64,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取数组中的最小值
+        /// [Obsolete("请直接使用 array.Min() (LINQ)")]
         /// </summary>
         /// <param name="array">要获取最小值的数组</param>
         /// <returns>返回数组中的最小值</returns>
+        [Obsolete("请直接使用 array.Min() (LINQ)", false)]
         public static T Min<T>(T[] array) where T : IComparable<T>
         {
             if (IsEmpty(array))
@@ -83,9 +89,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取数组中的和
+        /// [Obsolete("请直接使用 array.Sum() (LINQ)")]
         /// </summary>
         /// <param name="array">要获取和的数组</param>
         /// <returns>返回数组的和</returns>
+        [Obsolete("请直接使用 array.Sum() (LINQ)", false)]
         public static int Sum(int[] array)
         {
             if (IsEmpty(array))
@@ -104,9 +112,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取数组的平均值
+        /// [Obsolete("请直接使用 array.Average() (LINQ)")]
         /// </summary>
         /// <param name="array">要获取平均值的数组</param>
         /// <returns>返回数组的平均值</returns>
+        [Obsolete("请直接使用 array.Average() (LINQ)", false)]
         public static double Average(int[] array)
         {
             if (IsEmpty(array))
@@ -160,10 +170,12 @@ namespace EasyTool
 
         /// <summary>
         /// 判断数组是否包含某个元素
+        /// [Obsolete("请直接使用 array.Contains(item) (LINQ)")]
         /// </summary>
         /// <param name="array">要操作的数组</param>
         /// <param name="item">要判断的元素</param>
         /// <returns>如果数组中包含该元素，则返回 true；否则返回 false</returns>
+        [Obsolete("请直接使用 array.Contains(item) (LINQ)", false)]
         public static bool Contains<T>(T[] array, T item)
         {
             if (IsEmpty(array))

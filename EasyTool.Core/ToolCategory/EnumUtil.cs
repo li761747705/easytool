@@ -15,9 +15,11 @@ namespace EasyTool
     {
         /// <summary>
         /// 获取指定枚举类型的所有成员名称
+        /// [Obsolete("请直接使用 Enum.GetNames(typeof(TEnum))")]
         /// </summary>
         /// <typeparam name="TEnum">要获取成员名称的枚举类型</typeparam>
         /// <returns>所有成员名称的字符串数组</returns>
+        [Obsolete("请直接使用 Enum.GetNames(typeof(TEnum))", false)]
         public static string[] GetNames<TEnum>()
         {
             return Enum.GetNames(typeof(TEnum));
@@ -25,9 +27,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定枚举类型的所有成员的值
+        /// [Obsolete("请直接使用 (TEnum[])Enum.GetValues(typeof(TEnum))")]
         /// </summary>
         /// <typeparam name="TEnum">要获取成员值的枚举类型</typeparam>
         /// <returns>所有成员值的数组</returns>
+        [Obsolete("请直接使用 (TEnum[])Enum.GetValues(typeof(TEnum))", false)]
         public static TEnum[] GetValues<TEnum>()
         {
             return (TEnum[])Enum.GetValues(typeof(TEnum));
@@ -35,10 +39,12 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定枚举值的名称
+        /// [Obsolete("请直接使用 Enum.GetName(typeof(TEnum), value)")]
         /// </summary>
         /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">枚举值</param>
         /// <returns>枚举值的名称</returns>
+        [Obsolete("请直接使用 Enum.GetName(typeof(TEnum), value)", false)]
         public static string GetName<TEnum>(TEnum value)
         {
             return Enum.GetName(typeof(TEnum), value);
@@ -46,10 +52,12 @@ namespace EasyTool
 
         /// <summary>
         /// 检查指定的值是否是枚举类型TEnum的成员
+        /// [Obsolete("请直接使用 Enum.IsDefined(typeof(TEnum), value)")]
         /// </summary>
         /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">要检查的值</param>
         /// <returns>如果指定的值是TEnum的成员，则为true；否则为false</returns>
+        [Obsolete("请直接使用 Enum.IsDefined(typeof(TEnum), value)", false)]
         public static bool IsDefined<TEnum>(object value)
         {
             return Enum.IsDefined(typeof(TEnum), value);
@@ -57,10 +65,12 @@ namespace EasyTool
 
         /// <summary>
         /// 将字符串转换为枚举类型TEnum的值
+        /// [Obsolete("请直接使用 (TEnum)Enum.Parse(typeof(TEnum), value)")]
         /// </summary>
         /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">要转换的字符串</param>
         /// <returns>与字符串对应的枚举值</returns>
+        [Obsolete("请直接使用 (TEnum)Enum.Parse(typeof(TEnum), value)", false)]
         public static TEnum Parse<TEnum>(string value)
         {
             return (TEnum)Enum.Parse(typeof(TEnum), value);
@@ -81,9 +91,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定枚举类型的Type对象
+        /// [Obsolete("请直接使用 typeof(TEnum)")]
         /// </summary>
         /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <returns>枚举类型的Type对象</returns>
+        [Obsolete("请直接使用 typeof(TEnum)", false)]
         public static Type GetEnumType<TEnum>()
         {
             return typeof(TEnum);
@@ -193,10 +205,12 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定枚举类型的指定值的名称
+        /// [Obsolete("请直接使用 Enum.GetName(typeof(TEnum), value)")]
         /// </summary>
         /// <typeparam name="TEnum">枚举类型</typeparam>
         /// <param name="value">枚举值</param>
         /// <returns>与值对应的名称，如果值不存在，则返回null</returns>
+        [Obsolete("请直接使用 Enum.GetName(typeof(TEnum), value)", false)]
         public static string? GetNameByValue<TEnum>(TEnum value)
         {
             return Enum.GetName(typeof(TEnum), value!);

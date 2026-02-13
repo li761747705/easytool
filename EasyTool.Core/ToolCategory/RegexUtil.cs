@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,10 +13,12 @@ namespace EasyTool
     {
         /// <summary>
         /// 验证字符串是否与指定的正则表达式匹配
+        /// [Obsolete("请直接使用 Regex.IsMatch(input, pattern)")]
         /// </summary>
         /// <param name="input">要验证的字符串</param>
         /// <param name="pattern">正则表达式</param>
         /// <returns>如果字符串与正则表达式匹配，则为true；否则为false</returns>
+        [Obsolete("请直接使用 Regex.IsMatch(input, pattern)", false)]
         public static bool IsMatch(string input, string pattern)
         {
             return Regex.IsMatch(input, pattern);
@@ -28,7 +30,7 @@ namespace EasyTool
         /// <param name="input">要验证的字符串</param>
         /// <param name="pattern">正则表达式</param>
         /// <returns>如果字符串与正则表达式匹配，则为匹配结果；否则为null</returns>
-        public static string Match(string input, string pattern)
+        public static string? Match(string input, string pattern)
         {
             Match match = Regex.Match(input, pattern);
             return match.Success ? match.Value : null;
@@ -47,11 +49,13 @@ namespace EasyTool
 
         /// <summary>
         /// 使用指定的替换字符串替换输入字符串中与指定正则表达式匹配的所有子字符串
+        /// [Obsolete("请直接使用 Regex.Replace(input, pattern, replacement)")]
         /// </summary>
         /// <param name="input">要替换的字符串</param>
         /// <param name="pattern">正则表达式</param>
         /// <param name="replacement">替换字符串</param>
         /// <returns>替换后的字符串</returns>
+        [Obsolete("请直接使用 Regex.Replace(input, pattern, replacement)", false)]
         public static string Replace(string input, string pattern, string replacement)
         {
             return Regex.Replace(input, pattern, replacement);
@@ -65,7 +69,7 @@ namespace EasyTool
         /// <param name="replacement">替换字符串</param>
         /// <param name="count">替换次数</param>
         /// <returns>包含替换后的字符串和替换次数的元组</returns>
-        public static (string, int) Replace(string input, string pattern, string replacement, int count)
+        public static (string?, int) Replace(string input, string pattern, string replacement, int count)
         {
             string result = Regex.Replace(input, pattern, replacement, RegexOptions.None, TimeSpan.FromSeconds(1));
             return (result, Regex.Matches(input, pattern).Count);
@@ -77,7 +81,7 @@ namespace EasyTool
         /// <param name="input">要验证的字符串</param>
         /// <param name="pattern">正则表达式</param>
         /// <returns>所有分组匹配结果的字符串数组</returns>
-        public static string[] MatchGroups(string input, string pattern)
+        public static string[]? MatchGroups(string input, string pattern)
         {
             Match match = Regex.Match(input, pattern);
             if (match.Success)
@@ -96,7 +100,7 @@ namespace EasyTool
         /// <param name="input">要验证的字符串</param>
         /// <param name="pattern">正则表达式</param>
         /// <returns>所有分组匹配结果及分组名称的字典</returns>
-        public static Dictionary<string, string> MatchGroupsWithNames(string input, string pattern)
+        public static Dictionary<string, string>? MatchGroupsWithNames(string input, string pattern)
         {
             Match match = Regex.Match(input, pattern);
             if (match.Success)
@@ -115,7 +119,7 @@ namespace EasyTool
         /// <param name="input">要验证的字符串</param>
         /// <param name="pattern">正则表达式</param>
         /// <returns>匹配结果和捕获组名称的字典</returns>
-        public static Dictionary<string, string> MatchWithGroupNames(string input, string pattern)
+        public static Dictionary<string, string>? MatchWithGroupNames(string input, string pattern)
         {
             Match match = Regex.Match(input, pattern);
             if (match.Success)
@@ -134,7 +138,7 @@ namespace EasyTool
         /// <param name="input">要验证的字符串</param>
         /// <param name="pattern">正则表达式</param>
         /// <returns>所有分组匹配结果及分组名称的元组</returns>
-        public static (string, Dictionary<string, string>) MatchGroupsWithNamesTuple(string input, string pattern)
+        public static (string?, Dictionary<string, string>?) MatchGroupsWithNamesTuple(string input, string pattern)
         {
             Match match = Regex.Match(input, pattern);
             if (match.Success)

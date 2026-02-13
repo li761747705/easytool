@@ -13,7 +13,7 @@ namespace EasyTool.Extension
     public static class HttpClientExtension
     {
         private const string NetErrorMessage = "网络异常";
-
+        
         #region 标准的Http请求扩展
 
         /// <summary>

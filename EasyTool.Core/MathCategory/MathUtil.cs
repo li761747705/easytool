@@ -124,10 +124,12 @@ namespace EasyTool
 
         /// <summary>
         /// 求两个浮点数的平均值
+        /// [Obsolete("请直接使用 (a + b) / 2")]
         /// </summary>
         /// <param name="a">第一个浮点数</param>
         /// <param name="b">第二个浮点数</param>
         /// <returns>两个浮点数的平均值</returns>
+        [Obsolete("请直接使用 (a + b) / 2", false)]
         public static double Average(double a, double b)
         {
             return (a + b) / 2;

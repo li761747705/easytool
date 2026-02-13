@@ -152,14 +152,27 @@ namespace EasyTool.Web.Development
                 foreach (var propertyType in propertyTypes)
                 {
                     var property = new DtoProperty(propertyType.PropertyType, propertyType.Name);
-                    property.Title = propertyType.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? "";
-                    property.IsInverseProperty = propertyType.GetCustomAttribute<InversePropertyAttribute>() != null;
 
+                    // 优先使用 DisplayAttribute 或 DescriptionAttribute，然后是 DisplayNameAttribute
+                    property.Title = propertyType.GetCustomAttribute<DisplayAttribute>()?.GetName()
+                                  ?? propertyType.GetCustomAttribute<DescriptionAttribute>()?.Description
+                                  ?? propertyType.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName
+                                  ?? "";
+
+                    property.IsInverseProperty = propertyType.GetCustomAttribute<InversePropertyAttribute>() != null;
                     property.IsKey = propertyType.GetCustomAttribute<KeyAttribute>() != null;
                     property.IsRequired = propertyType.GetCustomAttribute<RequiredAttribute>() != null;
                     property.StringLength = propertyType.GetCustomAttribute<StringLengthAttribute>()?.MaximumLength ?? 0;
-                    dto.Propertys.Add(property);
 
+                    // 支持更多 .NET 约定特性
+                    property.IsEditable = propertyType.GetCustomAttribute<System.ComponentModel.ReadOnlyAttribute>() == null;
+                    property.DataType = GetDataType(propertyType.GetCustomAttribute<DataTypeAttribute>());
+                    property.RegularExpression = propertyType.GetCustomAttribute<RegularExpressionAttribute>()?.Pattern;
+                    property.RangeMinimum = propertyType.GetCustomAttribute<RangeAttribute>()?.Minimum as double?;
+                    property.RangeMaximum = propertyType.GetCustomAttribute<RangeAttribute>()?.Maximum as double?;
+                    property.IsForeignKey = propertyType.GetCustomAttribute<ForeignKeyAttribute>() != null;
+
+                    dto.Propertys.Add(property);
                 }
 
                 dtos.Add(dto);
@@ -188,7 +201,9 @@ namespace EasyTool.Web.Development
 
         }
 
-        //TODO:需要改造成使用.net约定的属性
+        /// <summary>
+        /// DTO 属性信息，支持标准 .NET DataAnnotations 特性
+        /// </summary>
         public class DtoProperty
         {
             public DtoProperty(Type type, string name)
@@ -196,18 +211,79 @@ namespace EasyTool.Web.Development
                 Type = type;
                 Name = name;
             }
+
+            /// <summary>
+            /// 属性类型
+            /// </summary>
             public Type Type { get; set; }
+
+            /// <summary>
+            /// 属性名称
+            /// </summary>
             public string Name { get; set; }
 
-            public string Title { get; set; }//字段名称
+            /// <summary>
+            /// 显示名称（支持 DisplayAttribute、DescriptionAttribute、DisplayNameAttribute）
+            /// </summary>
+            public string Title { get; set; }
 
-            public bool IsInverseProperty { get; set; }//是否关联属性
+            /// <summary>
+            /// 是否关联属性（InversePropertyAttribute）
+            /// </summary>
+            public bool IsInverseProperty { get; set; }
 
-            public bool IsRequired { get; set; }//是否必填
+            /// <summary>
+            /// 是否必填（RequiredAttribute）
+            /// </summary>
+            public bool IsRequired { get; set; }
 
-            public int StringLength { get; set; }//字符串长度
+            /// <summary>
+            /// 字符串长度（StringLengthAttribute）
+            /// </summary>
+            public int StringLength { get; set; }
 
-            public bool IsKey { get; set; }//是否主键
+            /// <summary>
+            /// 是否主键（KeyAttribute）
+            /// </summary>
+            public bool IsKey { get; set; }
+
+            /// <summary>
+            /// 是否可编辑（EditableAttribute）
+            /// </summary>
+            public bool IsEditable { get; set; } = true;
+
+            /// <summary>
+            /// 数据类型（DataTypeAttribute）
+            /// </summary>
+            public string DataType { get; set; }
+
+            /// <summary>
+            /// 正则表达式验证（RegularExpressionAttribute）
+            /// </summary>
+            public string RegularExpression { get; set; }
+
+            /// <summary>
+            /// 范围最小值（RangeAttribute）
+            /// </summary>
+            public double? RangeMinimum { get; set; }
+
+            /// <summary>
+            /// 范围最大值（RangeAttribute）
+            /// </summary>
+            public double? RangeMaximum { get; set; }
+
+            /// <summary>
+            /// 是否外键（ForeignKeyAttribute）
+            /// </summary>
+            public bool IsForeignKey { get; set; }
+        }
+
+        /// <summary>
+        /// 获取 DataTypeAttribute 的数据类型名称
+        /// </summary>
+        private static string GetDataType(DataTypeAttribute attribute)
+        {
+            return attribute?.DataType.ToString() ?? string.Empty;
         }
  
     }

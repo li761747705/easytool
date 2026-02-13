@@ -304,9 +304,11 @@ namespace EasyTool
 
         /// <summary>
         /// 拷贝文件
+        /// [Obsolete("请直接使用 File.Copy(src, dest)")]
         /// </summary>
         /// <param name="src">源文件路径</param>
         /// <param name="destinationPath">目标文件路径</param>
+        [Obsolete("请直接使用 File.Copy(src, dest)", false)]
         public static void Cp(string src, string dest)
         {
             try
@@ -398,9 +400,11 @@ namespace EasyTool
 
         /// <summary>
         /// 移动文件或重命名文件
+        /// [Obsolete("请直接使用 File.Move(src, dest)")]
         /// </summary>
         /// <param name="src">源文件路径</param>
         /// <param name="dest">目标文件路径</param>
+        [Obsolete("请直接使用 File.Move(src, dest)", false)]
         public static void Mv(string src, string dest)
         {
             try
@@ -537,9 +541,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取绝对路径
+        /// [Obsolete("请直接使用 Path.GetFullPath(path)")]
         /// </summary>
         /// <param name="path">相对路径</param>
         /// <returns>绝对路径</returns>
+        [Obsolete("请直接使用 Path.GetFullPath(path)", false)]
         public static string GetAbsolutePath(string path)
         {
             if (!Path.IsPathRooted(path))
@@ -766,8 +772,10 @@ namespace EasyTool
 
         /// <summary>
         /// 删除文件
+        /// [Obsolete("请直接使用 File.Delete(path)")]
         /// </summary>
         /// <param name="path">文件路径</param>
+        [Obsolete("请直接使用 File.Delete(path)", false)]
         public static void Rm(string path)
         {
             try
@@ -782,8 +790,10 @@ namespace EasyTool
 
         /// <summary>
         /// 创建目录
+        /// [Obsolete("请直接使用 Directory.CreateDirectory(path)")]
         /// </summary>
         /// <param name="path">目录路径</param>
+        [Obsolete("请直接使用 Directory.CreateDirectory(path)", false)]
         public static void Mkdir(string path)
         {
             try
@@ -798,8 +808,10 @@ namespace EasyTool
 
         /// <summary>
         /// 删除目录
+        /// [Obsolete("请直接使用 Directory.Delete(path)")]
         /// </summary>
         /// <param name="path">目录路径</param>
+        [Obsolete("请直接使用 Directory.Delete(path)", false)]
         public static void Rmdir(string path)
         {
             try
@@ -815,9 +827,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取文件名
+        /// [Obsolete("请直接使用 file?.Name")]
         /// </summary>
         /// <param name="file">文件</param>
         /// <returns>文件名</returns>
+        [Obsolete("请直接使用 file?.Name", false)]
         public static string GetFileName(FileInfo file)
         {
             if (file == null)
@@ -1146,10 +1160,12 @@ namespace EasyTool
 
         /// <summary>
         /// 从文件中读取每一行数据
+        /// [Obsolete("请直接使用 File.ReadAllLines(path, encoding)")]
         /// </summary>
         /// <param name="path">文件路径</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns></returns>
+        [Obsolete("请直接使用 File.ReadAllLines(path, encoding)", false)]
         public static string[] ReadAllLines(string path, Encoding? encoding = null)
         {
             // 如果未指定编码格式，则默认为 UTF-8
@@ -1194,8 +1210,10 @@ namespace EasyTool
 
         /// <summary>
         /// 获取当前系统的换行分隔符
+        /// [Obsolete("请直接使用 Environment.NewLine")]
         /// </summary>
         /// <returns>换行分隔符</returns>
+        [Obsolete("请直接使用 Environment.NewLine", false)]
         public static string GetLineSeparator()
         {
             return Environment.NewLine;
@@ -1231,7 +1249,7 @@ namespace EasyTool
         /// <param name="path">文件路径</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>文件信息</returns>
-        public static FileInfo AppendString(string content, string path, Encoding encoding = null)
+        public static FileInfo AppendString(string content, string path, Encoding? encoding = null)
         {
             if (encoding == null)
             {
@@ -1251,7 +1269,7 @@ namespace EasyTool
         /// <param name="path">文件路径</param>
         /// <param name="encoding">编码格式，默认为UTF-8</param>
         /// <returns>文件信息</returns>
-        public static FileInfo WriteLines(List<string> list, string path, Encoding encoding = null)
+        public static FileInfo WriteLines(List<string> list, string path, Encoding? encoding = null)
         {
             if (encoding == null)
             {

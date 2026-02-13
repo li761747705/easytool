@@ -18,9 +18,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将给定的字节数组转换为 Base64 编码字符串。
+        /// [Obsolete("请直接使用 Convert.ToBase64String(bytes)")]
         /// </summary>
         /// <param name="bytes">要转换的字节数组</param>
         /// <returns>转换后的 Base64 编码字符串</returns>
+        [Obsolete("请直接使用 Convert.ToBase64String(bytes)", false)]
         public static string Encode(byte[] bytes)
         {
             if (bytes == null)
@@ -61,9 +63,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将给定的 Base64 编码字符串转换为字节数组。
+        /// [Obsolete("请直接使用 Convert.FromBase64String(str)")]
         /// </summary>
         /// <param name="str">要转换的 Base64 编码字符串</param>
         /// <returns>转换后的字节数组</returns>
+        [Obsolete("请直接使用 Convert.FromBase64String(str)", false)]
         public static byte[] Decode(string str)
         {
             if (string.IsNullOrEmpty(str))

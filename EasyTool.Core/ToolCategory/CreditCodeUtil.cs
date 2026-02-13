@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -89,20 +89,21 @@ namespace EasyTool
         /// </summary>
         /// <param name="creditCode">社会信用代码</param>
         /// <returns>组织机构代码</returns>
-        public static string GetOrgCodeFromCreditCode(string creditCode)
+        public static string? GetOrgCodeFromCreditCode(string? creditCode)
         {
             if (string.IsNullOrWhiteSpace(creditCode) || creditCode.Length != 18)
             {
                 return null;
             }
-                return creditCode.Substring(0, 9);
-            }
+            return creditCode.Substring(0, 9);
+        }
+
         /// <summary>
         /// 从社会信用代码中提取企业类型
         /// </summary>
         /// <param name="creditCode">社会信用代码</param>
         /// <returns>企业类型</returns>
-        public static string GetEntTypeFromCreditCode(string creditCode)
+        public static string? GetEntTypeFromCreditCode(string? creditCode)
         {
             if (string.IsNullOrWhiteSpace(creditCode) || creditCode.Length != 18)
             {
@@ -117,7 +118,7 @@ namespace EasyTool
         /// </summary>
         /// <param name="creditCode">社会信用代码</param>
         /// <returns>注册号</returns>
-        public static string GetRegNumFromCreditCode(string creditCode)
+        public static string? GetRegNumFromCreditCode(string? creditCode)
         {
             if (string.IsNullOrWhiteSpace(creditCode) || creditCode.Length != 18)
             {
@@ -132,7 +133,7 @@ namespace EasyTool
         /// </summary>
         /// <param name="creditCode">社会信用代码</param>
         /// <returns>行政区划码</returns>
-        public static string GetAreaCodeFromCreditCode(string creditCode)
+        public static string? GetAreaCodeFromCreditCode(string? creditCode)
         {
             if (string.IsNullOrWhiteSpace(creditCode) || creditCode.Length != 18)
             {
@@ -147,7 +148,7 @@ namespace EasyTool
         /// </summary>
         /// <param name="creditCode">社会信用代码</param>
         /// <returns>机构类型</returns>
-        public static string GetOrgTypeFromCreditCode(string creditCode)
+        public static string? GetOrgTypeFromCreditCode(string? creditCode)
         {
             if (string.IsNullOrWhiteSpace(creditCode) || creditCode.Length != 18)
             {

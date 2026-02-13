@@ -5,9 +5,12 @@ using System.Text;
 
 namespace EasyTool
 {
-    //TODO:疑问，这些功能Linq支持吗？
     /// <summary>
     /// 迭代器工具类
+    /// <para/>
+    /// 注意：此类中的方法与 System.Linq 提供的功能高度相似。
+    /// 对于新代码，建议优先使用 LINQ 标准查询运算符（如 Where、Select、Take、Skip、OrderBy、GroupBy 等）。
+    /// 此类保留用于向后兼容和特定场景需求。
     /// </summary>
     public static class IteratorUtil
     {
@@ -24,7 +27,9 @@ namespace EasyTool
 
         /// <summary>
         /// 过滤掉一个迭代器中不符合条件的元素
+        /// [Obsolete("请直接使用 source.Where(predicate) (LINQ)")]
         /// </summary>
+        [Obsolete("请直接使用 source.Where(predicate) (LINQ)", false)]
         public static IEnumerable<T> Filter<T>(this IEnumerable<T> source, Func<T, bool> predicate)
         {
             foreach (var item in source)
@@ -38,7 +43,9 @@ namespace EasyTool
 
         /// <summary>
         /// 对一个迭代器中的每个元素进行转换
+        /// [Obsolete("请直接使用 source.Select(selector) (LINQ)")]
         /// </summary>
+        [Obsolete("请直接使用 source.Select(selector) (LINQ)", false)]
         public static IEnumerable<TResult> Map<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
         {
             foreach (var item in source)
@@ -49,7 +56,9 @@ namespace EasyTool
 
         /// <summary>
         /// 从一个迭代器中取出前 n 个元素
+        /// [Obsolete("请直接使用 source.Take(count) (LINQ)")]
         /// </summary>
+        [Obsolete("请直接使用 source.Take(count) (LINQ)", false)]
         public static IEnumerable<T> Take<T>(this IEnumerable<T> source, int count)
         {
             foreach (var item in source)
@@ -67,7 +76,9 @@ namespace EasyTool
 
         /// <summary>
         /// 跳过一个迭代器中的前 n 个元素
+        /// [Obsolete("请直接使用 source.Skip(count) (LINQ)")]
         /// </summary>
+        [Obsolete("请直接使用 source.Skip(count) (LINQ)", false)]
         public static IEnumerable<T> Skip<T>(this IEnumerable<T> source, int count)
         {
             foreach (var item in source)
@@ -85,7 +96,9 @@ namespace EasyTool
 
         /// <summary>
         /// 将一个迭代器的元素分组
+        /// [Obsolete("请直接使用 source.GroupBy(keySelector, x => x) (LINQ)")]
         /// </summary>
+        [Obsolete("请直接使用 source.GroupBy(keySelector, x => x) (LINQ)", false)]
         public static IEnumerable<IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
         {
             return source.GroupBy(keySelector, x => x);
@@ -137,7 +150,9 @@ namespace EasyTool
 
         /// <summary>
         /// 对一个迭代器中的元素进行排序
+        /// [Obsolete("请直接使用 source.OrderBy(keySelector) (LINQ)")]
         /// </summary>
+        [Obsolete("请直接使用 source.OrderBy(keySelector) (LINQ)", false)]
         public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
         {
             return source.OrderBy(keySelector, Comparer<TKey>.Default);
@@ -161,7 +176,9 @@ namespace EasyTool
 
         /// <summary>
         /// 对一个迭代器中的元素进行倒序排序
+        /// [Obsolete("请直接使用 source.OrderByDescending(keySelector) (LINQ)")]
         /// </summary>
+        [Obsolete("请直接使用 source.OrderByDescending(keySelector) (LINQ)", false)]
         public static IOrderedEnumerable<TSource> OrderByDescending<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
         {
             return source.OrderByDescending(keySelector, Comparer<TKey>.Default);

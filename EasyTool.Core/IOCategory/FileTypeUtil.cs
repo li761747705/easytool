@@ -38,7 +38,7 @@ namespace EasyTool
                 header += buffer[i].ToString();
             }
 
-            string type = null;
+            string? type = null;
             switch (header)
             {
                 case "255216": // jpg

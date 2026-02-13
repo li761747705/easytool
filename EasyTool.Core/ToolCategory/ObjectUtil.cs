@@ -21,7 +21,9 @@ namespace EasyTool
 
         /// <summary>
         /// 检查对象是否为 null
+        /// [Obsolete("请直接使用 obj == null")]
         /// </summary>
+        [Obsolete("请直接使用 obj == null", false)]
         public static bool IsNull(object? obj)
         {
             return obj == null;
@@ -29,7 +31,9 @@ namespace EasyTool
 
         /// <summary>
         /// 检查对象是否不为 null
+        /// [Obsolete("请直接使用 obj != null")]
         /// </summary>
+        [Obsolete("请直接使用 obj != null", false)]
         public static bool IsNotNull(object? obj)
         {
             return obj != null;
@@ -86,7 +90,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取对象的类型名称
+        /// [Obsolete("请直接使用 obj.GetType().Name")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType().Name", false)]
         public static string GetTypeName(object obj)
         {
             return obj.GetType().Name;
@@ -107,27 +113,89 @@ namespace EasyTool
         {
             if (IsNull(obj))
             {
-                return null;
+                // 处理可空值类型的默认值
+                return GetDefault(targetType);
             }
 
-            if (targetType.IsAssignableFrom(obj.GetType()))
+            Type sourceType = obj.GetType();
+
+            // 如果目标类型可以从源类型赋值，直接返回
+            if (targetType.IsAssignableFrom(sourceType))
             {
                 return obj;
             }
 
-            if (obj is IConvertible)
+            // 使用 TypeConverter 进行转换
+            var converter = System.ComponentModel.TypeDescriptor.GetConverter(targetType);
+            if (converter != null && converter.CanConvertFrom(sourceType))
             {
-                return System.Convert.ChangeType(obj, targetType);
+                return converter.ConvertFrom(obj);
             }
 
-            // TODO: 支持自定义类型转换
+            // 尝试从源类型的 TypeConverter 转换
+            var sourceConverter = System.ComponentModel.TypeDescriptor.GetConverter(sourceType);
+            if (sourceConverter != null && sourceConverter.CanConvertTo(targetType))
+            {
+                return sourceConverter.ConvertTo(obj, targetType);
+            }
 
-            throw new InvalidCastException($"无法将类型为 {obj.GetType().Name} 的对象转换为类型为 {targetType.Name} 的对象");
+            // 使用 IConvertible 接口转换
+            if (obj is IConvertible)
+            {
+                try
+                {
+                    return System.Convert.ChangeType(obj, targetType);
+                }
+                catch (InvalidCastException)
+                {
+                    // 继续尝试其他转换方式
+                }
+            }
+
+            // 尝试使用隐式或显式转换操作符
+            try
+            {
+                // 查找源类型的隐式转换操作符
+                var implicitOp = sourceType.GetMethod("op_Implicit", new[] { sourceType });
+                if (implicitOp != null && implicitOp.ReturnType == targetType)
+                {
+                    return implicitOp.Invoke(null, new[] { obj });
+                }
+
+                // 查找源类型的显式转换操作符
+                var explicitOp = sourceType.GetMethod("op_Explicit", new[] { sourceType });
+                if (explicitOp != null && explicitOp.ReturnType == targetType)
+                {
+                    return explicitOp.Invoke(null, new[] { obj });
+                }
+
+                // 查找目标类型的隐式转换操作符
+                var targetImplicitOp = targetType.GetMethod("op_Implicit", new[] { sourceType });
+                if (targetImplicitOp != null && targetImplicitOp.ReturnType == targetType)
+                {
+                    return targetImplicitOp.Invoke(null, new[] { obj });
+                }
+
+                // 查找目标类型的显式转换操作符
+                var targetExplicitOp = targetType.GetMethod("op_Explicit", new[] { sourceType });
+                if (targetExplicitOp != null && targetExplicitOp.ReturnType == targetType)
+                {
+                    return targetExplicitOp.Invoke(null, new[] { obj });
+                }
+            }
+            catch (InvalidCastException)
+            {
+                // 转换操作符失败，继续抛出异常
+            }
+
+            throw new InvalidCastException($"无法将类型为 {sourceType.Name} 的对象转换为类型为 {targetType.Name} 的对象");
         }
 
         /// <summary>
         /// 获取对象的属性列表
+        /// [Obsolete("请直接使用 obj.GetType().GetProperties()")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType().GetProperties()", false)]
         public static IEnumerable<PropertyInfo> GetProperties(object obj)
         {
             return obj.GetType().GetProperties();
@@ -151,7 +219,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取对象的字段列表
+        /// [Obsolete("请直接使用 obj.GetType().GetFields()")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType().GetFields()", false)]
         public static IEnumerable<FieldInfo> GetFields(object obj)
         {
             return obj.GetType().GetFields();
@@ -175,7 +245,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取对象的方法列表
+        /// [Obsolete("请直接使用 obj.GetType().GetMethods()")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType().GetMethods()", false)]
         public static IEnumerable<MethodInfo> GetMethods(object obj)
         {
             return obj.GetType().GetMethods();
@@ -183,7 +255,9 @@ namespace EasyTool
 
         /// <summary>
         /// 判断对象是否实现了指定接口
+        /// [Obsolete("请直接使用 interfaceType.IsAssignableFrom(obj.GetType())")]
         /// </summary>
+        [Obsolete("请直接使用 interfaceType.IsAssignableFrom(obj.GetType())", false)]
         public static bool ImplementsInterface(object obj, Type interfaceType)
         {
             return interfaceType.IsAssignableFrom(obj.GetType());
@@ -191,7 +265,9 @@ namespace EasyTool
 
         /// <summary>
         /// 判断对象是否为指定类型的实例
+        /// [Obsolete("请直接使用 targetType.IsInstanceOfType(obj)")]
         /// </summary>
+        [Obsolete("请直接使用 targetType.IsInstanceOfType(obj)", false)]
         public static bool IsInstanceOfType(object obj, Type targetType)
         {
             return targetType.IsInstanceOfType(obj);
@@ -474,7 +550,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取对象的哈希码
+        /// [Obsolete("请直接使用 obj?.GetHashCode() ?? 0")]
         /// </summary>
+        [Obsolete("请直接使用 obj?.GetHashCode() ?? 0", false)]
         public static int GetHashCode(object obj)
         {
             if (IsNull(obj))
@@ -507,7 +585,9 @@ namespace EasyTool
 
         /// <summary>
         /// 判断对象是否为值类型
+        /// [Obsolete("请直接使用 obj?.GetType().IsValueType ?? false")]
         /// </summary>
+        [Obsolete("请直接使用 obj?.GetType().IsValueType ?? false", false)]
         public static bool IsValueType(object obj)
         {
             if (IsNull(obj))
@@ -668,7 +748,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定类型的 Type 对象
+        /// [Obsolete("请直接使用 Type.GetType(typeName)")]
         /// </summary>
+        [Obsolete("请直接使用 Type.GetType(typeName)", false)]
         public static Type GetType(string typeName)
         {
             return Type.GetType(typeName);
@@ -676,7 +758,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取对象的 Type 对象
+        /// [Obsolete("请直接使用 obj.GetType()")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType()", false)]
         public static Type GetType(object obj)
         {
             return obj.GetType();
@@ -684,7 +768,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有成员信息，包括字段、属性、方法和事件等
+        /// [Obsolete("请直接使用 type.GetMembers()")]
         /// </summary>
+        [Obsolete("请直接使用 type.GetMembers()", false)]
         public static MemberInfo[] GetMembers(Type type)
         {
             return type.GetMembers();
@@ -692,7 +778,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有属性信息
+        /// [Obsolete("请直接使用 type.GetProperties()")]
         /// </summary>
+        [Obsolete("请直接使用 type.GetProperties()", false)]
         public static PropertyInfo[] GetProperties(Type type)
         {
             return type.GetProperties();
@@ -700,7 +788,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有字段信息
+        /// [Obsolete("请直接使用 type.GetFields()")]
         /// </summary>
+        [Obsolete("请直接使用 type.GetFields()", false)]
         public static FieldInfo[] GetFields(Type type)
         {
             return type.GetFields();
@@ -708,7 +798,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定名称的属性信息
+        /// [Obsolete("请直接使用 type.GetProperty(propertyName)")]
         /// </summary>
+        [Obsolete("请直接使用 type.GetProperty(propertyName)", false)]
         public static PropertyInfo GetProperty(Type type, string propertyName)
         {
             return type.GetProperty(propertyName);
@@ -716,7 +808,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定名称的属性信息
+        /// [Obsolete("请直接使用 obj.GetType().GetProperty(propertyName)")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType().GetProperty(propertyName)", false)]
         public static PropertyInfo GetProperty(object obj, string propertyName)
         {
             return obj.GetType().GetProperty(propertyName);
@@ -724,7 +818,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定名称的字段信息
+        /// [Obsolete("请直接使用 type.GetField(fieldName)")]
         /// </summary>
+        [Obsolete("请直接使用 type.GetField(fieldName)", false)]
         public static FieldInfo GetField(Type type, string fieldName)
         {
             return type.GetField(fieldName);
@@ -732,7 +828,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定名称的字段信息
+        /// [Obsolete("请直接使用 obj.GetType().GetField(fieldName)")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType().GetField(fieldName)", false)]
         public static FieldInfo GetField(object obj, string fieldName)
         {
             return obj.GetType().GetField(fieldName);
@@ -740,7 +838,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定名称的方法信息
+        /// [Obsolete("请直接使用 type.GetMethod(methodName)")]
         /// </summary>
+        [Obsolete("请直接使用 type.GetMethod(methodName)", false)]
         public static MethodInfo GetMethod(Type type, string methodName)
         {
             return type.GetMethod(methodName);
@@ -748,7 +848,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定名称的方法信息
+        /// [Obsolete("请直接使用 obj.GetType().GetMethod(methodName)")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType().GetMethod(methodName)", false)]
         public static MethodInfo GetMethod(object obj, string methodName)
         {
             return obj.GetType().GetMethod(methodName);
@@ -756,7 +858,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定名称和参数类型的方法信息
+        /// [Obsolete("请直接使用 type.GetMethod(methodName, parameterTypes)")]
         /// </summary>
+        [Obsolete("请直接使用 type.GetMethod(methodName, parameterTypes)", false)]
         public static MethodInfo GetMethod(Type type, string methodName, Type[] parameterTypes)
         {
             return type.GetMethod(methodName, parameterTypes);
@@ -764,7 +868,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定名称和参数类型的方法信息
+        /// [Obsolete("请直接使用 obj.GetType().GetMethod(methodName, parameterTypes)")]
         /// </summary>
+        [Obsolete("请直接使用 obj.GetType().GetMethod(methodName, parameterTypes)", false)]
         public static MethodInfo GetMethod(object obj, string methodName, Type[] parameterTypes)
         {
             return obj.GetType().GetMethod(methodName, parameterTypes);
@@ -792,7 +898,9 @@ namespace EasyTool
 
         /// <summary>
         /// 创建指定类型的实例
+        /// [Obsolete("请直接使用 Activator.CreateInstance(type, constructorParameters)")]
         /// </summary>
+        [Obsolete("请直接使用 Activator.CreateInstance(type, constructorParameters)", false)]
         public static object CreateInstance(Type type, object[] constructorParameters)
         {
             return Activator.CreateInstance(type, constructorParameters);
@@ -801,7 +909,9 @@ namespace EasyTool
 
         /// <summary>
         /// 判断指定类型是否派生自指定的基类或接口
+        /// [Obsolete("请直接使用 type.IsSubclassOf(baseType)")]
         /// </summary>
+        [Obsolete("请直接使用 type.IsSubclassOf(baseType)", false)]
         public static bool IsSubclassOf(Type type, Type baseType)
         {
             return type.IsSubclassOf(baseType);
@@ -820,7 +930,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定类型实现的所有接口类型
+        /// [Obsolete("请直接使用 type.GetInterfaces()")]
         /// </summary>
+        [Obsolete("请直接使用 type.GetInterfaces()", false)]
         public static Type[] GetInterfaces(Type type)
         {
             return type.GetInterfaces();
@@ -828,7 +940,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定类型的程序集限定名
+        /// [Obsolete("请直接使用 type.AssemblyQualifiedName")]
         /// </summary>
+        [Obsolete("请直接使用 type.AssemblyQualifiedName", false)]
         public static string GetAssemblyQualifiedName(Type type)
         {
             return type.AssemblyQualifiedName;
@@ -852,7 +966,9 @@ namespace EasyTool
 
         /// <summary>
         /// 判断指定类型是否是可空类型
+        /// [Obsolete("请直接使用 Nullable.GetUnderlyingType(type) != null")]
         /// </summary>
+        [Obsolete("请直接使用 Nullable.GetUnderlyingType(type) != null", false)]
         public static bool IsNullable(Type type)
         {
             return Nullable.GetUnderlyingType(type) != null;
@@ -860,7 +976,9 @@ namespace EasyTool
 
         /// <summary>
         /// 获取可空类型的基础类型
+        /// [Obsolete("请直接使用 Nullable.GetUnderlyingType(type) ?? type")]
         /// </summary>
+        [Obsolete("请直接使用 Nullable.GetUnderlyingType(type) ?? type", false)]
         public static Type GetNullableType(Type type)
         {
             return Nullable.GetUnderlyingType(type) ?? type;
@@ -944,7 +1062,9 @@ namespace EasyTool
 
         /// <summary>
         /// 判断指定类型是否是枚举类型
+        /// [Obsolete("请直接使用 type.IsEnum")]
         /// </summary>
+        [Obsolete("请直接使用 type.IsEnum", false)]
         public static bool IsEnumType(Type type)
         {
             return type.IsEnum;

@@ -11,9 +11,11 @@ namespace EasyTool
     {
         /// <summary>
         /// 根据类型名称获取Type对象
+        /// [Obsolete("请直接使用 Type.GetType(typeName)")]
         /// </summary>
         /// <param name="typeName">类型名称</param>
         /// <returns>Type对象</returns>
+        [Obsolete("请直接使用 Type.GetType(typeName)", false)]
         public static Type GetType(string typeName)
         {
             return Type.GetType(typeName);
@@ -21,9 +23,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定程序集中的所有类型
+        /// [Obsolete("请直接使用 assembly.GetTypes()")]
         /// </summary>
         /// <param name="assembly">程序集</param>
         /// <returns>类型数组</returns>
+        [Obsolete("请直接使用 assembly.GetTypes()", false)]
         public static Type[] GetTypes(Assembly assembly)
         {
             return assembly.GetTypes();
@@ -31,9 +35,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定类型所在的程序集
+        /// [Obsolete("请直接使用 type.Assembly")]
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>程序集</returns>
+        [Obsolete("请直接使用 type.Assembly", false)]
         public static Assembly GetAssembly(Type type)
         {
             return type.Assembly;
@@ -41,10 +47,12 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定类型的指定类型的特性
+        /// [Obsolete("请直接使用 type.GetCustomAttribute<T>()")]
         /// </summary>
         /// <typeparam name="T">特性类型</typeparam>
         /// <param name="type">类型</param>
         /// <returns>特性对象</returns>
+        [Obsolete("请直接使用 type.GetCustomAttribute<T>()", false)]
         public static T GetAttribute<T>(Type type) where T : Attribute
         {
             return type.GetCustomAttribute<T>();
@@ -63,9 +71,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取指定类型的默认值
+        /// [Obsolete("请直接使用 type.IsValueType ? Activator.CreateInstance(type) : null")]
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>默认值</returns>
+        [Obsolete("请直接使用 type.IsValueType ? Activator.CreateInstance(type) : null", false)]
         public static object GetDefaultValue(Type type)
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
@@ -73,9 +83,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的基类
+        /// [Obsolete("请直接使用 type.BaseType")]
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>基类</returns>
+        [Obsolete("请直接使用 type.BaseType", false)]
         public static Type GetBaseType(Type type)
         {
             return type.BaseType;
@@ -83,10 +95,12 @@ namespace EasyTool
 
         /// <summary>
         /// 判断类型是否实现了某个接口
+        /// [Obsolete("请直接使用 interfaceType.IsAssignableFrom(type)")]
         /// </summary>
         /// <param name="type">类型</param>
         /// <param name="interfaceType">接口类型</param>
         /// <returns>是否实现</returns>
+        [Obsolete("请直接使用 interfaceType.IsAssignableFrom(type)", false)]
         public static bool HasInterface(Type type, Type interfaceType)
         {
             return interfaceType.IsAssignableFrom(type);
@@ -94,9 +108,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取方法的参数信息
+        /// [Obsolete("请直接使用 method.GetParameters()")]
         /// </summary>
         /// <param name="method">方法</param>
         /// <returns>参数信息数组</returns>
+        [Obsolete("请直接使用 method.GetParameters()", false)]
         public static ParameterInfo[] GetParameters(MethodInfo method)
         {
             return method.GetParameters();
@@ -154,9 +170,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类型的所有接口
+        /// [Obsolete("请直接使用 type.GetInterfaces()")]
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>接口数组</returns>
+        [Obsolete("请直接使用 type.GetInterfaces()", false)]
         public static Type[] GetInterfaces(Type type)
         {
             return type.GetInterfaces();

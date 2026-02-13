@@ -9,11 +9,13 @@ namespace EasyTool
     {
         /// <summary>
         /// 在列表中查找元素，并返回其索引。如果未找到，则返回 -1。
+        /// [Obsolete("请直接使用 list.IndexOf(item)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要查找的列表</param>
         /// <param name="item">要查找的元素</param>
         /// <returns>元素在列表中的索引，如果未找到则返回 -1</returns>
+        [Obsolete("请直接使用 list.IndexOf(item)", false)]
         public static int IndexOf<T>(List<T> list, T item)
         {
             return list.IndexOf(item);
@@ -21,10 +23,12 @@ namespace EasyTool
 
         /// <summary>
         /// 向列表中添加多个元素。
+        /// [Obsolete("请直接使用 list.AddRange(items)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要添加元素的列表</param>
         /// <param name="items">要添加到列表中的元素</param>
+        [Obsolete("请直接使用 list.AddRange(items)", false)]
         public static void AddRange<T>(List<T> list, IEnumerable<T> items)
         {
             list.AddRange(items);
@@ -32,10 +36,12 @@ namespace EasyTool
 
         /// <summary>
         /// 在列表中删除指定索引处的元素。
+        /// [Obsolete("请直接使用 list.RemoveAt(index)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要删除元素的列表</param>
         /// <param name="index">要删除元素的索引</param>
+        [Obsolete("请直接使用 list.RemoveAt(index)", false)]
         public static void RemoveAt<T>(List<T> list, int index)
         {
             list.RemoveAt(index);
@@ -43,11 +49,13 @@ namespace EasyTool
 
         /// <summary>
         /// 从列表中删除指定元素的第一个匹配项。
+        /// [Obsolete("请直接使用 list.Remove(item)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要删除元素的列表</param>
         /// <param name="item">要删除的元素</param>
         /// <returns>如果找到并成功删除元素，则返回 true；否则返回 false</returns>
+        [Obsolete("请直接使用 list.Remove(item)", false)]
         public static bool Remove<T>(List<T> list, T item)
         {
             return list.Remove(item);
@@ -77,10 +85,12 @@ namespace EasyTool
 
         /// <summary>
         /// 返回一个新的列表，其中包含指定列表中的元素，但不包括重复元素。
+        /// [Obsolete("请直接使用 list.Distinct().ToList() (LINQ)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要去重的列表</param>
         /// <returns>去重后的新列表</returns>
+        [Obsolete("请直接使用 list.Distinct().ToList() (LINQ)", false)]
         public static List<T> Distinct<T>(List<T> list)
         {
             return list.Distinct().ToList();
@@ -88,11 +98,13 @@ namespace EasyTool
 
         /// <summary>
         /// 根据指定的条件筛选出列表中符合条件的元素。
+        /// [Obsolete("请直接使用 list.Where(predicate).ToList() (LINQ)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要筛选的列表</param>
         /// <param name="predicate">筛选条件</param>
         /// <returns>符合条件的元素列表</returns>
+        [Obsolete("请直接使用 list.Where(predicate).ToList() (LINQ)", false)]
         public static List<T> Where<T>(List<T> list, Func<T, bool> predicate)
         {
             return list.Where(predicate).ToList();
@@ -100,12 +112,14 @@ namespace EasyTool
 
         /// <summary>
         /// 将列表中的每个元素应用到指定的转换函数，并返回转换后的新列表。
+        /// [Obsolete("请直接使用 list.Select(selector).ToList() (LINQ)")]
         /// </summary>
         /// <typeparam name="TSource">列表元素类型</typeparam>
         /// <typeparam name="TResult">转换后的元素类型</typeparam>
         /// <param name="list">要转换的列表</param>
         /// <param name="selector">转换函数</param>
         /// <returns>转换后的新列表</returns>
+        [Obsolete("请直接使用 list.Select(selector).ToList() (LINQ)", false)]
         public static List<TResult> Select<TSource, TResult>(List<TSource> list, Func<TSource, TResult> selector)
         {
             return list.Select(selector).ToList();
@@ -113,10 +127,12 @@ namespace EasyTool
 
         /// <summary>
         /// 对列表中的每个元素应用指定的操作。
+        /// [Obsolete("请直接使用 list.ForEach(action)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要应用操作的列表</param>
         /// <param name="action">要应用的操作</param>
+        [Obsolete("请直接使用 list.ForEach(action)", false)]
         public static void ForEach<T>(List<T> list, Action<T> action)
         {
             list.ForEach(action);
@@ -124,9 +140,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将列表中的元素排序。
+        /// [Obsolete("请直接使用 list.Sort()")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要排序的列表</param>
+        [Obsolete("请直接使用 list.Sort()", false)]
         public static void Sort<T>(List<T> list)
         {
             list.Sort();
@@ -134,10 +152,12 @@ namespace EasyTool
 
         /// <summary>
         /// 将列表中的元素按指定的比较器排序。
+        /// [Obsolete("请直接使用 list.Sort(comparer)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要排序的列表</param>
         /// <param name="comparer">比较器</param>
+        [Obsolete("请直接使用 list.Sort(comparer)", false)]
         public static void Sort<T>(List<T> list, IComparer<T> comparer)
         {
             list.Sort(comparer);
@@ -160,10 +180,12 @@ namespace EasyTool
 
         /// <summary>
         /// 向列表中批量添加元素。
+        /// [Obsolete("请直接使用 list.AddRange(items)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list">要添加元素的列表</param>
         /// <param name="items">要添加到列表中的元素</param>
+        [Obsolete("请直接使用 list.AddRange(items)", false)]
         public static void AddRange<T>(List<T> list, params T[] items)
         {
             list.AddRange(items);
@@ -194,7 +216,7 @@ namespace EasyTool
             {
                 for (int i = 0; i < list1.Count; i++)
                 {
-                    if (!list1[i].Equals(list2[i]))
+                    if (!EqualityComparer<T>.Default.Equals(list1[i], list2[i]))
                     {
                         return false;
                     }
@@ -206,11 +228,13 @@ namespace EasyTool
 
         /// <summary>
         /// 返回两个列表的交集。
+        /// [Obsolete("请直接使用 list1.Intersect(list2).ToList() (LINQ)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list1">要比较的第一个列表</param>
         /// <param name="list2">要比较的第二个列表</param>
         /// <returns>交集列表</returns>
+        [Obsolete("请直接使用 list1.Intersect(list2).ToList() (LINQ)", false)]
         public static List<T> Intersect<T>(List<T> list1, List<T> list2)
         {
             return list1.Intersect(list2).ToList();
@@ -218,11 +242,13 @@ namespace EasyTool
 
         /// <summary>
         /// 返回两个列表的并集。
+        /// [Obsolete("请直接使用 list1.Union(list2).ToList() (LINQ)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list1">要比较的第一个列表</param>
         /// <param name="list2">要比较的第二个列表</param>
         /// <returns>并集列表</returns>
+        [Obsolete("请直接使用 list1.Union(list2).ToList() (LINQ)", false)]
         public static List<T> Union<T>(List<T> list1, List<T> list2)
         {
             return list1.Union(list2).ToList();
@@ -230,11 +256,13 @@ namespace EasyTool
 
         /// <summary>
         /// 返回两个列表的差集。
+        /// [Obsolete("请直接使用 list1.Except(list2).ToList() (LINQ)")]
         /// </summary>
         /// <typeparam name="T">列表元素类型</typeparam>
         /// <param name="list1">要比较的第一个列表</param>
         /// <param name="list2">要比较的第二个列表</param>
         /// <returns>差集列表</returns>
+        [Obsolete("请直接使用 list1.Except(list2).ToList() (LINQ)", false)]
         public static List<T> Except<T>(List<T> list1, List<T> list2)
         {
             return list1.Except(list2).ToList();

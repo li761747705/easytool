@@ -12,9 +12,11 @@ namespace EasyTool
     {
         /// <summary>
         /// 获取类的完全限定名
+        /// [Obsolete("请直接使用 type.FullName")]
         /// </summary>
         /// <param name="type">要获取名称的类</param>
         /// <returns>类的完全限定名</returns>
+        [Obsolete("请直接使用 type.FullName", false)]
         public static string GetClassName(Type type)
         {
             return type.FullName;
@@ -22,9 +24,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类的命名空间
+        /// [Obsolete("请直接使用 type.Namespace")]
         /// </summary>
         /// <param name="type">要获取命名空间的类</param>
         /// <returns>类的命名空间</returns>
+        [Obsolete("请直接使用 type.Namespace", false)]
         public static string GetClassNamespace(Type type)
         {
             return type.Namespace;
@@ -50,9 +54,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类的所有方法
+        /// [Obsolete("请直接使用 type.GetMethods()")]
         /// </summary>
         /// <param name="type">要获取方法的类</param>
         /// <returns>类的所有方法</returns>
+        [Obsolete("请直接使用 type.GetMethods()", false)]
         public static MethodInfo[] GetClassMethods(Type type)
         {
             return type.GetMethods();
@@ -60,9 +66,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类的所有属性
+        /// [Obsolete("请直接使用 type.GetProperties()")]
         /// </summary>
         /// <param name="type">要获取属性的类</param>
         /// <returns>类的所有属性</returns>
+        [Obsolete("请直接使用 type.GetProperties()", false)]
         public static PropertyInfo[] GetClassProperties(Type type)
         {
             return type.GetProperties();
@@ -70,9 +78,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类的所有字段
+        /// [Obsolete("请直接使用 type.GetFields()")]
         /// </summary>
         /// <param name="type">要获取字段的类</param>
         /// <returns>类的所有字段</returns>
+        [Obsolete("请直接使用 type.GetFields()", false)]
         public static FieldInfo[] GetClassFields(Type type)
         {
             return type.GetFields();
@@ -80,9 +90,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类的所有事件
+        /// [Obsolete("请直接使用 type.GetEvents()")]
         /// </summary>
         /// <param name="type">要获取事件的类</param>
         /// <returns>类的所有事件</returns>
+        [Obsolete("请直接使用 type.GetEvents()", false)]
         public static EventInfo[] GetClassEvents(Type type)
         {
             return type.GetEvents();
@@ -90,9 +102,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类的所有构造函数
+        /// [Obsolete("请直接使用 type.GetConstructors()")]
         /// </summary>
         /// <param name="type">要获取构造函数的类</param>
         /// <returns>类的所有构造函数</returns>
+        [Obsolete("请直接使用 type.GetConstructors()", false)]
         public static ConstructorInfo[] GetClassConstructors(Type type)
         {
             return type.GetConstructors();
@@ -100,9 +114,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取类的默认构造函数
+        /// [Obsolete("请直接使用 type.GetConstructor(Type.EmptyTypes)")]
         /// </summary>
         /// <param name="type">要获取默认构造函数的类</param>
         /// <returns>类的默认构造函数</returns>
+        [Obsolete("请直接使用 type.GetConstructor(Type.EmptyTypes)", false)]
         public static ConstructorInfo GetDefaultClassConstructor(Type type)
         {
             return type.GetConstructor(Type.EmptyTypes);

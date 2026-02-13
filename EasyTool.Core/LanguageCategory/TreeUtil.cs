@@ -25,10 +25,10 @@ namespace EasyTool
         /// 构建树结构
         /// </summary>
         /// <returns>根节点</returns>
-        public TreeNode<T, D> BuildTree()
+        public TreeNode<T, D>? BuildTree()
         {
             // 获取根节点
-            var root = _nodes.FirstOrDefault(n => n.ParentId.Equals(default(T)));
+            var root = _nodes.FirstOrDefault(n => n.ParentId == null || n.ParentId.Equals(default(T)));
 
             if (root == null)
             {
@@ -43,7 +43,7 @@ namespace EasyTool
 
         private void BuildTree(TreeNode<T, D> node)
         {
-            node.Children = _nodes.Where(n => n.ParentId.Equals(node.Id)).ToList();
+            node.Children = _nodes.Where(n => n.ParentId != null && n.ParentId.Equals(node.Id)).ToList();
 
             if (node.Children.Count > 0)
             {
@@ -105,9 +105,9 @@ namespace EasyTool
             }
         }
 
-        private TreeNode<T, D> GetParent(T id)
+        private TreeNode<T, D>? GetParent(T id)
         {
-            return _nodes.FirstOrDefault(n => n.Id.Equals(id));
+            return _nodes.FirstOrDefault(n => n.Id != null && n.Id.Equals(id));
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace EasyTool
             {
                 return new List<TreeNode<T, D>>();
             }
-            return parent.Children.Where(n => !n.Id.Equals(node.Id)).ToList();
+            return parent.Children.Where(n => n.Id == null || !n.Id.Equals(node.Id)).ToList();
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace EasyTool
         public TreeNode<T, D>? GetNextSibling(TreeNode<T, D> node)
         {
             var siblings = GetSiblings(node);
-            var index = siblings.FindIndex(n => n.Id!.Equals(node.Id));
+            var index = siblings.FindIndex(n => n.Id != null && n.Id.Equals(node.Id));
             return index + 1 < siblings.Count ? siblings[index + 1] : null;
         }
 
@@ -183,7 +183,7 @@ namespace EasyTool
         public TreeNode<T, D>? GetPreviousSibling(TreeNode<T, D> node)
         {
             var siblings = GetSiblings(node);
-            var index = siblings.FindIndex(n => n.Id!.Equals(node.Id));
+            var index = siblings.FindIndex(n => n.Id != null && n.Id.Equals(node.Id));
             return index - 1 >= 0 ? siblings[index - 1] : null;
         }
 
@@ -283,13 +283,13 @@ namespace EasyTool
     public class TreeNode<T, D>
     {
         public T Id { get; set; }
-        public T ParentId { get; set; }
-        public string Name { get; set; }
+        public T? ParentId { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int Weight { get; set; }
-        public D Data { get; set; }
-        public List<TreeNode<T, D>> Children { get; set; }
+        public D Data { get; set; } = default!;
+        public List<TreeNode<T, D>> Children { get; set; } = new List<TreeNode<T, D>>();
 
-        public TreeNode(T id, T parentId, string name, int weight, D data)
+        public TreeNode(T id, T? parentId, string name, int weight, D data)
         {
             this.Id = id;
             this.ParentId = parentId;

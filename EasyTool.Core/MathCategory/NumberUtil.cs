@@ -123,10 +123,12 @@ namespace EasyTool
 
         /// <summary>
         /// 格式化一个 decimal 数字
+        /// [Obsolete("请直接使用 number.ToString(format)")]
         /// </summary>
         /// <param name="number">待格式化的数字</param>
         /// <param name="format">格式化字符串</param>
         /// <returns>格式化后的字符串</returns>
+        [Obsolete("请直接使用 number.ToString(format)", false)]
         public static string DecimalFormat(decimal number, string format)
         {
             return number.ToString(format);

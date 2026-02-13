@@ -87,9 +87,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将16进制字符串中的所有字符转换为大写
+        /// [Obsolete("请直接使用 hex.ToUpper()")]
         /// </summary>
         /// <param name="hex">16进制字符串</param>
         /// <returns>大写16进制字符串</returns>
+        [Obsolete("请直接使用 hex.ToUpper()", false)]
         public static string HexToUpper(string hex)
         {
             return hex.ToUpper();
@@ -97,9 +99,11 @@ namespace EasyTool
 
         /// <summary>
         /// 将16进制字符串中的所有字符转换为小写
+        /// [Obsolete("请直接使用 hex.ToLower()")]
         /// </summary>
         /// <param name="hex">16进制字符串</param>
         /// <returns>小写16进制字符串</returns>
+        [Obsolete("请直接使用 hex.ToLower()", false)]
         public static string HexToLower(string hex)
         {
             return hex.ToLower();

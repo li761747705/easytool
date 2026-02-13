@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -13,9 +13,11 @@ namespace EasyTool
     {
         /// <summary>
         /// 根据文件路径加载 DLL 程序集，并返回一个 Assembly 对象
+        /// [Obsolete("请直接使用 Assembly.LoadFile(dllFilePath)")]
         /// </summary>
         /// <param name="dllFilePath">DLL 文件路径</param>
         /// <returns>返回一个 Assembly 对象</returns>
+        [Obsolete("请直接使用 Assembly.LoadFile(dllFilePath)", false)]
         public static Assembly LoadAssembly(string dllFilePath)
         {
             return Assembly.LoadFile(dllFilePath);
@@ -23,22 +25,26 @@ namespace EasyTool
 
         /// <summary>
         /// 根据类型名称从程序集中获取 Type 对象
+        /// [Obsolete("请直接使用 assembly.GetType(typeName)")]
         /// </summary>
         /// <param name="assembly">程序集</param>
         /// <param name="typeName">类型名称</param>
         /// <returns>返回 Type 对象</returns>
-        public static Type GetTypeFromAssembly(Assembly assembly, string typeName)
+        [Obsolete("请直接使用 assembly.GetType(typeName)", false)]
+        public static Type? GetTypeFromAssembly(Assembly assembly, string typeName)
         {
             return assembly.GetType(typeName);
         }
 
         /// <summary>
         /// 创建指定类型的实例，并返回一个 Object 对象
+        /// [Obsolete("请直接使用 Activator.CreateInstance(type, parameters)")]
         /// </summary>
         /// <param name="type">要创建实例的类型</param>
         /// <param name="parameters">实例化类型所需要的参数</param>
         /// <returns>返回创建的实例对象</returns>
-        public static object CreateInstance(Type type, params object[] parameters)
+        [Obsolete("请直接使用 Activator.CreateInstance(type, parameters)", false)]
+        public static object? CreateInstance(Type type, params object[] parameters)
         {
             return Activator.CreateInstance(type, parameters);
         }
@@ -50,9 +56,9 @@ namespace EasyTool
         /// <param name="typeName">类型名称</param>
         /// <param name="parameters">实例化类型所需要的参数</param>
         /// <returns>返回创建的实例对象</returns>
-        public static object CreateInstanceFromAssembly(Assembly assembly, string typeName, params object[] parameters)
+        public static object? CreateInstanceFromAssembly(Assembly assembly, string typeName, params object[] parameters)
         {
-            Type type = GetTypeFromAssembly(assembly, typeName);
+            Type? type = GetTypeFromAssembly(assembly, typeName);
             if (type != null)
             {
                 return CreateInstance(type, parameters);
@@ -67,10 +73,10 @@ namespace EasyTool
         /// <param name="methodName">方法名称</param>
         /// <param name="parameters">方法所需要的参数</param>
         /// <returns>返回调用结果</returns>
-        public static object InvokeMethod(object instance, string methodName, params object[] parameters)
+        public static object? InvokeMethod(object instance, string methodName, params object[] parameters)
         {
             Type type = instance.GetType();
-            MethodInfo methodInfo = type.GetMethod(methodName);
+            MethodInfo? methodInfo = type.GetMethod(methodName);
             if (methodInfo != null)
             {
                 return methodInfo.Invoke(instance, parameters);
@@ -83,9 +89,11 @@ namespace EasyTool
 
         /// <summary>
         /// 获取程序集中所有的类型信息
+        /// [Obsolete("请直接使用 assembly.GetTypes()")]
         /// </summary>
         /// <param name="assembly">程序集</param>
         /// <returns>返回 Type[] 数组，数组中每个元素代表程序集中的一个类型</returns>
+        [Obsolete("请直接使用 assembly.GetTypes()", false)]
         public static Type[] GetAllTypesFromAssembly(Assembly assembly)
         {
             return assembly.GetTypes();
@@ -93,10 +101,12 @@ namespace EasyTool
 
         /// <summary>
         /// 判断指定类型是否实现了指定的接口
+        /// [Obsolete("请直接使用 interfaceType.IsAssignableFrom(type)")]
         /// </summary>
         /// <param name="type">要判断的类型</param>
         /// <param name="interfaceType">要判断的接口类型</param>
         /// <returns>返回布尔值，表示指定类型是否实现了指定的接口</returns>
+        [Obsolete("请直接使用 interfaceType.IsAssignableFrom(type)", false)]
         public static bool IsImplementInterface(Type type, Type interfaceType)
         {
             return interfaceType.IsAssignableFrom(type);
