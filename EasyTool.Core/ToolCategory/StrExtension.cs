@@ -11,27 +11,6 @@ namespace EasyTool.Extension
     public static class StrExtension
     {
         #region 文本可为空判断
-
-        /// <summary>
-        /// 判断字符串是否为 null 或空
-        /// [Obsolete("请直接使用 string.IsNullOrEmpty(value)")]
-        /// </summary>
-        [Obsolete("请直接使用 string.IsNullOrEmpty(value)", false)]
-        public static bool IsNullOrEmpty(this string value)
-        {
-            return string.IsNullOrEmpty(value);
-        }
-
-        /// <summary>
-        /// 判断字符串是否为 null 或空白字符
-        /// [Obsolete("请直接使用 string.IsNullOrWhiteSpace(value)")]
-        /// </summary>
-        [Obsolete("请直接使用 string.IsNullOrWhiteSpace(value)", false)]
-        public static bool IsNullOrWhiteSpace(this string value)
-        {
-            return string.IsNullOrWhiteSpace(value);
-        }
-
         #endregion
 
         #region 字符串验证
@@ -230,33 +209,6 @@ namespace EasyTool.Extension
             return slug;
         }
 
-        /// <summary>
-        /// 反转字符串
-        /// [Obsolete("请直接使用 new string(value.Reverse().ToArray()) 或通过 LINQ")]
-        /// </summary>
-        [Obsolete("请直接使用 new string(value.Reverse().ToArray())", false)]
-        public static string Reverse(this string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return value;
-
-            var charArray = value.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
-        }
-
-        /// <summary>
-        /// 获取字符串的字节数（UTF-8编码）
-        /// [Obsolete("请直接使用 Encoding.UTF8.GetByteCount(value)")]
-        /// </summary>
-        [Obsolete("请直接使用 Encoding.UTF8.GetByteCount(value)", false)]
-        public static int GetByteCount(this string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return 0;
-
-            return Encoding.UTF8.GetByteCount(value);
-        }
 
         /// <summary>
         /// 隐藏字符串的中间部分（例如：手机号、身份证号）

@@ -237,18 +237,6 @@ namespace EasyTool.Extension
 
         #region 泛型处理
 
-        /// <summary>
-        /// 获取可空类型的实际类型
-        /// [Obsolete("请直接使用 Nullable.GetUnderlyingType(type) ?? type")]
-        /// </summary>
-        [Obsolete("请直接使用 Nullable.GetUnderlyingType(type) ?? type", false)]
-        public static Type? GetNullableType(this Type? type)
-        {
-            if (type == null)
-                return null;
-
-            return Nullable.GetUnderlyingType(type) ?? type;
-        }
 
         /// <summary>
         /// 获取集合的元素类型

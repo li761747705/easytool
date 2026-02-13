@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -204,16 +204,6 @@ namespace EasyTool.ConvertCategory
         }
 
         /// <summary>
-        /// 布尔值转换为整数1或者0
-        /// [Obsolete("请直接使用 Convert.ToInt32(b)")]
-        /// </summary>
-        [Obsolete("请直接使用 Convert.ToInt32(b)", false)]
-        public static int ToInt(this bool b)
-        {
-            return b ? 1 : 0;
-        }
-
-        /// <summary>
         /// 布尔值转换为中文
         /// </summary>
         /// <param name="b"></param>
@@ -268,21 +258,6 @@ namespace EasyTool.ConvertCategory
             return bytes;
         }
 
-        /// <summary>
-        /// 转换为Base64
-        /// [Obsolete("请直接使用 Convert.ToBase64String(bytes)")]
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <returns></returns>
-        [Obsolete("请直接使用 Convert.ToBase64String(bytes)", false)]
-        public static string ToBase64(this byte[] bytes)
-        {
-            if (bytes == null)
-                return string.Empty;
-
-            return Convert.ToBase64String(bytes);
-        }
-
 
 
         /// <summary>
@@ -311,26 +286,6 @@ namespace EasyTool.ConvertCategory
             long longTimeStamp = long.Parse(timeStamp + "0000");
             TimeSpan ts = new TimeSpan(longTimeStamp);
             return dd.Add(ts);
-        }
-
-        /// <summary>
-        /// 字符串转Guid
-        /// [Obsolete("请直接使用 Guid.TryParse(guid, out var result) 或 new Guid(guid)")]
-        /// </summary>
-        /// <param name="guid"></param>
-        /// <returns></returns>
-        [Obsolete("请直接使用 Guid.TryParse(guid, out var result)", false)]
-        public static Guid? ToGuid(this string guid)
-        {
-            try
-            {
-                return new Guid(guid);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
         }
 
         #endregion

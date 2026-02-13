@@ -48,18 +48,6 @@ namespace EasyTool.Extension
 
         #region 枚举转换
 
-        /// <summary>
-        /// 将枚举值转换为整数
-        /// [Obsolete("请直接使用 Convert.ToInt32(value)")]
-        /// </summary>
-        [Obsolete("请直接使用 Convert.ToInt32(value)", false)]
-        public static int ToInt(this Enum value)
-        {
-            if (value == null)
-                return 0;
-
-            return Convert.ToInt32(value);
-        }
 
         /// <summary>
         /// 将整数转换为枚举
@@ -88,19 +76,57 @@ namespace EasyTool.Extension
             return defaultValue;
         }
 
+
+        #endregion
+
+        #region 枚举字典扩展
+
         /// <summary>
-        /// 尝试解析字符串为枚举
-        /// [Obsolete("请直接使用 Enum.TryParse(value, true, out result)")]
+        /// 获取枚举类型的所有成员的名称和值的键值对
         /// </summary>
-        [Obsolete("请直接使用 Enum.TryParse(value, true, out result)", false)]
-        public static bool TryParseEnum<T>(this string value, out T result) where T : struct, Enum
+        public static IDictionary<string, T> ToNameDictionary<T>() where T : struct, Enum
         {
-            return Enum.TryParse(value, true, out result);
+            var valuesDictionary = new Dictionary<string, T>();
+            foreach (T value in GetValues<T>())
+            {
+                valuesDictionary.Add(Enum.GetName(typeof(T), value)!, value);
+            }
+            return valuesDictionary;
+        }
+
+        /// <summary>
+        /// 获取指定枚举值的描述
+        /// </summary>
+        public static string? GetDescriptionByValue<T>(T value) where T : struct, Enum
+        {
+            var name = Enum.GetName(typeof(T), value);
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+            var field = typeof(T).GetField(name);
+            var attr = field?.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
+            return attr?.Description;
+        }
+
+        /// <summary>
+        /// 获取指定枚举值的显示名称
+        /// </summary>
+        public static string? GetDisplayNameByValue<T>(T value) where T : struct, Enum
+        {
+            var name = Enum.GetName(typeof(T), value);
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+            var field = typeof(T).GetField(name);
+            var attr = field?.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false).FirstOrDefault() as System.ComponentModel.DataAnnotations.DisplayAttribute;
+            return attr?.GetName();
         }
 
         #endregion
 
-        #region 枚举集合
+        #region 枚举判断
 
         /// <summary>
         /// 获取枚举类型的所有值
@@ -148,15 +174,6 @@ namespace EasyTool.Extension
 
         #region 枚举判断
 
-        /// <summary>
-        /// 判断是否是定义的枚举值
-        /// [Obsolete("请直接使用 Enum.IsDefined(typeof(T), value)")]
-        /// </summary>
-        [Obsolete("请直接使用 Enum.IsDefined(typeof(T), value)", false)]
-        public static bool IsDefined<T>(this T value) where T : struct, Enum
-        {
-            return Enum.IsDefined(typeof(T), value);
-        }
 
         /// <summary>
         /// 判断字符串是否是有效的枚举名称或值

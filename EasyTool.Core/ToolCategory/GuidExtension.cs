@@ -10,15 +10,6 @@ namespace EasyTool.Extension
     {
         #region 空值判断
 
-        /// <summary>
-        /// 判断 Guid 是否为空
-        /// [Obsolete("请直接使用 guid == Guid.Empty")]
-        /// </summary>
-        [Obsolete("请直接使用 guid == Guid.Empty", false)]
-        public static bool IsEmpty(this Guid guid)
-        {
-            return guid == Guid.Empty;
-        }
 
         /// <summary>
         /// 判断 Guid 是否为空或默认值
@@ -80,15 +71,6 @@ namespace EasyTool.Extension
             return guid.ToString("B");
         }
 
-        /// <summary>
-        /// 获取 Guid 的字节数组表示
-        /// [Obsolete("请直接使用 guid.ToByteArray()")]
-        /// </summary>
-        [Obsolete("请直接使用 guid.ToByteArray()", false)]
-        public static byte[] ToByteArray(this Guid guid)
-        {
-            return guid.ToByteArray();
-        }
 
         /// <summary>
         /// 将 Guid 转换为 Base64 字符串

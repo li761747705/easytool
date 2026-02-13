@@ -314,16 +314,6 @@ namespace EasyTool.Extension
         #region 转换操作
 
         /// <summary>
-        /// 转换为只读字符串
-        /// [Obsolete("请直接使用 sb?.ToString() ?? string.Empty")]
-        /// </summary>
-        [Obsolete("请直接使用 sb?.ToString() ?? string.Empty", false)]
-        public static string ToReadOnly(this StringBuilder sb)
-        {
-            return sb?.ToString() ?? string.Empty;
-        }
-
-        /// <summary>
         /// 转换为 MemoryStream
         /// </summary>
         public static MemoryStream ToMemoryStream(this StringBuilder sb, Encoding? encoding = null)

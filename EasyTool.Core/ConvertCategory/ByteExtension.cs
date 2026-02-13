@@ -127,31 +127,6 @@ namespace EasyTool.Extension
             return bytes;
         }
 
-        /// <summary>
-        /// 将字节数组转换为Base64字符串
-        /// [Obsolete("请直接使用 Convert.ToBase64String(bytes)")]
-        /// </summary>
-        [Obsolete("请直接使用 Convert.ToBase64String(bytes)", false)]
-        public static string ToBase64(this byte[] bytes)
-        {
-            if (bytes == null || bytes.Length == 0)
-                return string.Empty;
-
-            return Convert.ToBase64String(bytes);
-        }
-
-        /// <summary>
-        /// 从Base64字符串转换为字节数组
-        /// [Obsolete("请直接使用 Convert.FromBase64String(base64)")]
-        /// </summary>
-        [Obsolete("请直接使用 Convert.FromBase64String(base64)", false)]
-        public static byte[] FromBase64ToBytes(this string base64)
-        {
-            if (string.IsNullOrWhiteSpace(base64))
-                return Array.Empty<byte>();
-
-            return Convert.FromBase64String(base64);
-        }
 
         /// <summary>
         /// 将字节数组转换为二进制字符串
@@ -430,59 +405,6 @@ namespace EasyTool.Extension
 
         #region 字节数组编码解码
 
-        /// <summary>
-        /// 将字节数组按UTF-8编码转换为字符串
-        /// [Obsolete("请直接使用 Encoding.UTF8.GetString(bytes)")]
-        /// </summary>
-        [Obsolete("请直接使用 Encoding.UTF8.GetString(bytes)", false)]
-        public static string ToUtf8String(this byte[] bytes)
-        {
-            if (bytes == null || bytes.Length == 0)
-                return string.Empty;
-
-            return Encoding.UTF8.GetString(bytes);
-        }
-
-        /// <summary>
-        /// 将字节数组按指定编码转换为字符串
-        /// [Obsolete("请直接使用 encoding.GetString(bytes)")]
-        /// </summary>
-        [Obsolete("请直接使用 encoding.GetString(bytes)", false)]
-        public static string ToString(this byte[] bytes, Encoding encoding)
-        {
-            if (bytes == null || bytes.Length == 0)
-                return string.Empty;
-
-            encoding ??= Encoding.UTF8;
-            return encoding.GetString(bytes);
-        }
-
-        /// <summary>
-        /// 将字符串按UTF-8编码转换为字节数组
-        /// [Obsolete("请直接使用 Encoding.UTF8.GetBytes(str)")]
-        /// </summary>
-        [Obsolete("请直接使用 Encoding.UTF8.GetBytes(str)", false)]
-        public static byte[] ToUtf8Bytes(this string str)
-        {
-            if (string.IsNullOrEmpty(str))
-                return Array.Empty<byte>();
-
-            return Encoding.UTF8.GetBytes(str);
-        }
-
-        /// <summary>
-        /// 将字符串按指定编码转换为字节数组
-        /// [Obsolete("请直接使用 encoding.GetBytes(str)")]
-        /// </summary>
-        [Obsolete("请直接使用 encoding.GetBytes(str)", false)]
-        public static byte[] ToBytes(this string str, Encoding encoding)
-        {
-            if (string.IsNullOrEmpty(str))
-                return Array.Empty<byte>();
-
-            encoding ??= Encoding.UTF8;
-            return encoding.GetBytes(str);
-        }
 
         #endregion
 

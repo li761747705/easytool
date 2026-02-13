@@ -189,45 +189,6 @@ namespace EasyTool.Extension
 
         #region 复制操作
 
-        /// <summary>
-        /// 将流复制到另一个流
-        /// [Obsolete("请直接使用 source.CopyTo(destination)")]
-        /// </summary>
-        [Obsolete("请直接使用 source.CopyTo(destination)", false)]
-        public static void CopyTo(this Stream source, Stream destination)
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-            if (destination == null)
-                throw new ArgumentNullException(nameof(destination));
-
-            source.CopyTo(destination, 81920);
-        }
-
-        /// <summary>
-        /// 将流复制到另一个流（指定缓冲区大小）
-        /// [Obsolete("请直接使用 source.CopyTo(destination)")]
-        /// </summary>
-        [Obsolete("请直接使用 source.CopyTo(destination)", false)]
-        public static void CopyTo(this Stream source, Stream destination, int bufferSize)
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-            if (destination == null)
-                throw new ArgumentNullException(nameof(destination));
-
-            if (!source.CanRead)
-                throw new InvalidOperationException("Source stream does not support reading.");
-            if (!destination.CanWrite)
-                throw new InvalidOperationException("Destination stream does not support writing.");
-
-            var buffer = new byte[bufferSize];
-            int bytesRead;
-            while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                destination.Write(buffer, 0, bytesRead);
-            }
-        }
 
         /// <summary>
         /// 将流复制到字节数组
@@ -254,37 +215,6 @@ namespace EasyTool.Extension
 
         #region 位置操作
 
-        /// <summary>
-        /// 将流位置重置到开头
-        /// [Obsolete("请直接使用 stream.Seek(0, SeekOrigin.Begin)")]
-        /// </summary>
-        [Obsolete("请直接使用 stream.Seek(0, SeekOrigin.Begin)", false)]
-        public static void ResetPosition(this Stream stream)
-        {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-
-            if (stream.CanSeek)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-            }
-        }
-
-        /// <summary>
-        /// 将流位置重置到末尾
-        /// [Obsolete("请直接使用 stream.Seek(0, SeekOrigin.End)")]
-        /// </summary>
-        [Obsolete("请直接使用 stream.Seek(0, SeekOrigin.End)", false)]
-        public static void SeekToEnd(this Stream stream)
-        {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-
-            if (stream.CanSeek)
-            {
-                stream.Seek(0, SeekOrigin.End);
-            }
-        }
 
         #endregion
 

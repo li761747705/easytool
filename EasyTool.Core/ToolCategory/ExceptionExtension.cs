@@ -320,18 +320,6 @@ namespace EasyTool.Extension
             return exception.InnerExceptions.ToArray();
         }
 
-        /// <summary>
-        /// 展平聚合异常（递归获取所有内层异常）
-        /// [Obsolete("请直接使用 exception.Flatten().InnerExceptions.ToArray()")]
-        /// </summary>
-        [Obsolete("请直接使用 exception.Flatten().InnerExceptions.ToArray()", false)]
-        public static Exception[] Flatten(this AggregateException? exception)
-        {
-            if (exception == null)
-                return Array.Empty<Exception>();
-
-            return exception.Flatten().InnerExceptions.ToArray();
-        }
 
         #endregion
     }

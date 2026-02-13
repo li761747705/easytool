@@ -1,11 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Text;
 
 namespace EasyTool
 {
+    /// <summary>
+    /// 数学工具类，提供数字计算和数学运算方法
+    /// </summary>
     public static class MathUtil
     {
+        #region 质数与阶乘
+
+        /// <summary>
+        /// 判断一个整数是否为质数
+        /// </summary>
+        /// <param name="n">要判断的整数</param>
+        /// <returns>如果是质数，则返回 true；否则返回 false</returns>
+        public static bool IsPrime(int n)
+        {
+            if (n <= 1)
+            {
+                return false;
+            }
+
+            for (int i = 2; i <= Math.Sqrt(n); i++)
+            {
+                if (n % i == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 求一个整数的阶乘
+        /// </summary>
+        /// <param name="n">要求阶乘的整数</param>
+        /// <returns>阶乘结果</returns>
+        public static int Factorial(int n)
+        {
+            if (n < 0)
+            {
+                throw new ArgumentException("阶乘只能求非负整数");
+            }
+
+            int result = 1;
+            for (int i = 1; i <= n; i++)
+            {
+                result *= i;
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region 最大公约数与最小公倍数
+
         /// <summary>
         /// 计算两个整数的最大公约数
         /// </summary>
@@ -35,28 +87,9 @@ namespace EasyTool
             return a * b / Gcd(a, b);
         }
 
-        /// <summary>
-        /// 判断一个整数是否为质数
-        /// </summary>
-        /// <param name="n">要判断的整数</param>
-        /// <returns>如果是质数，则返回 true；否则返回 false</returns>
-        public static bool IsPrime(int n)
-        {
-            if (n <= 1)
-            {
-                return false;
-            }
+        #endregion
 
-            for (int i = 2; i <= Math.Sqrt(n); i++)
-            {
-                if (n % i == 0)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+        #region 数值计算
 
         /// <summary>
         /// 计算两个浮点数的差的绝对值是否小于指定的精度
@@ -68,71 +101,6 @@ namespace EasyTool
         public static bool ApproxEqual(double a, double b, double eps)
         {
             return Math.Abs(a - b) < eps;
-        }
-
-        /// <summary>
-        /// 求一个整数的阶乘
-        /// </summary>
-        /// <param name="n">要求阶乘的整数</param>
-        /// <returns>阶乘结果</returns>
-        public static int Factorial(int n)
-        {
-            if (n <= 1)
-            {
-                return 1;
-            }
-            else
-            {
-                return n * Factorial(n - 1);
-            }
-        }
-
-        /// <summary>
-        /// 求一个整数的斐波那契数列的值
-        /// </summary>
-        /// <param name="n">要求斐波那契数列的整数</param>
-        /// <returns>斐波那契数列的值</returns>
-        public static int Fibonacci(int n)
-        {
-            if (n <= 1)
-            {
-                return n;
-            }
-            else
-            {
-                return Fibonacci(n - 1) + Fibonacci(n - 2);
-            }
-        }
-
-        /// <summary>
-        /// 求一个整数的二进制表示中 1 的个数
-        /// </summary>
-        /// <param name="n">要求二进制表示中 1 的个数的整数</param>
-        /// <returns>二进制表示中 1 的个数</returns>
-        public static int CountBits(int n)
-        {
-            int count = 0;
-
-            while (n != 0)
-            {
-                count++;
-                n &= n - 1;
-            }
-
-            return count;
-        }
-
-        /// <summary>
-        /// 求两个浮点数的平均值
-        /// [Obsolete("请直接使用 (a + b) / 2")]
-        /// </summary>
-        /// <param name="a">第一个浮点数</param>
-        /// <param name="b">第二个浮点数</param>
-        /// <returns>两个浮点数的平均值</returns>
-        [Obsolete("请直接使用 (a + b) / 2", false)]
-        public static double Average(double a, double b)
-        {
-            return (a + b) / 2;
         }
 
         /// <summary>
@@ -168,6 +136,177 @@ namespace EasyTool
                 int half = Pow(n, k / 2);
                 return half * half * n;
             }
+        }
+
+        /// <summary>
+        /// 求一个整数的绝对值
+        /// </summary>
+        /// <param name="number">待求绝对值的数字</param>
+        /// <returns>该数字的绝对值</returns>
+        public static int Abs(int number)
+        {
+            return number < 0 ? -number : number;
+        }
+
+        /// <summary>
+        /// 求一个整数的平方
+        /// </summary>
+        /// <param name="number">待求平方的数字</param>
+        /// <returns>该数字的平方</returns>
+        public static int Square(int number)
+        {
+            return number * number;
+        }
+
+        /// <summary>
+        /// 求一个整数的立方
+        /// </summary>
+        /// <param name="number">待求立方的数字</param>
+        /// <returns>该数字的立方</returns>
+        public static int Cube(int number)
+        {
+            return number * number * number;
+        }
+
+        /// <summary>
+        /// 计算两个整数的和，如果结果溢出了 int 类型的取值范围，则返回 int.MaxValue
+        /// </summary>
+        /// <param name="a">第一个整数</param>
+        /// <param name="b">第二个整数</param>
+        /// <returns>两个整数的和，如果结果溢出了 int 类型的取值范围，则返回 int.MaxValue</returns>
+        public static int SafeAdd(int a, int b)
+        {
+            int sum = a + b;
+
+            if (a > 0 && b > 0 && sum < 0)
+            {
+                return int.MaxValue;
+            }
+            else if (a < 0 && b < 0 && sum > 0)
+            {
+                return int.MinValue;
+            }
+            else
+            {
+                return sum;
+            }
+        }
+
+        #endregion
+
+        #region 进制转换
+
+        /// <summary>
+        /// 把一个数字转换为二进制字符串
+        /// </summary>
+        /// <param name="number">待转换的数字</param>
+        /// <returns>该数字的二进制字符串</returns>
+        public static string ToBinaryString(int number)
+        {
+            if (number == 0)
+            {
+                return "0";
+            }
+
+            string result = string.Empty;
+            while (number > 0)
+            {
+                result = (number % 2).ToString() + result;
+                number /= 2;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 把一个数字转换为八进制字符串
+        /// </summary>
+        /// <param name="number">待转换的数字</param>
+        /// <returns>该数字的八进制字符串</returns>
+        public static string ToOctalString(int number)
+        {
+            if (number == 0)
+            {
+                return "0";
+            }
+
+            string result = string.Empty;
+            while (number > 0)
+            {
+                result = (number % 8).ToString() + result;
+                number /= 8;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 把一个数字转换为十六进制字符串
+        /// </summary>
+        /// <param name="number">待转换的数字</param>
+        /// <returns>该数字的十六进制字符串</returns>
+        public static string ToHexString(int number)
+        {
+            if (number == 0)
+            {
+                return "0";
+            }
+
+            string result = string.Empty;
+            while (number > 0)
+            {
+                int remainder = number % 16;
+                if (remainder < 10)
+                {
+                    result = remainder.ToString() + result;
+                }
+                else
+                {
+                    result = (char)('A' + remainder - 10) + result;
+                }
+                number /= 16;
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region 高级数学函数
+
+        /// <summary>
+        /// 求一个整数的斐波那契数列的值
+        /// </summary>
+        /// <param name="n">要求斐波那契数列的整数</param>
+        /// <returns>斐波那契数列的值</returns>
+        public static int Fibonacci(int n)
+        {
+            if (n <= 1)
+            {
+                return n;
+            }
+            else
+            {
+                return Fibonacci(n - 1) + Fibonacci(n - 2);
+            }
+        }
+
+        /// <summary>
+        /// 求一个整数的二进制表示中 1 的个数
+        /// </summary>
+        /// <param name="n">要求二进制表示中 1 的个数的整数</param>
+        /// <returns>二进制表示中 1 的个数</returns>
+        public static int CountBits(int n)
+        {
+            int count = 0;
+
+            while (n != 0)
+            {
+                count++;
+                n &= n - 1;
+            }
+
+            return count;
         }
 
         /// <summary>
@@ -272,28 +411,6 @@ namespace EasyTool
             return factors;
         }
 
-        /// <summary>
-        /// 计算两个整数的和，如果结果溢出了 int 类型的取值范围，则返回 int.MaxValue
-        /// </summary>
-        /// <param name="a">第一个整数</param>
-        /// <param name="b">第二个整数</param>
-        /// <returns>两个整数的和，如果结果溢出了 int 类型的取值范围，则返回 int.MaxValue</returns>
-        public static int Add(int a, int b)
-        {
-            int sum = a + b;
-
-            if (a > 0 && b > 0 && sum < 0)
-            {
-                return int.MaxValue;
-            }
-            else if (a < 0 && b < 0 && sum > 0)
-            {
-                return int.MinValue;
-            }
-            else
-            {
-                return sum;
-            }
-        }
+        #endregion
     }
 }

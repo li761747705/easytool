@@ -33,6 +33,93 @@ namespace EasyTool.Extension
         #region 数组操作
 
         /// <summary>
+        /// 数组排序
+        /// </summary>
+        public static T[] Sort<T>(this T[]? array) where T : IComparable<T>
+        {
+            if (array.IsEmpty())
+            {
+                throw new ArgumentException("Array is empty.");
+            }
+
+            T[] sortedArray = new T[array.Length];
+            array.CopyTo(sortedArray, 0);
+            Array.Sort(sortedArray);
+
+            return sortedArray;
+        }
+
+        /// <summary>
+        /// 数组反转
+        /// </summary>
+        public static T[] Reverse<T>(this T[]? array)
+        {
+            if (array.IsEmpty())
+            {
+                throw new ArgumentException("Array is empty.");
+            }
+
+            T[] reversedArray = new T[array.Length];
+            array.CopyTo(reversedArray, 0);
+            Array.Reverse(reversedArray);
+
+            return reversedArray;
+        }
+
+        /// <summary>
+        /// 判断两个数组是否完全相等
+        /// </summary>
+        public static bool EqualsTo<T>(this T[]? array, T[]? other)
+        {
+            if (array.IsEmpty() && other.IsEmpty())
+            {
+                return true;
+            }
+
+            if (array.IsEmpty() || other.IsEmpty())
+            {
+                return false;
+            }
+
+            if (array!.Length != other!.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (!array[i].Equals(other[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 合并两个数组
+        /// </summary>
+        public static T[] Concat<T>(this T[]? array, T[]? other)
+        {
+            if (array.IsEmpty())
+            {
+                return other ?? Array.Empty<T>();
+            }
+
+            if (other.IsEmpty())
+            {
+                return array;
+            }
+
+            T[] result = new T[array.Length + other.Length];
+            array.CopyTo(result, 0);
+            other.CopyTo(result, array.Length);
+
+            return result;
+        }
+
+        /// <summary>
         /// 随机打乱数组顺序（Fisher-Yates 洗牌算法）
         /// </summary>
         public static T[]? Shuffle<T>(this T[]? array)
@@ -75,26 +162,6 @@ namespace EasyTool.Extension
             }
         }
 
-        /// <summary>
-        /// 将数组的元素连接成字符串
-        /// [Obsolete("请直接使用 string.Join(separator, array)")]
-        /// </summary>
-        /// <param name="array">数组</param>
-        /// <param name="separator">分隔符，默认为逗号</param>
-        [Obsolete("请直接使用 string.Join(separator, array)", false)]
-        public static string Join<T>(this T[]? array, string separator = ",")
-        {
-            if (array == null || array.Length == 0)
-                return string.Empty;
-
-            return string.Join(separator, array);
-        }
-
-        /// <summary>
-        /// 清除数组中的重复元素
-        /// [Obsolete("请直接使用 array.Distinct().ToArray() (LINQ)")]
-        /// </summary>
-        [Obsolete("请直接使用 array.Distinct().ToArray() (LINQ)", false)]
         public static T[]? Distinct<T>(this T[]? array)
         {
             if (array == null)
@@ -133,18 +200,6 @@ namespace EasyTool.Extension
 
         #region 数组查找
 
-        /// <summary>
-        /// 查找数组中满足条件的第一个元素的索引
-        /// [Obsolete("请直接使用 Array.FindIndex(array, predicate)")]
-        /// </summary>
-        [Obsolete("请直接使用 Array.FindIndex(array, predicate)", false)]
-        public static int FindIndex<T>(this T[]? array, Predicate<T> predicate)
-        {
-            if (array == null)
-                return -1;
-
-            return Array.FindIndex(array, predicate);
-        }
 
         /// <summary>
         /// 查找数组中满足条件的所有元素的索引
@@ -180,57 +235,6 @@ namespace EasyTool.Extension
 
         #region 数组转换
 
-        /// <summary>
-        /// 将数组转换为 HashSet
-        /// [Obsolete("请直接使用 new HashSet<T>(array)")]
-        /// </summary>
-        [Obsolete("请直接使用 new HashSet<T>(array)", false)]
-        public static HashSet<T> ToHashSet<T>(this T[]? array)
-        {
-            if (array == null)
-                return new HashSet<T>();
-
-            return new HashSet<T>(array);
-        }
-
-        /// <summary>
-        /// 将数组转换为 Queue
-        /// [Obsolete("请直接使用 new Queue<T>(array)")]
-        /// </summary>
-        [Obsolete("请直接使用 new Queue<T>(array)", false)]
-        public static Queue<T> ToQueue<T>(this T[]? array)
-        {
-            if (array == null)
-                return new Queue<T>();
-
-            return new Queue<T>(array);
-        }
-
-        /// <summary>
-        /// 将数组转换为 Stack
-        /// [Obsolete("请直接使用 new Stack<T>(array)")]
-        /// </summary>
-        [Obsolete("请直接使用 new Stack<T>(array)", false)]
-        public static Stack<T> ToStack<T>(this T[]? array)
-        {
-            if (array == null)
-                return new Stack<T>();
-
-            return new Stack<T>(array);
-        }
-
-        /// <summary>
-        /// 将数组转换为 LinkedList
-        /// [Obsolete("请直接使用 new LinkedList<T>(array)")]
-        /// </summary>
-        [Obsolete("请直接使用 new LinkedList<T>(array)", false)]
-        public static LinkedList<T> ToLinkedList<T>(this T[]? array)
-        {
-            if (array == null)
-                return new LinkedList<T>();
-
-            return new LinkedList<T>(array);
-        }
 
         /// <summary>
         /// 将二维数组展平为一维数组
@@ -372,21 +376,6 @@ namespace EasyTool.Extension
 
         #region 数组遍历
 
-        /// <summary>
-        /// 遍历数组并对每个元素执行指定操作
-        /// [Obsolete("请直接使用 Array.ForEach(array, action) 或 foreach 循环")]
-        /// </summary>
-        [Obsolete("请直接使用 Array.ForEach(array, action) 或 foreach 循环", false)]
-        public static void ForEach<T>(this T[]? array, Action<T> action)
-        {
-            if (array == null || action == null)
-                return;
-
-            foreach (var item in array)
-            {
-                action(item);
-            }
-        }
 
         /// <summary>
         /// 遍历数组并对每个元素及其索引执行指定操作
@@ -406,24 +395,6 @@ namespace EasyTool.Extension
 
         #region 数组统计
 
-        /// <summary>
-        /// 统计数组中满足条件的元素数量
-        /// [Obsolete("请直接使用 array.Count(predicate) (LINQ)")]
-        /// </summary>
-        [Obsolete("请直接使用 array.Count(predicate) (LINQ)", false)]
-        public static int Count<T>(this T[]? array, Func<T, bool> predicate)
-        {
-            if (array == null)
-                return 0;
-
-            int count = 0;
-            foreach (var item in array)
-            {
-                if (predicate(item))
-                    count++;
-            }
-            return count;
-        }
 
         #endregion
     }

@@ -86,28 +86,15 @@ namespace EasyTool
         }
 
         /// <summary>
-        /// 将16进制字符串中的所有字符转换为大写
-        /// [Obsolete("请直接使用 hex.ToUpper()")]
+        /// 将16进制字符串转换为大写形式
         /// </summary>
         /// <param name="hex">16进制字符串</param>
-        /// <returns>大写16进制字符串</returns>
-        [Obsolete("请直接使用 hex.ToUpper()", false)]
+        /// <returns>大写形式的16进制字符串</returns>
         public static string HexToUpper(string hex)
         {
             return hex.ToUpper();
         }
 
-        /// <summary>
-        /// 将16进制字符串中的所有字符转换为小写
-        /// [Obsolete("请直接使用 hex.ToLower()")]
-        /// </summary>
-        /// <param name="hex">16进制字符串</param>
-        /// <returns>小写16进制字符串</returns>
-        [Obsolete("请直接使用 hex.ToLower()", false)]
-        public static string HexToLower(string hex)
-        {
-            return hex.ToLower();
-        }
 
         /// <summary>
         /// 获取16进制字符串中指定位置的字符

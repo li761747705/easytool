@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace EasyTool.Extension
@@ -186,6 +188,18 @@ namespace EasyTool.Extension
         }
 
         /// <summary>
+        /// 异步深拷贝对象（使用 JSON 序列化）
+        /// </summary>
+        public static async Task<T?> DeepCloneAsync<T>(this T obj)
+        {
+            if (obj == null)
+                return default;
+
+            var json = await Task.Run(() => obj.ToJson());
+            return await Task.Run(() => json.FromJson<T>());
+        }
+
+        /// <summary>
         /// 浅拷贝对象（使用 MemberwiseClone）
         /// </summary>
         public static T? ShallowClone<T>(this T obj) where T : class
@@ -347,15 +361,6 @@ namespace EasyTool.Extension
 
         #region 对象检查
 
-        /// <summary>
-        /// 判断对象是否是指定类型
-        /// [Obsolete("请直接使用 obj is T")]
-        /// </summary>
-        [Obsolete("请直接使用 obj is T", false)]
-        public static bool Is<T>(this object obj)
-        {
-            return obj is T;
-        }
 
         /// <summary>
         /// 判断对象是否实现了指定接口
@@ -405,47 +410,481 @@ namespace EasyTool.Extension
         #region 对象信息
 
         /// <summary>
-        /// 获取对象的类型名称
-        /// [Obsolete("请直接使用 obj?.GetType().Name")]
+        /// 获取指定类型的默认值
         /// </summary>
-        [Obsolete("请直接使用 obj?.GetType().Name", false)]
-        public static string GetTypeName(this object obj)
+        public static object? GetDefault(Type type)
         {
-            return obj?.GetType().Name ?? "null";
+            return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 
         /// <summary>
-        /// 获取对象的完整类型名称
-        /// [Obsolete("请直接使用 obj?.GetType().FullName")]
+        /// 判断对象是否是其类型的默认值
         /// </summary>
-        [Obsolete("请直接使用 obj?.GetType().FullName", false)]
-        public static string GetFullTypeName(this object obj)
+        public static bool IsDefaultValue(this object obj)
         {
-            return obj?.GetType().FullName ?? "null";
+            return obj == null || obj.Equals(GetDefault(obj.GetType()));
+        }
+
+        /// <summary>
+        /// 判断指定类型是否是可空值类型
+        /// </summary>
+        public static bool IsNullable(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+
+        /// <summary>
+        /// 获取可空类型的基础类型
+        /// </summary>
+        public static Type GetNullableType(Type type)
+        {
+            return Nullable.GetUnderlyingType(type);
+        }
+
+        /// <summary>
+        /// 获取可空类型或枚举类型的基础类型
+        /// </summary>
+        public static Type GetUnderlyingType(Type type)
+        {
+            if (IsNullable(type))
+            {
+                return GetNullableType(type);
+            }
+
+            if (type.IsEnum)
+            {
+                return Enum.GetUnderlyingType(type);
+            }
+
+            return type;
+        }
+
+        /// <summary>
+        /// 判断指定类型是否是简单类型
+        /// </summary>
+        public static bool IsSimpleType(Type type)
+        {
+            if (type == typeof(string))
+            {
+                return true;
+            }
+
+            if (type.IsValueType)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 判断指定类型是否是数字类型
+        /// </summary>
+        public static bool IsNumericType(Type type)
+        {
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.Int16:
+                case TypeCode.UInt32:
+                case TypeCode.Int32:
+                case TypeCode.UInt64:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// 判断指定类型是否是布尔类型
+        /// </summary>
+        public static bool IsBooleanType(Type type)
+        {
+            return type == typeof(bool);
+        }
+
+        /// <summary>
+        /// 判断指定类型是否是日期时间类型
+        /// </summary>
+        public static bool IsDateTimeType(Type type)
+        {
+            return type == typeof(DateTime);
+        }
+
+        /// <summary>
+        /// 判断指定类型是否是集合类型
+        /// </summary>
+        public static bool IsEnumerableType(Type type)
+        {
+            return typeof(IEnumerable).IsAssignableFrom(type);
+        }
+
+        /// <summary>
+        /// 获取指定类型的所有派生类型
+        /// </summary>
+        public static Type[] GetSubclassesOf(Type baseType)
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => baseType.IsAssignableFrom(p) && p != baseType)
+                .ToArray();
         }
 
         #endregion
 
         #region 对象转字符串
 
+        #endregion
+
+        #region 对象转换（静态工具方法）
+
         /// <summary>
-        /// 将对象转换为字符串（处理 null）
-        /// [Obsolete("请直接使用 obj?.ToString() ?? string.Empty")]
+        /// 将对象转换为指定类型（使用 TypeConverter 和 IConvertible）
         /// </summary>
-        [Obsolete("请直接使用 obj?.ToString() ?? string.Empty", false)]
-        public static string ToStringSafe(this object obj)
+        public static T ConvertTo<T>(object obj)
         {
-            return obj?.ToString() ?? string.Empty;
+            return (T)ConvertTo(obj, typeof(T));
         }
 
         /// <summary>
-        /// 将对象转换为字符串（null 时返回默认值）
-        /// [Obsolete("请直接使用 obj?.ToString() ?? defaultValue")]
+        /// 将对象转换为指定类型（使用 TypeConverter 和 IConvertible）
         /// </summary>
-        [Obsolete("请直接使用 obj?.ToString() ?? defaultValue", false)]
-        public static string ToStringOrDefault(this object obj, string defaultValue = "")
+        public static object? ConvertTo(object obj, Type targetType)
         {
-            return obj?.ToString() ?? defaultValue;
+            if (obj == null)
+            {
+                return GetDefault(targetType);
+            }
+
+            Type sourceType = obj.GetType();
+
+            if (targetType.IsAssignableFrom(sourceType))
+            {
+                return obj;
+            }
+
+            var converter = System.ComponentModel.TypeDescriptor.GetConverter(targetType);
+            if (converter != null && converter.CanConvertFrom(sourceType))
+            {
+                return converter.ConvertFrom(obj);
+            }
+
+            var sourceConverter = System.ComponentModel.TypeDescriptor.GetConverter(sourceType);
+            if (sourceConverter != null && sourceConverter.CanConvertTo(targetType))
+            {
+                return sourceConverter.ConvertTo(obj, targetType);
+            }
+
+            if (obj is IConvertible)
+            {
+                try
+                {
+                    return System.Convert.ChangeType(obj, targetType);
+                }
+                catch (InvalidCastException)
+                {
+                }
+            }
+
+            try
+            {
+                var implicitOp = sourceType.GetMethod("op_Implicit", new[] { sourceType });
+                if (implicitOp != null && implicitOp.ReturnType == targetType)
+                {
+                    return implicitOp.Invoke(null, new[] { obj });
+                }
+
+                var explicitOp = sourceType.GetMethod("op_Explicit", new[] { sourceType });
+                if (explicitOp != null && explicitOp.ReturnType == targetType)
+                {
+                    return explicitOp.Invoke(null, new[] { obj });
+                }
+
+                var targetImplicitOp = targetType.GetMethod("op_Implicit", new[] { sourceType });
+                if (targetImplicitOp != null && targetImplicitOp.ReturnType == targetType)
+                {
+                    return targetImplicitOp.Invoke(null, new[] { obj });
+                }
+
+                var targetExplicitOp = targetType.GetMethod("op_Explicit", new[] { sourceType });
+                if (targetExplicitOp != null && targetExplicitOp.ReturnType == targetType)
+                {
+                    return targetExplicitOp.Invoke(null, new[] { obj });
+                }
+            }
+            catch (InvalidCastException)
+            {
+            }
+
+            throw new InvalidCastException($"无法将类型为 {sourceType.Name} 的对象转换为类型为 {targetType.Name} 的对象");
+        }
+
+        #endregion
+
+        #region 对象属性复制
+
+        /// <summary>
+        /// 将源对象的属性复制到目标对象中
+        /// </summary>
+        public static void CopyProperties(object source, object target)
+        {
+            Type sourceType = source.GetType();
+            Type targetType = target.GetType();
+
+            foreach (PropertyInfo sourceProperty in sourceType.GetProperties())
+            {
+                if (!sourceProperty.CanRead)
+                {
+                    continue;
+                }
+
+                PropertyInfo targetProperty = targetType.GetProperty(sourceProperty.Name);
+
+                if (targetProperty == null || !targetProperty.CanWrite)
+                {
+                    continue;
+                }
+
+                object value = GetPropertyValue(source, sourceProperty.Name);
+                SetPropertyValue(target, targetProperty.Name, value);
+            }
+        }
+
+        /// <summary>
+        /// 对象属性值的加密
+        /// </summary>
+        public static void EncryptPropertyValue(object obj, string propertyName, Func<string, string> encryptFunc)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
+            if (encryptFunc == null)
+            {
+                throw new ArgumentNullException(nameof(encryptFunc));
+            }
+
+            PropertyInfo property = obj.GetType().GetProperty(propertyName);
+
+            if (property == null)
+            {
+                throw new ArgumentException($"对象类型 {obj.GetType().Name} 中没有名为 {propertyName} 的属性", nameof(propertyName));
+            }
+
+            object value = property.GetValue(obj);
+
+            if (value != null && value is string)
+            {
+                string encryptedValue = encryptFunc((string)value);
+                property.SetValue(obj, encryptedValue);
+            }
+        }
+
+        /// <summary>
+        /// 对象属性值的解密
+        /// </summary>
+        public static void DecryptPropertyValue(object obj, string propertyName, Func<string, string> decryptFunc)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
+            if (decryptFunc == null)
+            {
+                throw new ArgumentNullException(nameof(decryptFunc));
+            }
+
+            PropertyInfo property = obj.GetType().GetProperty(propertyName);
+
+            if (property == null)
+            {
+                throw new ArgumentException($"对象类型 {obj.GetType().Name} 中没有名为 {propertyName} 的属性", nameof(propertyName));
+            }
+
+            object value = property.GetValue(obj);
+
+            if (value != null && value is string)
+            {
+                string decryptedValue = decryptFunc((string)value);
+                property.SetValue(obj, decryptedValue);
+            }
+        }
+
+        /// <summary>
+        /// 在对象属性上进行特定的处理
+        /// </summary>
+        public static void ProcessPropertyValue(object obj, string propertyName, Action<object> processAction)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
+            if (processAction == null)
+            {
+                throw new ArgumentNullException(nameof(processAction));
+            }
+
+            PropertyInfo property = obj.GetType().GetProperty(propertyName);
+
+            if (property == null)
+            {
+                throw new ArgumentException($"对象类型 {obj.GetType().Name} 中没有名为 {propertyName} 的属性", nameof(propertyName));
+            }
+
+            object value = property.GetValue(obj);
+
+            if (value != null)
+            {
+                processAction(value);
+                property.SetValue(obj, value);
+            }
+        }
+
+        #endregion
+
+        #region 对象比较
+
+        /// <summary>
+        /// 比较两个对象的差异（属性值或字段值不同）
+        /// </summary>
+        public static IEnumerable<string> CompareDifferences(object obj1, object obj2)
+        {
+            if (obj1 == null && obj2 == null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            if (obj1 == null || obj2 == null)
+            {
+                throw new ArgumentNullException("比较对象不能为 null");
+            }
+
+            List<string> differences = new List<string>();
+
+            foreach (PropertyInfo property in obj1.GetType().GetProperties())
+            {
+                object value1 = property.GetValue(obj1);
+                object value2 = property.GetValue(obj2);
+
+                if (!Equals(value1, value2))
+                {
+                    differences.Add($"属性 {property.Name} 的值不同：{value1} -> {value2}");
+                }
+            }
+
+            foreach (FieldInfo field in obj1.GetType().GetFields())
+            {
+                object value1 = field.GetValue(obj1);
+                object value2 = field.GetValue(obj2);
+
+                if (!Equals(value1, value2))
+                {
+                    differences.Add($"字段 {field.Name} 的值不同：{value1} -> {value2}");
+                }
+            }
+
+            return differences;
+        }
+
+        #endregion
+
+        #region 对象高级转换
+
+        /// <summary>
+        /// 将对象转换为键值对集合
+        /// </summary>
+        public static IEnumerable<KeyValuePair<string, object>> ToKeyValuePairs(this object obj)
+        {
+            if (obj == null)
+            {
+                return Enumerable.Empty<KeyValuePair<string, object>>();
+            }
+
+            List<KeyValuePair<string, object>> pairs = new List<KeyValuePair<string, object>>();
+
+            foreach (PropertyInfo property in obj.GetType().GetProperties())
+            {
+                pairs.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(obj)));
+            }
+
+            foreach (FieldInfo field in obj.GetType().GetFields())
+            {
+                pairs.Add(new KeyValuePair<string, object>(field.Name, field.GetValue(obj)));
+            }
+
+            return pairs;
+        }
+
+        /// <summary>
+        /// 将对象转换为动态扩展对象
+        /// </summary>
+        public static dynamic? ToDynamic(this object obj)
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+
+            IDictionary<string, object> dictionary = new System.Dynamic.ExpandoObject();
+
+            foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties())
+            {
+                if (!propertyInfo.CanRead)
+                {
+                    continue;
+                }
+
+                object value = GetPropertyValue(obj, propertyInfo.Name);
+                dictionary.Add(propertyInfo.Name, value);
+            }
+
+            foreach (FieldInfo fieldInfo in obj.GetType().GetFields())
+            {
+                object value = GetFieldValue(obj, fieldInfo.Name);
+                dictionary.Add(fieldInfo.Name, value);
+            }
+
+            return dictionary;
+        }
+
+        /// <summary>
+        /// 获取对象的字段值
+        /// </summary>
+        public static object? GetFieldValue(this object obj, string fieldName)
+        {
+            return obj.GetType().GetField(fieldName)?.GetValue(obj);
+        }
+
+        /// <summary>
+        /// 设置对象的字段值
+        /// </summary>
+        public static void SetFieldValue(this object obj, string fieldName, object? value)
+        {
+            obj.GetType().GetField(fieldName)?.SetValue(obj, value);
         }
 
         #endregion

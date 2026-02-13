@@ -42,29 +42,6 @@ namespace EasyTool.Extension
             }
         }
 
-        /// <summary>
-        /// 返回字典中键的集合
-        /// [Obsolete("请直接使用 dictionary.Keys")]
-        /// </summary>
-        /// <param name="dictionary">要获取键的字典</param>
-        /// <returns>字典中所有键的集合</returns>
-        [Obsolete("请直接使用 dictionary.Keys", false)]
-        public static IEnumerable<TKey> GetKeys<TKey, TValue>(this IDictionary<TKey, TValue> dictionary)
-        {
-            return dictionary.Keys;
-        }
-
-        /// <summary>
-        /// 返回字典中值的集合
-        /// [Obsolete("请直接使用 dictionary.Values")]
-        /// </summary>
-        /// <param name="dictionary">要获取值的字典</param>
-        /// <returns>字典中所有值的集合</returns>
-        [Obsolete("请直接使用 dictionary.Values", false)]
-        public static IEnumerable<TValue> GetValues<TKey, TValue>(this IDictionary<TKey, TValue> dictionary)
-        {
-            return dictionary.Values;
-        }
 
         /// <summary>
         /// 从字典中删除指定的键

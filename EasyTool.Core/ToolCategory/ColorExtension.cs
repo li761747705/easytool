@@ -279,19 +279,7 @@ namespace EasyTool.Extension
         #endregion
 
         #region 命名颜色
-
-        /// <summary>
-        /// 从名称创建颜色
-        /// [Obsolete("请直接使用 Color.FromName(name)")]
-        /// </summary>
-        [Obsolete("请直接使用 Color.FromName(name)", false)]
-        public static Color FromName(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-                return Color.Empty;
-
-            return Color.FromName(name);
-        }
+        #endregion
 
         /// <summary>
         /// 获取颜色名称
@@ -304,7 +292,7 @@ namespace EasyTool.Extension
             return color.ToHex();
         }
 
-        #endregion
+        // endregion
 
         #region 颜色对比
 

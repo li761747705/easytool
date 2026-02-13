@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -193,41 +193,56 @@ namespace EasyTool
         /// <returns>分页HTML代码</returns>
         public string GetPaginationHtml(string urlFormat, string currentPageClass = "current", int range = 5)
         {
-            string html = "";
+            var sb = new StringBuilder();
             if (totalPage <= 1)
             {
-                return html;
+                return sb.ToString();
             }
+
             int startPage = Math.Max(1, currentPage - range);
             int endPage = Math.Min(totalPage, currentPage + range);
             if (startPage > 1)
             {
-                html += "<a href=\"" + String.Format(urlFormat, 1) + "\">1</a>";
+                sb.Append("<a href=\"");
+                sb.Append(String.Format(urlFormat, 1));
+                sb.Append("\">1</a>");
                 if (startPage > 2)
                 {
-                    html += "<span>...</span>";
+                    sb.Append("<span>...</span>");
                 }
             }
             for (int i = startPage; i <= endPage; i++)
             {
                 if (i == currentPage)
                 {
-                    html += "<span class=\"" + currentPageClass + "\">" + i.ToString() + "</span>";
+                    sb.Append("<span class=\"");
+                    sb.Append(currentPageClass);
+                    sb.Append("\">");
+                    sb.Append(i.ToString());
+                    sb.Append("</span>");
                 }
                 else
                 {
-                    html += "<a href=\"" + String.Format(urlFormat, i) + "\">" + i.ToString() + "</a>";
+                    sb.Append("<a href=\"");
+                    sb.Append(String.Format(urlFormat, i));
+                    sb.Append("\">");
+                    sb.Append(i.ToString());
+                    sb.Append("</a>");
                 }
             }
             if (endPage < totalPage)
             {
                 if (endPage < totalPage - 1)
                 {
-                    html += "<span>...</span>";
+                    sb.Append("<span>...</span>");
                 }
-                html += "<a href=\"" + String.Format(urlFormat, totalPage) + "\">" + totalPage.ToString() + "</a>";
+                sb.Append("<a href=\"");
+                sb.Append(String.Format(urlFormat, totalPage));
+                sb.Append("\">");
+                sb.Append(totalPage.ToString());
+                sb.Append("</a>");
             }
-            return html;
+            return sb.ToString();
         }
     }
 }

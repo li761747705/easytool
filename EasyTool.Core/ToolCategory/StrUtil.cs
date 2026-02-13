@@ -20,19 +20,6 @@ namespace EasyTool
             return Regex.Replace(str, @"\s+", "");
         }
 
-        /// <summary>
-        /// 将字符串中的指定字符替换成新的字符
-        /// [Obsolete("请直接使用 str.Replace(oldChar, newChar)")]
-        /// </summary>
-        /// <param name="str">要处理的字符串</param>
-        /// <param name="oldChar">要替换的字符</param>
-        /// <param name="newChar">新的字符</param>
-        /// <returns>处理后的字符串</returns>
-        [Obsolete("请直接使用 str.Replace(oldChar, newChar)", false)]
-        public static string ReplaceChar(string str, char oldChar, char newChar)
-        {
-            return str.Replace(oldChar, newChar);
-        }
 
         /// <summary>
         /// 检查字符串是否为数字
@@ -67,91 +54,12 @@ namespace EasyTool
             return DateTime.TryParse(str, out result);
         }
 
-        /// <summary>
-        /// 获取字符串的字节数组
-        /// [Obsolete("请直接使用 Encoding.UTF8.GetBytes(str)")]
-        /// </summary>
-        /// <param name="str">要处理的字符串</param>
-        /// <returns>字符串的字节数组</returns>
-        [Obsolete("请直接使用 Encoding.UTF8.GetBytes(str)", false)]
-        public static byte[] GetBytes(string str)
-        {
-            return System.Text.Encoding.UTF8.GetBytes(str);
-        }
 
-        /// <summary>
-        /// 将字节数组转换为字符串
-        /// [Obsolete("请直接使用 Encoding.UTF8.GetString(bytes)")]
-        /// </summary>
-        /// <param name="bytes">要处理的字节数组</param>
-        /// <returns>字节数组转换后的字符串</returns>
-        [Obsolete("请直接使用 Encoding.UTF8.GetString(bytes)", false)]
-        public static string GetString(byte[] bytes)
-        {
-            return System.Text.Encoding.UTF8.GetString(bytes);
-        }
 
-        /// <summary>
-        /// 将字符串转换为大写
-        /// [Obsolete("请直接使用 str.ToUpper()")]
-        /// </summary>
-        /// <param name="str">要处理的字符串</param>
-        /// <returns>处理后的字符串</returns>
-        [Obsolete("请直接使用 str.ToUpper()", false)]
-        public static string ToUpperCase(string str)
-        {
-            return str.ToUpper();
-        }
 
-        /// <summary>
-        /// 将字符串转换为小写
-        /// [Obsolete("请直接使用 str.ToLower()")]
-        /// </summary>
-        /// <param name="str">要处理的字符串</param>
-        /// <returns>处理后的字符串</returns>
-        [Obsolete("请直接使用 str.ToLower()", false)]
-        public static string ToLowerCase(string str)
-        {
-            return str.ToLower();
-        }
 
-        /// <summary>
-        /// 检查字符串是否为空或null
-        /// [Obsolete("请直接使用 string.IsNullOrEmpty(str)")]
-        /// </summary>
-        /// <param name="str">要检查的字符串</param>
-        /// <returns>如果是空或null，则返回true，否则返回false</returns>
-        [Obsolete("请直接使用 string.IsNullOrEmpty(str)", false)]
-        public static bool IsNullOrEmpty(string str)
-        {
-            return string.IsNullOrEmpty(str);
-        }
 
-        /// <summary>
-        /// 检查字符串是否为空或仅由空格组成
-        /// [Obsolete("请直接使用 string.IsNullOrWhiteSpace(str)")]
-        /// </summary>
-        /// <param name="str">要检查的字符串</param>
-        /// <returns>如果是空或仅由空格组成，则返回true，否则返回false</returns>
-        [Obsolete("请直接使用 string.IsNullOrWhiteSpace(str)", false)]
-        public static bool IsNullOrWhiteSpace(string str)
-        {
-            return string.IsNullOrWhiteSpace(str);
-        }
 
-        /// <summary>
-        /// 截取字符串的指定部分
-        /// [Obsolete("请直接使用 str.Substring(startIndex, length)")]
-        /// </summary>
-        /// <param name="str">要处理的字符串</param>
-        /// <param name="startIndex">起始位置（从0开始）</param>
-        /// <param name="length">要截取的长度</param>
-        /// <returns>截取后的字符串</returns>
-        [Obsolete("请直接使用 str.Substring(startIndex, length)", false)]
-        public static string Substring(string str, int startIndex, int length)
-        {
-            return str.Substring(startIndex, length);
-        }
 
         /// <summary>
         /// 将字符串转换为驼峰命名法
@@ -161,19 +69,20 @@ namespace EasyTool
         public static string ToCamelCase(string str)
         {
             string[] words = str.Split(new char[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
-            string result = "";
+            var sb = new StringBuilder();
             for (int i = 0; i < words.Length; i++)
             {
                 if (i == 0)
                 {
-                    result += words[i].ToLower();
+                    sb.Append(words[i].ToLower());
                 }
                 else
                 {
-                    result += words[i].Substring(0, 1).ToUpper() + words[i].Substring(1).ToLower();
+                    sb.Append(words[i].Substring(0, 1).ToUpper());
+                    sb.Append(words[i].Substring(1).ToLower());
                 }
             }
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -184,12 +93,13 @@ namespace EasyTool
         public static string ToPascalCase(string str)
         {
             string[] words = str.Split(new char[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
-            string result = "";
+            var sb = new StringBuilder();
             for (int i = 0; i < words.Length; i++)
             {
-                result += words[i].Substring(0, 1).ToUpper() + words[i].Substring(1).ToLower();
+                sb.Append(words[i].Substring(0, 1).ToUpper());
+                sb.Append(words[i].Substring(1).ToLower());
             }
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -200,19 +110,20 @@ namespace EasyTool
         public static string ToSnakeCase(string str)
         {
             string[] words = str.Split(new char[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
-            string result = "";
+            var sb = new StringBuilder();
             for (int i = 0; i < words.Length; i++)
             {
                 if (i == 0)
                 {
-                    result += words[i].ToLower();
+                    sb.Append(words[i].ToLower());
                 }
                 else
                 {
-                    result += "_" + words[i].ToLower();
+                    sb.Append('_');
+                    sb.Append(words[i].ToLower());
                 }
             }
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -223,19 +134,20 @@ namespace EasyTool
         public static string ToKebabCase(string str)
         {
             string[] words = str.Split(new char[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
-            string result = "";
+            var sb = new StringBuilder();
             for (int i = 0; i < words.Length; i++)
             {
                 if (i == 0)
                 {
-                    result += words[i].ToLower();
+                    sb.Append(words[i].ToLower());
                 }
                 else
                 {
-                    result += "-" + words[i].ToLower();
+                    sb.Append('-');
+                    sb.Append(words[i].ToLower());
                 }
             }
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -259,33 +171,7 @@ namespace EasyTool
             return string.Equals(RemoveAllSpaces(str1), RemoveAllSpaces(str2), StringComparison.OrdinalIgnoreCase);
         }
 
-        /// <summary>
-        /// 在字符串的左侧填充指定字符，使字符串达到指定长度
-        /// [Obsolete("请直接使用 str.PadLeft(length, paddingChar)")]
-        /// </summary>
-        /// <param name="str">要处理的字符串</param>
-        /// <param name="length">指定长度</param>
-        /// <param name="paddingChar">填充字符</param>
-        /// <returns>处理后的字符串</returns>
-        [Obsolete("请直接使用 str.PadLeft(length, paddingChar)", false)]
-        public static string PadLeft(string str, int length, char paddingChar)
-        {
-            return str.PadLeft(length, paddingChar);
-        }
 
-        /// <summary>
-        /// 在字符串的右侧填充指定字符，使字符串达到指定长度
-        /// [Obsolete("请直接使用 str.PadRight(length, paddingChar)")]
-        /// </summary>
-        /// <param name="str">要处理的字符串</param>
-        /// <param name="length">指定长度</param>
-        /// <param name="paddingChar">填充字符</param>
-        /// <returns>处理后的字符串</returns>
-        [Obsolete("请直接使用 str.PadRight(length, paddingChar)", false)]
-        public static string PadRight(string str, int length, char paddingChar)
-        {
-            return str.PadRight(length, paddingChar);
-        }
 
         /// <summary>
         /// 将字符串中的某些字符替换成指定的字符

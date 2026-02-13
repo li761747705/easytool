@@ -170,65 +170,6 @@ namespace EasyTool.Extension
             return new FileInfo(targetPath);
         }
 
-        /// <summary>
-        /// 读取文件的所有文本内容
-        /// [Obsolete("请直接使用 File.ReadAllText(file.FullName)")]
-        /// </summary>
-        [Obsolete("请直接使用 File.ReadAllText(file.FullName)", false)]
-        public static string ReadAllText(this FileInfo file)
-        {
-            if (file == null || !file.Exists)
-                return string.Empty;
-
-            return File.ReadAllText(file.FullName);
-        }
-
-        /// <summary>
-        /// 读取文件的所有字节
-        /// [Obsolete("请直接使用 File.ReadAllBytes(file.FullName)")]
-        /// </summary>
-        [Obsolete("请直接使用 File.ReadAllBytes(file.FullName)", false)]
-        public static byte[] ReadAllBytes(this FileInfo file)
-        {
-            if (file == null || !file.Exists)
-                return Array.Empty<byte>();
-
-            return File.ReadAllBytes(file.FullName);
-        }
-
-        /// <summary>
-        /// 写入文本内容到文件
-        /// [Obsolete("请直接使用 File.WriteAllText(file.FullName, content)")]
-        /// </summary>
-        [Obsolete("请直接使用 File.WriteAllText(file.FullName, content)", false)]
-        public static void WriteAllText(this FileInfo file, string content)
-        {
-            if (file == null)
-                throw new ArgumentNullException(nameof(file));
-
-            // 确保目录存在
-            if (!file.Directory.Exists)
-                file.Directory.Create();
-
-            File.WriteAllText(file.FullName, content);
-        }
-
-        /// <summary>
-        /// 写入字节到文件
-        /// [Obsolete("请直接使用 File.WriteAllBytes(file.FullName, content)")]
-        /// </summary>
-        [Obsolete("请直接使用 File.WriteAllBytes(file.FullName, content)", false)]
-        public static void WriteAllBytes(this FileInfo file, byte[] content)
-        {
-            if (file == null)
-                throw new ArgumentNullException(nameof(file));
-
-            // 确保目录存在
-            if (!file.Directory.Exists)
-                file.Directory.Create();
-
-            File.WriteAllBytes(file.FullName, content);
-        }
 
         #endregion
 

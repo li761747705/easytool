@@ -21,6 +21,7 @@ namespace EasyTool
             {
                 hash += c;
             }
+
             return hash;
         }
 
@@ -36,6 +37,7 @@ namespace EasyTool
             {
                 hash = (hash << 4) ^ (hash >> 28) ^ c;
             }
+
             return hash;
         }
 
@@ -53,6 +55,7 @@ namespace EasyTool
                 hash += (hash << 10);
                 hash ^= (hash >> 6);
             }
+
             hash += (hash << 3);
             hash ^= (hash >> 11);
             hash += (hash << 15);
@@ -71,6 +74,7 @@ namespace EasyTool
             {
                 hash = 33 * hash + c;
             }
+
             return hash;
         }
 
@@ -81,7 +85,7 @@ namespace EasyTool
         /// <param name="prime">大质数</param>
         /// <param name="num_buckets">哈希桶的数量</param>
         /// <param name="a">a的取值范围为[1, prime - 1]</param>
-        /// <param name="b">b的取值范围
+        /// <param name="b">b的取值范围</param>
         public static uint Universal(string str, uint prime, uint num_buckets, uint a, uint b)
         {
             uint hash = a;
@@ -89,6 +93,7 @@ namespace EasyTool
             {
                 hash = hash * prime + c;
             }
+
             hash = (hash * a + b) % num_buckets;
             return hash;
         }
@@ -106,6 +111,7 @@ namespace EasyTool
             {
                 hash ^= table[str[i]];
             }
+
             return hash;
         }
 
@@ -123,6 +129,7 @@ namespace EasyTool
                 hash *= fnv_prime;
                 hash ^= c;
             }
+
             return hash;
         }
 
@@ -157,6 +164,7 @@ namespace EasyTool
                 hash = hash * a + c;
                 a = a * b;
             }
+
             return hash;
         }
 
@@ -172,6 +180,7 @@ namespace EasyTool
             {
                 hash ^= ((hash << 5) + c + (hash >> 2));
             }
+
             return hash;
         }
 
@@ -196,6 +205,7 @@ namespace EasyTool
                     hash = ((hash ^ (test >> (int)ThreeQuarters)) & (~HighBits));
                 }
             }
+
             return hash;
         }
 
@@ -216,8 +226,10 @@ namespace EasyTool
                 {
                     hash ^= (x >> 24);
                 }
+
                 hash &= ~x;
             }
+
             return hash;
         }
 
@@ -234,6 +246,7 @@ namespace EasyTool
             {
                 hash = hash * seed + c;
             }
+
             return hash;
         }
 
@@ -249,6 +262,7 @@ namespace EasyTool
             {
                 hash = c + (hash << 6) + (hash << 16) - hash;
             }
+
             return hash;
         }
 
@@ -264,6 +278,7 @@ namespace EasyTool
             {
                 hash = ((hash << 5) + hash) + c;
             }
+
             return hash;
         }
 
@@ -279,6 +294,7 @@ namespace EasyTool
             {
                 hash = ((hash << 5) ^ (hash >> 27)) ^ c;
             }
+
             return hash;
         }
 
@@ -302,6 +318,7 @@ namespace EasyTool
                     hash ^= (~((hash << 11) ^ str[i] ^ (hash >> 5)));
                 }
             }
+
             return hash;
         }
 
@@ -327,6 +344,7 @@ namespace EasyTool
                     hash += (hash << 10);
                     hash ^= (hash >> 6);
                 }
+
                 hash += (hash << 3);
                 hash ^= (hash >> 11);
                 hash += (hash << 15);
@@ -393,6 +411,7 @@ namespace EasyTool
             {
                 h = 31 * h + c;
             }
+
             hash = h;
             return hash;
         }
@@ -412,8 +431,9 @@ namespace EasyTool
                 hash1 = (hash1 * seed) + c;
                 hash2 = (hash2 * seed) + c + 1;
             }
+
             return hash1 + (hash2 * 1566083941);
         }
 
     }
-    }
+}

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web;
+using EasyTool.Extension;
 
 namespace EasyTool
 {
@@ -302,24 +303,6 @@ namespace EasyTool
         }
 
 
-        /// <summary>
-        /// 拷贝文件
-        /// [Obsolete("请直接使用 File.Copy(src, dest)")]
-        /// </summary>
-        /// <param name="src">源文件路径</param>
-        /// <param name="destinationPath">目标文件路径</param>
-        [Obsolete("请直接使用 File.Copy(src, dest)", false)]
-        public static void Cp(string src, string dest)
-        {
-            try
-            {
-                File.Copy(src, dest);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"拷贝文件 {src} 到 {dest} 失败：{ex.Message}", ex);
-            }
-        }
 
         /// <summary>
         /// 复制文件或目录
@@ -398,24 +381,6 @@ namespace EasyTool
             }
         }
 
-        /// <summary>
-        /// 移动文件或重命名文件
-        /// [Obsolete("请直接使用 File.Move(src, dest)")]
-        /// </summary>
-        /// <param name="src">源文件路径</param>
-        /// <param name="dest">目标文件路径</param>
-        [Obsolete("请直接使用 File.Move(src, dest)", false)]
-        public static void Mv(string src, string dest)
-        {
-            try
-            {
-                File.Move(src, dest);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"移动/重命名文件 {src} 到 {dest} 失败：{ex.Message}", ex);
-            }
-        }
 
         /// <summary>
         /// 移动文件或者目录
@@ -539,22 +504,6 @@ namespace EasyTool
             }
         }
 
-        /// <summary>
-        /// 获取绝对路径
-        /// [Obsolete("请直接使用 Path.GetFullPath(path)")]
-        /// </summary>
-        /// <param name="path">相对路径</param>
-        /// <returns>绝对路径</returns>
-        [Obsolete("请直接使用 Path.GetFullPath(path)", false)]
-        public static string GetAbsolutePath(string path)
-        {
-            if (!Path.IsPathRooted(path))
-            {
-                path = Path.Combine(Directory.GetCurrentDirectory(), path);
-            }
-
-            return Path.GetFullPath(path);
-        }
 
         /// <summary>
         /// 判断给定路径是否是绝对路径
@@ -770,76 +719,7 @@ namespace EasyTool
             return filePath.Substring(startIndex);
         }
 
-        /// <summary>
-        /// 删除文件
-        /// [Obsolete("请直接使用 File.Delete(path)")]
-        /// </summary>
-        /// <param name="path">文件路径</param>
-        [Obsolete("请直接使用 File.Delete(path)", false)]
-        public static void Rm(string path)
-        {
-            try
-            {
-                File.Delete(path);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"删除文件 {path} 失败：{ex.Message}");
-            }
-        }
 
-        /// <summary>
-        /// 创建目录
-        /// [Obsolete("请直接使用 Directory.CreateDirectory(path)")]
-        /// </summary>
-        /// <param name="path">目录路径</param>
-        [Obsolete("请直接使用 Directory.CreateDirectory(path)", false)]
-        public static void Mkdir(string path)
-        {
-            try
-            {
-                Directory.CreateDirectory(path);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"创建目录 {path} 失败：{ex.Message}", ex);
-            }
-        }
-
-        /// <summary>
-        /// 删除目录
-        /// [Obsolete("请直接使用 Directory.Delete(path)")]
-        /// </summary>
-        /// <param name="path">目录路径</param>
-        [Obsolete("请直接使用 Directory.Delete(path)", false)]
-        public static void Rmdir(string path)
-        {
-            try
-            {
-                Directory.Delete(path);
-                Console.WriteLine($"目录 {path} 已成功删除");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"删除目录 {path} 失败：{ex.Message}",ex);
-            }
-        }
-
-        /// <summary>
-        /// 获取文件名
-        /// [Obsolete("请直接使用 file?.Name")]
-        /// </summary>
-        /// <param name="file">文件</param>
-        /// <returns>文件名</returns>
-        [Obsolete("请直接使用 file?.Name", false)]
-        public static string GetFileName(FileInfo file)
-        {
-            if (file == null)
-            {
-                return null;
-            }
-            return file.Name;
-        }
 
         /// <summary>
         /// 获取文件名
@@ -938,7 +818,8 @@ namespace EasyTool
         /// <returns>类型，文件的扩展名，未找到为null</returns>
         public static string? GetType(FileInfo file)
         {
-            return FileTypeUtil.GetType(file);
+            // 通过文件头部获取类型
+            return file.GetFileType();
         }
 
         /// <summary>
@@ -1158,27 +1039,6 @@ namespace EasyTool
             return result;
         }
 
-        /// <summary>
-        /// 从文件中读取每一行数据
-        /// [Obsolete("请直接使用 File.ReadAllLines(path, encoding)")]
-        /// </summary>
-        /// <param name="path">文件路径</param>
-        /// <param name="encoding">编码格式，默认为UTF-8</param>
-        /// <returns></returns>
-        [Obsolete("请直接使用 File.ReadAllLines(path, encoding)", false)]
-        public static string[] ReadAllLines(string path, Encoding? encoding = null)
-        {
-            // 如果未指定编码格式，则默认为 UTF-8
-            if (encoding == null)
-            {
-                encoding = Encoding.UTF8;
-            }
-
-            // 读取文件所有行数据
-            string[] lines = File.ReadAllLines(path, encoding);
-
-            return lines;
-        }
 
 
         /// <summary>
@@ -1208,16 +1068,6 @@ namespace EasyTool
         }
 
 
-        /// <summary>
-        /// 获取当前系统的换行分隔符
-        /// [Obsolete("请直接使用 Environment.NewLine")]
-        /// </summary>
-        /// <returns>换行分隔符</returns>
-        [Obsolete("请直接使用 Environment.NewLine", false)]
-        public static string GetLineSeparator()
-        {
-            return Environment.NewLine;
-        }
 
         /// <summary>
         /// 将string写入文件，覆盖模式

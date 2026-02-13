@@ -352,31 +352,6 @@ namespace EasyTool.Extension
 
         #region 大小写转换
 
-        /// <summary>
-        /// 转换为大写（不变则为返回原字符串）
-        /// [Obsolete("请直接使用 value.ToUpper()")]
-        /// </summary>
-        [Obsolete("请直接使用 value.ToUpper()", false)]
-        public static string ToUpperSafe(this string str)
-        {
-            if (string.IsNullOrEmpty(str))
-                return str;
-
-            return str.ToUpper();
-        }
-
-        /// <summary>
-        /// 转换为小写（不变则为返回原字符串）
-        /// [Obsolete("请直接使用 value.ToLower()")]
-        /// </summary>
-        [Obsolete("请直接使用 value.ToLower()", false)]
-        public static string ToLowerSafe(this string str)
-        {
-            if (string.IsNullOrEmpty(str))
-                return str;
-
-            return str.ToLower();
-        }
 
         /// <summary>
         /// 转换为单词首字母大写（如：helloWorld -> HelloWorld）
