@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
 
-namespace EasyTool.ToolCategory
+namespace EasyTool.DataCategory
 {
 /// <summary>
 /// 简单实体转化拓展类

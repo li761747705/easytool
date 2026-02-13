@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyTool.ToolCategory
+namespace EasyTool.DataCategory
 {
     /// <summary>
     /// 社会信用代码工具
