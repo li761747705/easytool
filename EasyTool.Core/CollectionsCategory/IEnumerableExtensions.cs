@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 
-namespace EasyTool.IEnumerableCategory
+namespace EasyTool.CollectionsCategory
 {
     /// <summary>
     /// IEnumerable 通用扩展方法

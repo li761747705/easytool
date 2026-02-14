@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EasyTool.DataCategory
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// 分页工具类，支持多种数据源和多种排序方式的分页
