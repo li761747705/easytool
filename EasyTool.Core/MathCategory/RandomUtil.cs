@@ -1,54 +1,65 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace EasyTool.MathCategory
 {
     public static class RandomUtil
     {
-        private static readonly Random random = new Random();
+#if NET6_0_OR_GREATER
+        // .NET 6+ 使用 Random.Shared，线程安全且高性能
+        private static Random SharedRandom => Random.Shared;
+#else
+        // .NET Standard 2.1 使用 ThreadLocal 确保线程安全
+        private static readonly ThreadLocal<Random> ThreadLocalRandom = new(() => new Random(Guid.NewGuid().GetHashCode()));
+        private static Random SharedRandom => ThreadLocalRandom.Value!;
+#endif
 
         /// <summary>
         /// 生成指定范围内的随机整数
+        /// <para>注意：返回值为 [min, max) 区间，即包含 min 但不包含 max</para>
         /// </summary>
-        /// <param name="min">随机整数的最小值</param>
-        /// <param name="max">随机整数的最大值</param>
+        /// <param name="min">随机整数的最小值（包含）</param>
+        /// <param name="max">随机整数的最大值（不包含）</param>
         /// <returns>生成的随机整数</returns>
         public static int RandomInt(int min, int max)
         {
-            return random.Next(min, max);
+            return SharedRandom.Next(min, max);
         }
 
         /// <summary>
         /// 生成指定位数的随机数字字符串
+        /// <para>仅包含数字 0-9</para>
         /// </summary>
         /// <param name="length">生成的随机数字字符串的长度</param>
         /// <returns>生成的随机数字字符串</returns>
         public static string RandomDigitString(int length)
         {
-            string result = "";
+            var sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {
-                result += random.Next(10);
+                sb.Append(SharedRandom.Next(10));
             }
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
         /// 生成指定位数的随机字母数字字符串
+        /// <para>包含大小写字母 A-Z, a-z 和数字 0-9</para>
         /// </summary>
         /// <param name="length">生成的随机字母数字字符串的长度</param>
         /// <returns>生成的随机字母数字字符串</returns>
         public static string RandomAlphanumericString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            string result = "";
+            var sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {
-                result += chars[random.Next(chars.Length)];
+                sb.Append(chars[SharedRandom.Next(chars.Length)]);
             }
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -59,12 +70,12 @@ namespace EasyTool.MathCategory
         public static string RandomLetterString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            string result = "";
+            var sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {
-                result += chars[random.Next(chars.Length)];
+                sb.Append(chars[SharedRandom.Next(chars.Length)]);
             }
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -73,7 +84,7 @@ namespace EasyTool.MathCategory
         /// <returns>生成的随机布尔值</returns>
         public static bool RandomBool()
         {
-            return random.Next(2) == 0;
+            return SharedRandom.Next(2) == 0;
         }
 
         /// <summary>
@@ -86,7 +97,7 @@ namespace EasyTool.MathCategory
             int[] result = new int[length];
             for (int i = 0; i < length; i++)
             {
-                result[i] = random.Next();
+                result[i] = SharedRandom.Next();
             }
             return result;
         }
@@ -101,7 +112,7 @@ namespace EasyTool.MathCategory
             double[] result = new double[length];
             for (int i = 0; i < length; i++)
             {
-                result[i] = random.NextDouble();
+                result[i] = SharedRandom.NextDouble();
             }
             return result;
         }
@@ -131,7 +142,7 @@ namespace EasyTool.MathCategory
         public static DateTime RandomDate(DateTime startDate, DateTime endDate)
         {
             TimeSpan timeSpan = endDate - startDate;
-            TimeSpan newSpan = new TimeSpan(0, 0, random.Next(0, (int)timeSpan.TotalSeconds));
+            TimeSpan newSpan = new TimeSpan(0, 0, SharedRandom.Next(0, (int)timeSpan.TotalSeconds));
             return startDate + newSpan;
         }
 
@@ -143,18 +154,20 @@ namespace EasyTool.MathCategory
         public static T RandomEnumValue<T>()
         {
             Array values = Enum.GetValues(typeof(T));
-            return (T)values.GetValue(random.Next(values.Length));
+            return (T)values.GetValue(SharedRandom.Next(values.Length));
         }
 
         /// <summary>
         /// 获取一个指定范围内的随机整数
+        /// <para>注意：返回值为 [minValue, maxValue] 闭区间，即同时包含最小值和最大值</para>
+        /// <para>与 RandomInt 方法的区别：RandomInt 使用左闭右开区间 [min, max)，本方法使用闭区间</para>
         /// </summary>
-        /// <param name="minValue">最小值</param>
-        /// <param name="maxValue">最大值</param>
+        /// <param name="minValue">最小值（包含）</param>
+        /// <param name="maxValue">最大值（包含）</param>
         /// <returns>随机整数</returns>
         public static int GetRandomInt(int minValue, int maxValue)
         {
-            return random.Next(minValue, maxValue + 1);
+            return SharedRandom.Next(minValue, maxValue + 1);
         }
 
         /// <summary>
@@ -165,7 +178,7 @@ namespace EasyTool.MathCategory
         /// <returns>随机双精度浮点数</returns>
         public static double GetRandomDouble(double minValue, double maxValue)
         {
-            return minValue + (maxValue - minValue) * random.NextDouble();
+            return minValue + (maxValue - minValue) * SharedRandom.NextDouble();
         }
 
         /// <summary>
@@ -210,14 +223,15 @@ namespace EasyTool.MathCategory
         /// </summary>
         /// <param name="length">字符串长度</param>
         /// <returns>随机数字字符串</returns>
+        [Obsolete("请使用 RandomDigitString 替代，两者功能相同")]
         public static string RandomNumberString(int length)
         {
-            string result = "";
+            var sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {
-                result += random.Next(10).ToString();
+                sb.Append(SharedRandom.Next(10));
             }
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -225,12 +239,13 @@ namespace EasyTool.MathCategory
         /// </summary>
         /// <param name="length">字符串长度</param>
         /// <returns>随机字母数字字符串</returns>
+        [Obsolete("请使用 RandomAlphanumericString 替代，该方法实现较复杂且性能较差")]
         public static string RandomString(int length)
         {
-            string result = "";
+            var sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {
-                int code = random.Next(36) + 48;
+                int code = SharedRandom.Next(36) + 48;
                 if (code >= 58 && code <= 64)
                 {
                     code += 7;
@@ -239,9 +254,9 @@ namespace EasyTool.MathCategory
                 {
                     code += 6;
                 }
-                result += Convert.ToChar(code);
+                sb.Append(Convert.ToChar(code));
             }
-            return result;
+            return sb.ToString();
         }
     }
 }

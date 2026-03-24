@@ -347,5 +347,122 @@ namespace EasyTool.DateTimeCategory
             return (num >> (bit - 1)) & 1;
         }
 
+        #region 公历农历互转
+
+        /// <summary>
+        /// 公历转农历
+        /// </summary>
+        /// <param name="solarDate">公历日期</param>
+        /// <returns>农历日期信息，包含年、月、日</returns>
+        public static LunarDate? SolarToLunar(DateTime solarDate)
+        {
+            try
+            {
+                int[] lunarDate = GetLunarDate(solarDate.Year, solarDate.Month, solarDate.Day);
+                return new LunarDate(lunarDate[0], lunarDate[1], lunarDate[2], lunarDate[3] > 0 && lunarDate[4] == 1);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 农历转公历
+        /// </summary>
+        /// <param name="year">农历年份</param>
+        /// <param name="month">农历月份（1-12）</param>
+        /// <param name="day">农历日期</param>
+        /// <param name="isLeapMonth">是否为闰月</param>
+        /// <returns>公历日期</returns>
+        public static DateTime? LunarToSolar(int year, int month, int day, bool isLeapMonth = false)
+        {
+            if (year < 1900 || year > 2100)
+                return null;
+
+            try
+            {
+                // 计算从1900年1月31日到目标农历日期的天数
+                int offset = 0;
+
+                // 累加年份天数
+                for (int y = 1900; y < year; y++)
+                {
+                    offset += GetLunarYearDays(y);
+                }
+
+                int leapMonth = GetLunarLeapMonth(year);
+                bool leapProcessed = false;
+
+                // 累加月份天数
+                for (int m = 1; m < month; m++)
+                {
+                    // 处理闰月
+                    if (leapMonth > 0 && m == leapMonth && !leapProcessed)
+                    {
+                        offset += GetLunarLeapMonthDays(year);
+                        m--; // 重新处理当前月
+                        leapProcessed = true;
+                        continue;
+                    }
+                    offset += GetLunarMonthDays(year, m);
+                }
+
+                // 如果是闰月，需要加上闰月之前月份的天数
+                if (isLeapMonth && leapMonth == month)
+                {
+                    offset += GetLunarMonthDays(year, month);
+                }
+
+                // 加上日期天数
+                offset += day - 1;
+
+                // 计算公历日期
+                return new DateTime(1900, 1, 31).AddDays(offset);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// 农历日期信息
+    /// </summary>
+    public class LunarDate
+    {
+        /// <summary>
+        /// 农历年
+        /// </summary>
+        public int Year { get; }
+
+        /// <summary>
+        /// 农历月
+        /// </summary>
+        public int Month { get; }
+
+        /// <summary>
+        /// 农历日
+        /// </summary>
+        public int Day { get; }
+
+        /// <summary>
+        /// 是否为闰月
+        /// </summary>
+        public bool IsLeapMonth { get; }
+
+        /// <summary>
+        /// 创建农历日期
+        /// </summary>
+        public LunarDate(int year, int month, int day, bool isLeapMonth = false)
+        {
+            Year = year;
+            Month = month;
+            Day = day;
+            IsLeapMonth = isLeapMonth;
+        }
     }
 }

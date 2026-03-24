@@ -28,18 +28,23 @@ namespace EasyTool.IOCategory
         /// </summary>
         /// <param name="path">文件或目录的路径</param>
         /// <returns>是否为空</returns>
+        /// <exception cref="FileNotFoundException">路径不存在时抛出异常</exception>
         public static bool IsEmpty(string path)
         {
             // 判断是否为目录
             if (Directory.Exists(path))
             {
-                // 如果是目录，遍历目录下的所有文件，判断是否有文件
-                return Directory.GetFiles(path).Length>0;
+                // 如果是目录，判断目录下是否有文件（没有文件则为空）
+                return Directory.GetFiles(path).Length == 0;
             }
-            else
+            else if (File.Exists(path))
             {
                 // 如果是文件，判断文件大小是否为 0
                 return new FileInfo(path).Length == 0;
+            }
+            else
+            {
+                throw new FileNotFoundException($"路径 {path} 不存在");
             }
         }
 

@@ -263,6 +263,13 @@ namespace EasyTool.CollectionsCategory
 
         #region 随机操作
 
+#if NET6_0_OR_GREATER
+        private static System.Random GetSharedRandom() => System.Random.Shared;
+#else
+        private static readonly System.Threading.ThreadLocal<System.Random> ThreadLocalRandom = new(() => new System.Random(Guid.NewGuid().GetHashCode()));
+        private static System.Random GetSharedRandom() => ThreadLocalRandom.Value!;
+#endif
+
         /// <summary>
         /// 随机排序
         /// </summary>
@@ -271,8 +278,8 @@ namespace EasyTool.CollectionsCategory
             if (source == null)
                 yield break;
 
-            var random = new Random();
             var list = source.ToList();
+            var random = GetSharedRandom();
 
             for (int i = list.Count - 1; i > 0; i--)
             {
@@ -298,7 +305,7 @@ namespace EasyTool.CollectionsCategory
             if (list.Count == 0)
                 return default;
 
-            var random = new Random();
+            var random = GetSharedRandom();
             return list[random.Next(list.Count)];
         }
 
@@ -315,7 +322,7 @@ namespace EasyTool.CollectionsCategory
                 yield break;
 
             count = Math.Min(count, list.Count);
-            var random = new Random();
+            var random = GetSharedRandom();
             var selected = new HashSet<int>();
 
             while (selected.Count < count)

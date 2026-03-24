@@ -28,7 +28,7 @@ namespace EasyTool.CodeCategory
             encoding ??= Encoding.UTF8;
             byte[] keyBytes = encoding.GetBytes(sk).ToArray();
             byte[] toEncrypt = encoding.GetBytes(str);
-            var des = DES.Create();
+            using var des = DES.Create();
             des.Mode = cipher;
             des.Padding = padding;
             des.Key = keyBytes;
@@ -55,7 +55,7 @@ namespace EasyTool.CodeCategory
             encoding ??= Encoding.UTF8;
             byte[] keyBytes = encoding.GetBytes(sk).ToArray();
             byte[] toDecrypt = Convert.FromBase64String(str);
-            var des = DES.Create();
+            using var des = DES.Create();
             des.Mode = cipher;
             des.Padding = padding;
             des.Key = keyBytes;
@@ -87,7 +87,7 @@ namespace EasyTool.CodeCategory
             byte[] keyBytes = encoding.GetBytes(sk).ToArray();
             byte[] ivBytes = encoding.GetBytes(iv).ToArray();
             byte[] toEncrypt = encoding.GetBytes(str);
-            var des = DES.Create();
+            using var des = DES.Create();
             des.Mode = cipher;
             des.Padding = padding;
             des.Key = keyBytes;
@@ -118,7 +118,7 @@ namespace EasyTool.CodeCategory
             byte[] keyBytes = encoding.GetBytes(sk).ToArray();
             byte[] ivBytes = encoding.GetBytes(iv).ToArray();
             byte[] toDecrypt = Convert.FromBase64String(str);
-            var des = DES.Create();
+            using var des = DES.Create();
             des.Mode = cipher;
             des.Padding = padding;
             des.Key = keyBytes;
@@ -155,7 +155,7 @@ namespace EasyTool.CodeCategory
             if (ivBytes != null && ivBytes.Length != 8)
                 throw new ArgumentException("不合规的IV，请确认IV为8位");
 
-            var des = DES.Create();
+            using var des = DES.Create();
             des.Mode = cipher;
             des.Padding = padding;
             des.Key = keyBytes;
@@ -187,7 +187,7 @@ namespace EasyTool.CodeCategory
             if (ivBytes != null && ivBytes.Length != 8)
                 throw new ArgumentException("不合规的IV，请确认IV为8位");
 
-            var des = DES.Create();
+            using var des = DES.Create();
             des.Mode = cipher;
             des.Padding = padding;
             des.Key = keyBytes;

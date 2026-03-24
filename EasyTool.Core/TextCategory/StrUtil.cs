@@ -14,9 +14,13 @@ namespace EasyTool.TextCategory
         /// 移除字符串中的所有空格
         /// </summary>
         /// <param name="str">要处理的字符串</param>
-        /// <returns>处理后的字符串</returns>
+        /// <returns>处理后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string RemoveAllSpaces(string str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
             return Regex.Replace(str, @"\s+", "");
         }
 
@@ -28,8 +32,11 @@ namespace EasyTool.TextCategory
         /// <returns>如果是数字，则返回true，否则返回false</returns>
         public static bool IsNumeric(string str)
         {
-            double result;
-            return double.TryParse(str, out result);
+            if (string.IsNullOrEmpty(str))
+            {
+                return false;
+            }
+            return double.TryParse(str, out _);
         }
 
         /// <summary>
@@ -39,8 +46,11 @@ namespace EasyTool.TextCategory
         /// <returns>如果是整数，则返回true，否则返回false</returns>
         public static bool IsInteger(string str)
         {
-            int result;
-            return int.TryParse(str, out result);
+            if (string.IsNullOrEmpty(str))
+            {
+                return false;
+            }
+            return int.TryParse(str, out _);
         }
 
         /// <summary>
@@ -50,8 +60,11 @@ namespace EasyTool.TextCategory
         /// <returns>如果是日期，则返回true，否则返回false</returns>
         public static bool IsDate(string str)
         {
-            DateTime result;
-            return DateTime.TryParse(str, out result);
+            if (string.IsNullOrEmpty(str))
+            {
+                return false;
+            }
+            return DateTime.TryParse(str, out _);
         }
 
 
@@ -65,9 +78,13 @@ namespace EasyTool.TextCategory
         /// 将字符串转换为驼峰命名法
         /// </summary>
         /// <param name="str">要处理的字符串</param>
-        /// <returns>转换后的字符串</returns>
+        /// <returns>转换后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string ToCamelCase(string str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
             string[] words = str.Split(new char[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
             var sb = new StringBuilder();
             for (int i = 0; i < words.Length; i++)
@@ -89,9 +106,13 @@ namespace EasyTool.TextCategory
         /// 将字符串转换为帕斯卡命名法（大驼峰命名法）
         /// </summary>
         /// <param name="str">要处理的字符串</param>
-        /// <returns>转换后的字符串</returns>
+        /// <returns>转换后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string ToPascalCase(string str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
             string[] words = str.Split(new char[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
             var sb = new StringBuilder();
             for (int i = 0; i < words.Length; i++)
@@ -106,9 +127,13 @@ namespace EasyTool.TextCategory
         /// 将字符串转换为下划线命名法
         /// </summary>
         /// <param name="str">要处理的字符串</param>
-        /// <returns>转换后的字符串</returns>
+        /// <returns>转换后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string ToSnakeCase(string str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
             string[] words = str.Split(new char[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
             var sb = new StringBuilder();
             for (int i = 0; i < words.Length; i++)
@@ -130,9 +155,13 @@ namespace EasyTool.TextCategory
         /// 将字符串转换为连字符命名法（短横线命名法）
         /// </summary>
         /// <param name="str">要处理的字符串</param>
-        /// <returns>转换后的字符串</returns>
+        /// <returns>转换后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string ToKebabCase(string str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
             string[] words = str.Split(new char[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
             var sb = new StringBuilder();
             for (int i = 0; i < words.Length; i++)
@@ -154,9 +183,13 @@ namespace EasyTool.TextCategory
         /// 将字符串中的 HTML 标记去除
         /// </summary>
         /// <param name="str">要处理的字符串</param>
-        /// <returns>去除 HTML 标记后的字符串</returns>
+        /// <returns>去除 HTML 标记后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string StripHtml(string str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
             return Regex.Replace(str, "<.*?>", "");
         }
 
@@ -168,6 +201,8 @@ namespace EasyTool.TextCategory
         /// <returns>如果相等，则返回true，否则返回false</returns>
         public static bool EqualsIgnoreCaseAndWhiteSpace(string str1, string str2)
         {
+            if (str1 == null && str2 == null) return true;
+            if (str1 == null || str2 == null) return false;
             return string.Equals(RemoveAllSpaces(str1), RemoveAllSpaces(str2), StringComparison.OrdinalIgnoreCase);
         }
 
@@ -179,9 +214,17 @@ namespace EasyTool.TextCategory
         /// <param name="str">要处理的字符串</param>
         /// <param name="chars">要替换的字符数组</param>
         /// <param name="newChar">新的字符</param>
-        /// <returns>处理后的字符串</returns>
+        /// <returns>处理后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string ReplaceChars(string str, char[] chars, char newChar)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
+            if (chars == null)
+            {
+                return str;
+            }
             for (int i = 0; i < chars.Length; i++)
             {
                 str = str.Replace(chars[i], newChar);
@@ -195,9 +238,17 @@ namespace EasyTool.TextCategory
         /// <param name="str">要处理的字符串</param>
         /// <param name="oldValues">要替换的子字符串数组</param>
         /// <param name="newValue">新的子字符串</param>
-        /// <returns>处理后的字符串</returns>
+        /// <returns>处理后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string ReplaceStrings(string str, string[] oldValues, string newValue)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
+            if (oldValues == null)
+            {
+                return str;
+            }
             for (int i = 0; i < oldValues.Length; i++)
             {
                 str = str.Replace(oldValues[i], newValue);
@@ -211,9 +262,17 @@ namespace EasyTool.TextCategory
         /// <param name="str">要处理的字符串</param>
         /// <param name="oldValues">要替换的子字符串数组</param>
         /// <param name="newValue">新的子字符串</param>
-        /// <returns>处理后的字符串</returns>
+        /// <returns>处理后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string ReplaceStringsIgnoreCase(string str, string[] oldValues, string newValue)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
+            if (oldValues == null)
+            {
+                return str;
+            }
             for (int i = 0; i < oldValues.Length; i++)
             {
                 str = Regex.Replace(str, oldValues[i], newValue, RegexOptions.IgnoreCase);
@@ -225,9 +284,13 @@ namespace EasyTool.TextCategory
         /// 将字符串转换为 Title Case 格式，即每个单词的首字母大写
         /// </summary>
         /// <param name="str">要处理的字符串</param>
-        /// <returns>转换后的字符串</returns>
+        /// <returns>转换后的字符串，如果输入为 null 则返回空字符串</returns>
         public static string ToTitleCase(string str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
             return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str.ToLower());
         }
 

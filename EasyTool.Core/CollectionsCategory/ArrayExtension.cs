@@ -127,12 +127,15 @@ namespace EasyTool.CollectionsCategory
             if (array == null || array.Length < 2)
                 return array;
 
-            var random = new Random();
             var result = (T[])array.Clone();
 
             for (int i = result.Length - 1; i > 0; i--)
             {
-                int j = random.Next(i + 1);
+#if NET6_0_OR_GREATER
+                int j = Random.Shared.Next(i + 1);
+#else
+                int j = new Random(Guid.NewGuid().GetHashCode()).Next(i + 1);
+#endif
                 (result[i], result[j]) = (result[j], result[i]);
             }
 

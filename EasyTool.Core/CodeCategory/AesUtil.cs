@@ -15,9 +15,12 @@ namespace EasyTool.CodeCategory
         /// <summary>
         /// Aes 加密
         /// </summary>
-        /// <param name="str"></param>
-        /// <param name="sk"></param>
-        /// <returns></returns>
+        /// <param name="str">需要加密的字符串</param>
+        /// <param name="sk">加密密钥（16、24或32位）</param>
+        /// <param name="cipher">加密模式，默认ECB</param>
+        /// <param name="padding">填充模式，默认PKCS7</param>
+        /// <param name="encoding">编码格式，默认UTF-8</param>
+        /// <returns>Base64编码的加密结果</returns>
         public static string Encrypt(string str, string sk, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
         {
             if (string.IsNullOrEmpty(str)) return string.Empty;
@@ -25,7 +28,7 @@ namespace EasyTool.CodeCategory
             encoding ??= Encoding.UTF8;
             byte[] key = encoding.GetBytes(sk).ToArray();
             byte[] toEncrypt = encoding.GetBytes(str);
-            var aes = Aes.Create();
+            using var aes = Aes.Create();
             aes.Key = key;
             aes.Mode = cipher;
             aes.Padding = padding;
@@ -37,9 +40,12 @@ namespace EasyTool.CodeCategory
         /// <summary>
         /// Aes 解密
         /// </summary>
-        /// <param name="str"></param>
-        /// <param name="sk"></param>
-        /// <returns></returns>
+        /// <param name="str">Base64编码的加密字符串</param>
+        /// <param name="sk">解密密钥（16、24或32位）</param>
+        /// <param name="cipher">加密模式，默认ECB</param>
+        /// <param name="padding">填充模式，默认PKCS7</param>
+        /// <param name="encoding">编码格式，默认UTF-8</param>
+        /// <returns>解密后的原始字符串</returns>
         public static string Decrypt(string str, string sk, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
         {
             if (string.IsNullOrEmpty(str)) return string.Empty;
@@ -47,7 +53,7 @@ namespace EasyTool.CodeCategory
             encoding ??= Encoding.UTF8;
             byte[] key = encoding.GetBytes(sk).ToArray();
             byte[] toDecrypt = Convert.FromBase64String(str);
-            var aes = Aes.Create();
+            using var aes = Aes.Create();
             aes.Key = key;
             aes.Mode = cipher;
             aes.Padding = padding;
@@ -248,8 +254,8 @@ namespace EasyTool.CodeCategory
         /// <param name="iv">向量iv</param>
         /// <param name="cipher">默认CBC</param>
         /// <param name="padding">默认PKCS7</param>
-        /// <returns>加密流</returns>
-        public static CryptoStream CreateEncryptingStream(Stream outputStream, byte[] key, byte[]? iv = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
+        /// <returns>加密流包装器，使用后需要调用 Dispose 释放资源</returns>
+        public static AesCryptoStream CreateEncryptingStream(Stream outputStream, byte[] key, byte[]? iv = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
         {
             if (outputStream == null)
                 throw new ArgumentNullException(nameof(outputStream));
@@ -264,7 +270,8 @@ namespace EasyTool.CodeCategory
             aes.Mode = cipher;
             aes.Padding = padding;
             var encryptor = aes.CreateEncryptor(key, iv);
-            return new CryptoStream(outputStream, encryptor, CryptoStreamMode.Write);
+            var cryptoStream = new CryptoStream(outputStream, encryptor, CryptoStreamMode.Write);
+            return new AesCryptoStream(aes, cryptoStream);
         }
 
         /// <summary>
@@ -275,8 +282,8 @@ namespace EasyTool.CodeCategory
         /// <param name="iv">向量iv</param>
         /// <param name="cipher">默认CBC</param>
         /// <param name="padding">默认PKCS7</param>
-        /// <returns>解密流</returns>
-        public static CryptoStream CreateDecryptingStream(Stream inputStream, byte[] key, byte[]? iv = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
+        /// <returns>解密流包装器，使用后需要调用 Dispose 释放资源</returns>
+        public static AesCryptoStream CreateDecryptingStream(Stream inputStream, byte[] key, byte[]? iv = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
         {
             if (inputStream == null)
                 throw new ArgumentNullException(nameof(inputStream));
@@ -291,7 +298,56 @@ namespace EasyTool.CodeCategory
             aes.Mode = cipher;
             aes.Padding = padding;
             var decryptor = aes.CreateDecryptor(key, iv);
-            return new CryptoStream(inputStream, decryptor, CryptoStreamMode.Read);
+            var cryptoStream = new CryptoStream(inputStream, decryptor, CryptoStreamMode.Read);
+            return new AesCryptoStream(aes, cryptoStream);
+        }
+    }
+
+    /// <summary>
+    /// AES 加密流包装器，用于正确管理 Aes 和 CryptoStream 的生命周期
+    /// </summary>
+    public class AesCryptoStream : Stream, IDisposable
+    {
+        private readonly Aes _aes;
+        private readonly CryptoStream _cryptoStream;
+        private bool _disposed = false;
+
+        internal AesCryptoStream(Aes aes, CryptoStream cryptoStream)
+        {
+            _aes = aes ?? throw new ArgumentNullException(nameof(aes));
+            _cryptoStream = cryptoStream ?? throw new ArgumentNullException(nameof(cryptoStream));
+        }
+
+        public override bool CanRead => _cryptoStream.CanRead;
+        public override bool CanSeek => _cryptoStream.CanSeek;
+        public override bool CanWrite => _cryptoStream.CanWrite;
+        public override long Length => _cryptoStream.Length;
+        public override long Position { get => _cryptoStream.Position; set => _cryptoStream.Position = value; }
+
+        public override void Flush() => _cryptoStream.Flush();
+        public override int Read(byte[] buffer, int offset, int count) => _cryptoStream.Read(buffer, offset, count);
+        public override long Seek(long offset, SeekOrigin origin) => _cryptoStream.Seek(offset, origin);
+        public override void SetLength(long value) => _cryptoStream.SetLength(value);
+        public override void Write(byte[] buffer, int offset, int count) => _cryptoStream.Write(buffer, offset, count);
+
+        public new void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _cryptoStream?.Dispose();
+                    _aes?.Dispose();
+                }
+                _disposed = true;
+            }
+            base.Dispose(disposing);
         }
     }
 }
