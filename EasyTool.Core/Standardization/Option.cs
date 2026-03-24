@@ -14,6 +14,9 @@ namespace EasyTool.Standardization
      *标准化与前端下拉选项数据结构，减少前后端对接工作
      */
 
+
+
+
     /// <summary>
     /// 包含Value和Text的选择对象，用于前端下拉选项
     /// </summary>
