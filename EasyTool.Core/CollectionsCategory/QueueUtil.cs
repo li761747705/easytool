@@ -1,143 +1,368 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EasyTool.CollectionsCategory
 {
     /// <summary>
-    /// 队列工具类
+    /// 线程安全队列工具类
+    /// 提供生产者-消费者模式的队列操作
     /// </summary>
-    public static class QueueUtil
+    /// <typeparam name="T">元素类型</typeparam>
+    public class QueueUtil<T>
     {
+        private readonly Queue<T> _queue = new();
+        private readonly object _lock = new();
+        private readonly SemaphoreSlim _signal = new(0);
+
         /// <summary>
-        /// 将指定元素添加到队列的末尾。
-        /// [Obsolete("请直接使用 queue.Enqueue(item)")]
+        /// 获取队列元素数量
         /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        /// <param name="item">要添加的元素</param>
-        [Obsolete("请直接使用 queue.Enqueue(item)", false)]
-        public static void Enqueue<T>(Queue<T> queue, T item)
+        public int Count
         {
-            queue.Enqueue(item);
+            get
+            {
+                lock (_lock)
+                {
+                    return _queue.Count;
+                }
+            }
         }
 
         /// <summary>
-        /// 将指定集合中的元素添加到队列的末尾。
+        /// 检查队列是否为空
         /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        /// <param name="collection">要添加到队列中的集合</param>
-        public static void EnqueueRange<T>(Queue<T> queue, IEnumerable<T> collection)
+        public bool IsEmpty
         {
-            foreach (T item in collection)
+            get
             {
+                lock (_lock)
+                {
+                    return _queue.Count == 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 入队
+        /// </summary>
+        /// <param name="item">元素</param>
+        public void Enqueue(T item)
+        {
+            lock (_lock)
+            {
+                _queue.Enqueue(item);
+                _signal.Release();
+            }
+        }
+
+        /// <summary>
+        /// 批量入队
+        /// </summary>
+        /// <param name="items">元素集合</param>
+        public void EnqueueRange(IEnumerable<T> items)
+        {
+            lock (_lock)
+            {
+                foreach (var item in items)
+                {
+                    _queue.Enqueue(item);
+                    _signal.Release();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 出队
+        /// </summary>
+        /// <returns>元素</returns>
+        public T? Dequeue()
+        {
+            _signal.Wait();
+
+            lock (_lock)
+            {
+                return _queue.Count > 0 ? _queue.Dequeue() : default;
+            }
+        }
+
+        /// <summary>
+        /// 尝试出队
+        /// </summary>
+        /// <param name="item">元素</param>
+        /// <returns>是否成功</returns>
+        public bool TryDequeue(out T? item)
+        {
+            lock (_lock)
+            {
+                if (_queue.Count > 0)
+                {
+                    item = _queue.Dequeue();
+                    _signal.Wait(0);
+                    return true;
+                }
+
+                item = default;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 尝试出队（带超时）
+        /// </summary>
+        /// <param name="timeout">超时时间</param>
+        /// <param name="item">元素</param>
+        /// <returns>是否成功</returns>
+        public bool TryDequeue(TimeSpan timeout, out T? item)
+        {
+            if (_signal.Wait(timeout))
+            {
+                lock (_lock)
+                {
+                    if (_queue.Count > 0)
+                    {
+                        item = _queue.Dequeue();
+                        return true;
+                    }
+                }
+            }
+
+            item = default;
+            return false;
+        }
+
+        /// <summary>
+        /// 异步出队
+        /// </summary>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>元素</returns>
+        public async Task<T?> DequeueAsync(CancellationToken cancellationToken = default)
+        {
+            await _signal.WaitAsync(cancellationToken);
+
+            lock (_lock)
+            {
+                return _queue.Count > 0 ? _queue.Dequeue() : default;
+            }
+        }
+
+        /// <summary>
+        /// 异步尝试出队
+        /// </summary>
+        /// <param name="timeout">超时时间</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>元素或默认值</returns>
+        public async Task<(bool Success, T? Item)> TryDequeueAsync(TimeSpan timeout, CancellationToken cancellationToken = default)
+        {
+            if (await _signal.WaitAsync(timeout, cancellationToken))
+            {
+                lock (_lock)
+                {
+                    if (_queue.Count > 0)
+                    {
+                        return (true, _queue.Dequeue());
+                    }
+                }
+            }
+
+            return (false, default);
+        }
+
+        /// <summary>
+        /// 查看队首元素（不出队）
+        /// </summary>
+        /// <returns>队首元素</returns>
+        public T? Peek()
+        {
+            lock (_lock)
+            {
+                return _queue.Count > 0 ? _queue.Peek() : default;
+            }
+        }
+
+        /// <summary>
+        /// 尝试查看队首元素
+        /// </summary>
+        /// <param name="item">元素</param>
+        /// <returns>是否成功</returns>
+        public bool TryPeek(out T? item)
+        {
+            lock (_lock)
+            {
+                if (_queue.Count > 0)
+                {
+                    item = _queue.Peek();
+                    return true;
+                }
+
+                item = default;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 清空队列
+        /// </summary>
+        public void Clear()
+        {
+            lock (_lock)
+            {
+                while (_signal.CurrentCount > 0)
+                {
+                    _signal.Wait(0);
+                }
+                _queue.Clear();
+            }
+        }
+
+        /// <summary>
+        /// 获取所有元素（不出队）
+        /// </summary>
+        /// <returns>元素数组</returns>
+        public T[] ToArray()
+        {
+            lock (_lock)
+            {
+                return _queue.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// 获取所有元素并清空队列
+        /// </summary>
+        /// <returns>元素数组</returns>
+        public T[] Drain()
+        {
+            lock (_lock)
+            {
+                var items = _queue.ToArray();
+                _queue.Clear();
+                while (_signal.CurrentCount > 0)
+                {
+                    _signal.Wait(0);
+                }
+                return items;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 优先级队列工具类
+    /// </summary>
+    /// <typeparam name="T">元素类型</typeparam>
+    public class PriorityQueue<T>
+    {
+        private readonly SortedDictionary<int, Queue<T>> _queues = new();
+        private readonly object _lock = new();
+
+        /// <summary>
+        /// 获取元素数量
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _queues.Sum(q => q.Value.Count);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 入队
+        /// </summary>
+        /// <param name="item">元素</param>
+        /// <param name="priority">优先级（数字越小优先级越高）</param>
+        public void Enqueue(T item, int priority = 0)
+        {
+            lock (_lock)
+            {
+                if (!_queues.TryGetValue(priority, out var queue))
+                {
+                    queue = new Queue<T>();
+                    _queues[priority] = queue;
+                }
+
                 queue.Enqueue(item);
             }
         }
 
         /// <summary>
-        /// 移除并返回位于队列开头的元素。
-        /// [Obsolete("请直接使用 queue.Dequeue()")]
+        /// 出队
         /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        /// <returns>队列开头的元素</returns>
-        /// <exception cref="System.InvalidOperationException">队列为空时引发异常</exception>
-        [Obsolete("请直接使用 queue.Dequeue()", false)]
-        public static T Dequeue<T>(Queue<T> queue)
+        /// <returns>元素</returns>
+        public T? Dequeue()
         {
-            return queue.Dequeue();
-        }
-
-        /// <summary>
-        /// 返回位于队列开头的元素而不将其移除。
-        /// [Obsolete("请直接使用 queue.Peek()")]
-        /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        /// <returns>队列开头的元素</returns>
-        /// <exception cref="System.InvalidOperationException">队列为空时引发异常</exception>
-        [Obsolete("请直接使用 queue.Peek()", false)]
-        public static T Peek<T>(Queue<T> queue)
-        {
-            return queue.Peek();
-        }
-
-        /// <summary>
-        /// 确定队列中是否包含指定元素。
-        /// [Obsolete("请直接使用 queue.Contains(item)")]
-        /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        /// <param name="item">要查找的元素</param>
-        /// <returns>如果队列包含指定元素，则为 true；否则为 false。</returns>
-        [Obsolete("请直接使用 queue.Contains(item)", false)]
-        public static bool Contains<T>(Queue<T> queue, T item)
-        {
-            return queue.Contains(item);
-        }
-
-        /// <summary>
-        /// 从队列中移除指定元素的第一个匹配项。
-        /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        /// <param name="item">要移除的元素</param>
-        /// <returns>如果已成功移除元素，则为 true；否则为 false。</returns>
-        public static bool Remove<T>(Queue<T> queue, T item)
-        {
-            if (queue.Contains(item))
+            lock (_lock)
             {
-                var newQueue = new Queue<T>(queue.Where(x => !Equals(x, item)));
-                queue.Clear();
-                foreach (var element in newQueue)
+                foreach (var kvp in _queues)
                 {
-                    queue.Enqueue(element);
+                    if (kvp.Value.Count > 0)
+                    {
+                        return kvp.Value.Dequeue();
+                    }
                 }
-                return true;
+
+                return default;
             }
-            return false;
         }
 
         /// <summary>
-        /// 将队列中的所有元素复制到新数组中。
-        /// [Obsolete("请直接使用 queue.ToArray()")]
+        /// 尝试出队
         /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        /// <returns>包含队列中所有元素的新数组</returns>
-        [Obsolete("请直接使用 queue.ToArray()", false)]
-        public static T[] ToArray<T>(Queue<T> queue)
+        /// <param name="item">元素</param>
+        /// <returns>是否成功</returns>
+        public bool TryDequeue(out T? item)
         {
-            return queue.ToArray();
+            lock (_lock)
+            {
+                foreach (var kvp in _queues)
+                {
+                    if (kvp.Value.Count > 0)
+                    {
+                        item = kvp.Value.Dequeue();
+                        return true;
+                    }
+                }
+
+                item = default;
+                return false;
+            }
         }
 
         /// <summary>
-        /// 将队列中的所有元素复制到新数组中，从指定的索引开始。
-        /// [Obsolete("请直接使用 queue.CopyTo(array, arrayIndex)")]
+        /// 查看队首元素
         /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        /// <param name="array">要复制到的目标数组</param>
-        /// <param name="arrayIndex">目标数组的起始索引</param>
-        [Obsolete("请直接使用 queue.CopyTo(array, arrayIndex)", false)]
-        public static void CopyTo<T>(Queue<T> queue, T[] array, int arrayIndex)
+        /// <returns>元素</returns>
+        public T? Peek()
         {
-            queue.CopyTo(array, arrayIndex);
+            lock (_lock)
+            {
+                foreach (var kvp in _queues)
+                {
+                    if (kvp.Value.Count > 0)
+                    {
+                        return kvp.Value.Peek();
+                    }
+                }
+
+                return default;
+            }
         }
 
         /// <summary>
-        /// 从队列中移除所有元素。
-        /// [Obsolete("请直接使用 queue.Clear()")]
+        /// 清空队列
         /// </summary>
-        /// <typeparam name="T">队列元素类型</typeparam>
-        /// <param name="queue">队列</param>
-        [Obsolete("请直接使用 queue.Clear()", false)]
-        public static void Clear<T>(Queue<T> queue)
+        public void Clear()
         {
-            queue.Clear();
+            lock (_lock)
+            {
+                _queues.Clear();
+            }
         }
     }
+
 }

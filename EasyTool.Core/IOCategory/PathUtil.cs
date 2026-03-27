@@ -8,207 +8,11 @@ namespace EasyTool.IOCategory
 {
     /// <summary>
     /// 路径工具类
-    /// 提供路径操作的增强功能
     /// </summary>
     public static class PathUtil
     {
         /// <summary>
-        /// 获取相对路径
-        /// </summary>
-        public static string GetRelativePath(string basePath, string targetPath)
-        {
-            if (string.IsNullOrEmpty(basePath))
-                throw new ArgumentException("Base path cannot be null or empty", nameof(basePath));
-            if (string.IsNullOrEmpty(targetPath))
-                throw new ArgumentException("Target path cannot be null or empty", nameof(targetPath));
-
-            // 规范化路径
-            basePath = Normalize(basePath);
-            targetPath = Normalize(targetPath);
-
-            // 确保基础路径以分隔符结尾
-            if (!basePath.EndsWith(Path.DirectorySeparatorChar.ToString()) &&
-                !basePath.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
-            {
-                basePath += Path.DirectorySeparatorChar;
-            }
-
-            var baseParts = basePath.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-            var targetParts = targetPath.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-
-            // 处理 Windows 盘符
-            if (baseParts.Length > 0 && targetParts.Length > 0)
-            {
-                string baseRoot = GetRoot(basePath);
-                string targetRoot = GetRoot(targetPath);
-                if (!string.IsNullOrEmpty(baseRoot) && !string.IsNullOrEmpty(targetRoot) &&
-                    !baseRoot.Equals(targetRoot, StringComparison.OrdinalIgnoreCase))
-                {
-                    return targetPath; // 不同盘符，返回绝对路径
-                }
-            }
-
-            // 找到公共前缀
-            int commonLength = 0;
-            int minLen = Math.Min(baseParts.Length, targetParts.Length);
-            while (commonLength < minLen &&
-                   baseParts[commonLength].Equals(targetParts[commonLength], StringComparison.OrdinalIgnoreCase))
-            {
-                commonLength++;
-            }
-
-            // 构建相对路径
-            var result = new StringBuilder();
-
-            // 添加向上回溯
-            for (int i = commonLength; i < baseParts.Length - (basePath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? 0 : 1); i++)
-            {
-                if (result.Length > 0)
-                    result.Append(Path.DirectorySeparatorChar);
-                result.Append("..");
-            }
-
-            // 添加目标路径的剩余部分
-            for (int i = commonLength; i < targetParts.Length; i++)
-            {
-                if (result.Length > 0)
-                    result.Append(Path.DirectorySeparatorChar);
-                result.Append(targetParts[i]);
-            }
-
-            return result.Length == 0 ? "." : result.ToString();
-        }
-
-        private static string GetRoot(string path)
-        {
-            if (path.Length >= 2 && path[1] == ':')
-                return path.Substring(0, 2).ToUpperInvariant();
-            if (path.StartsWith("/") || path.StartsWith("\\"))
-                return path[0].ToString();
-            return "";
-        }
-
-        /// <summary>
-        /// 规范化路径（统一分隔符，移除多余的点和分隔符）
-        /// </summary>
-        public static string Normalize(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return path;
-
-            // 替换分隔符
-            path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-
-            // 处理 ./ 和 ../
-            var parts = path.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.None);
-            var result = new List<string>();
-
-            foreach (var part in parts)
-            {
-                if (part == ".")
-                    continue;
-                else if (part == "..")
-                {
-                    if (result.Count > 0 && result[result.Count - 1] != "..")
-                        result.RemoveAt(result.Count - 1);
-                    else if (!IsAbsolute(path))
-                        result.Add("..");
-                }
-                else
-                {
-                    result.Add(part);
-                }
-            }
-
-            string normalized = string.Join(Path.DirectorySeparatorChar.ToString(), result);
-
-            // 处理根路径
-            if (path.StartsWith(Path.DirectorySeparatorChar.ToString()) && !normalized.StartsWith(Path.DirectorySeparatorChar.ToString()))
-            {
-                if (path.Length >= 2 && path[1] == ':')
-                    normalized = path.Substring(0, 2) + Path.DirectorySeparatorChar + normalized;
-                else
-                    normalized = Path.DirectorySeparatorChar + normalized;
-            }
-
-            return normalized;
-        }
-
-        /// <summary>
-        /// 判断是否为绝对路径
-        /// </summary>
-        public static bool IsAbsolute(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return false;
-
-            // Windows: C:\ 或 \
-            // Unix: /
-            return Path.IsPathRooted(path) ||
-                   (path.Length >= 2 && path[1] == ':') ||
-                   path.StartsWith("/") ||
-                   path.StartsWith("\\\\");
-        }
-
-        /// <summary>
-        /// 获取文件扩展名（不带点）
-        /// </summary>
-        public static string GetExtensionWithoutDot(string path)
-        {
-            string ext = Path.GetExtension(path);
-            return string.IsNullOrEmpty(ext) ? "" : ext.Substring(1);
-        }
-
-        /// <summary>
-        /// 更改文件扩展名
-        /// </summary>
-        public static string ChangeExtension(string path, string newExtension)
-        {
-            if (string.IsNullOrEmpty(path))
-                return path;
-
-            newExtension = newExtension?.StartsWith(".") == true ? newExtension : "." + newExtension;
-            return Path.ChangeExtension(path, newExtension);
-        }
-
-        /// <summary>
-        /// 获取文件名（不带扩展名）
-        /// </summary>
-        public static string GetFileNameWithoutExtension(string path)
-        {
-            return Path.GetFileNameWithoutExtension(path);
-        }
-
-        /// <summary>
-        /// 获取父目录路径
-        /// </summary>
-        public static string GetParent(string path)
-        {
-            return Path.GetDirectoryName(path);
-        }
-
-        /// <summary>
-        /// 获取所有父目录路径
-        /// </summary>
-        public static List<string> GetParents(string path)
-        {
-            var parents = new List<string>();
-            string current = path;
-
-            while (!string.IsNullOrEmpty(current))
-            {
-                string parent = Path.GetDirectoryName(current);
-                if (string.IsNullOrEmpty(parent))
-                    break;
-                parents.Add(parent);
-                current = parent;
-            }
-
-            return parents;
-        }
-
-        /// <summary>
-        /// 连接路径片段
+        /// 合并路径
         /// </summary>
         public static string Combine(params string[] paths)
         {
@@ -216,16 +20,228 @@ namespace EasyTool.IOCategory
         }
 
         /// <summary>
+        /// 获取绝对路径
+        /// </summary>
+        public static string GetFullPath(string path, string? basePath = null)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+
+            if (Path.IsPathRooted(path))
+                return Path.GetFullPath(path);
+
+            basePath ??= Directory.GetCurrentDirectory();
+            return Path.GetFullPath(Path.Combine(basePath, path));
+        }
+
+        /// <summary>
+        /// 获取相对路径
+        /// </summary>
+        public static string GetRelativePath(string relativeTo, string path)
+        {
+            return Path.GetRelativePath(relativeTo, path);
+        }
+
+        /// <summary>
+        /// 获取文件名（包含扩展名）
+        /// </summary>
+        public static string GetFileName(string path)
+        {
+            return Path.GetFileName(path);
+        }
+
+        /// <summary>
+        /// 获取文件名（不含扩展名）
+        /// </summary>
+        public static string GetFileNameWithoutExtension(string path)
+        {
+            return Path.GetFileNameWithoutExtension(path);
+        }
+
+        /// <summary>
+        /// 获取扩展名
+        /// </summary>
+        public static string GetExtension(string path)
+        {
+            return Path.GetExtension(path);
+        }
+
+        /// <summary>
+        /// 获取目录路径
+        /// </summary>
+        public static string? GetDirectoryName(string path)
+        {
+            return Path.GetDirectoryName(path);
+        }
+
+        /// <summary>
+        /// 更改扩展名
+        /// </summary>
+        public static string ChangeExtension(string path, string extension)
+        {
+            return Path.ChangeExtension(path, extension);
+        }
+
+        /// <summary>
+        /// 移除扩展名
+        /// </summary>
+        public static string RemoveExtension(string path)
+        {
+            return Path.ChangeExtension(path, null) ?? path;
+        }
+
+        /// <summary>
+        /// 检查是否是绝对路径
+        /// </summary>
+        public static bool IsAbsolute(string path)
+        {
+            return Path.IsPathRooted(path);
+        }
+
+        /// <summary>
+        /// 检查是否是相对路径
+        /// </summary>
+        public static bool IsRelative(string path)
+        {
+            return !Path.IsPathRooted(path);
+        }
+
+        /// <summary>
+        /// 规范化路径（统一分隔符）
+        /// </summary>
+        public static string Normalize(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+
+            return path.Replace('/', Path.DirectorySeparatorChar)
+                      .Replace('\\', Path.DirectorySeparatorChar)
+                      .TrimEnd(Path.DirectorySeparatorChar);
+        }
+
+        /// <summary>
+        /// 确保以分隔符结尾
+        /// </summary>
+        public static string EnsureTrailingSeparator(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+
+            if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                return path + Path.DirectorySeparatorChar;
+
+            return path;
+        }
+
+        /// <summary>
+        /// 移除尾部分隔符
+        /// </summary>
+        public static string TrimTrailingSeparator(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+
+            return path.TrimEnd(Path.DirectorySeparatorChar, '/');
+        }
+
+        /// <summary>
+        /// 获取父目录
+        /// </summary>
+        public static string? GetParent(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            var dir = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(dir))
+                return null;
+
+            return dir;
+        }
+
+        /// <summary>
+        /// 获取所有父目录
+        /// </summary>
+        public static IEnumerable<string> GetParents(string path)
+        {
+            var current = path;
+            while (!string.IsNullOrEmpty(current))
+            {
+                var parent = Path.GetDirectoryName(current);
+                if (string.IsNullOrEmpty(parent))
+                    yield break;
+
+                yield return parent;
+                current = parent;
+            }
+        }
+
+        /// <summary>
+        /// 获取目录深度
+        /// </summary>
+        public static int GetDepth(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return 0;
+
+            path = Normalize(path);
+            return path.Split(Path.DirectorySeparatorChar).Length - 1;
+        }
+
+        /// <summary>
+        /// 检查路径是否在指定目录下
+        /// </summary>
+        public static bool IsInDirectory(string path, string directory)
+        {
+            if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(directory))
+                return false;
+
+            var fullPath = GetFullPath(path);
+            var fullDirectory = GetFullPath(directory);
+
+            return fullPath.StartsWith(EnsureTrailingSeparator(fullDirectory), StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// 获取唯一文件名（避免冲突）
+        /// </summary>
+        public static string GetUniqueFileName(string directory, string fileName)
+        {
+            var fullPath = Path.Combine(directory, fileName);
+
+            if (!File.Exists(fullPath))
+                return fileName;
+
+            var name = Path.GetFileNameWithoutExtension(fileName);
+            var ext = Path.GetExtension(fileName);
+            var counter = 1;
+
+            while (true)
+            {
+                var newName = $"{name} ({counter}){ext}";
+                fullPath = Path.Combine(directory, newName);
+
+                if (!File.Exists(fullPath))
+                    return newName;
+
+                counter++;
+            }
+        }
+
+        /// <summary>
         /// 获取临时文件路径
         /// </summary>
-        public static string GetTempFilePath(string extension = null)
+        public static string GetTempFilePath(string? extension = null)
         {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            var path = Path.GetTempFileName();
+
             if (!string.IsNullOrEmpty(extension))
             {
-                extension = extension.StartsWith(".") ? extension : "." + extension;
-                path += extension;
+                var newPath = Path.ChangeExtension(path, extension);
+                File.Move(path, newPath);
+                return newPath;
             }
+
             return path;
         }
 
@@ -234,113 +250,104 @@ namespace EasyTool.IOCategory
         /// </summary>
         public static string GetTempDirectoryPath()
         {
-            return Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        }
-
-        /// <summary>
-        /// 确保目录存在
-        /// </summary>
-        public static string EnsureDirectoryExists(string path)
-        {
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
+            var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(path);
             return path;
         }
 
         /// <summary>
-        /// 确保文件所在目录存在
+        /// 分割路径为各部分
         /// </summary>
-        public static string EnsureParentDirectoryExists(string filePath)
-        {
-            string dir = Path.GetDirectoryName(filePath);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-            return filePath;
-        }
-
-        /// <summary>
-        /// 获取唯一文件名（如果文件存在则添加序号）
-        /// </summary>
-        public static string GetUniqueFilePath(string basePath)
-        {
-            if (!File.Exists(basePath))
-                return basePath;
-
-            string dir = Path.GetDirectoryName(basePath);
-            string name = Path.GetFileNameWithoutExtension(basePath);
-            string ext = Path.GetExtension(basePath);
-
-            int count = 1;
-            string newPath;
-            do
-            {
-                newPath = Path.Combine(dir ?? "", $"{name} ({count}){ext}");
-                count++;
-            }
-            while (File.Exists(newPath));
-
-            return newPath;
-        }
-
-        /// <summary>
-        /// 获取唯一目录名
-        /// </summary>
-        public static string GetUniqueDirectoryPath(string basePath)
-        {
-            if (!Directory.Exists(basePath))
-                return basePath;
-
-            int count = 1;
-            string newPath;
-            do
-            {
-                newPath = $"{basePath} ({count})";
-                count++;
-            }
-            while (Directory.Exists(newPath));
-
-            return newPath;
-        }
-
-        /// <summary>
-        /// 获取路径深度
-        /// </summary>
-        public static int GetDepth(string path)
+        public static string[] Split(string path)
         {
             if (string.IsNullOrEmpty(path))
-                return 0;
+                return Array.Empty<string>();
 
             path = Normalize(path);
-            return path.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries).Length;
+
+            // 处理根目录
+            var root = Path.GetPathRoot(path);
+            if (!string.IsNullOrEmpty(root))
+            {
+                path = path.Substring(root.Length);
+                var parts = path.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+                var result = new string[parts.Length + 1];
+                result[0] = root.TrimEnd(Path.DirectorySeparatorChar);
+                Array.Copy(parts, 0, result, 1, parts.Length);
+                return result;
+            }
+
+            return path.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>
-        /// 路径是否在指定目录下
+        /// 构建路径
         /// </summary>
-        public static bool IsInDirectory(string path, string directory)
+        public static string Build(params string[] parts)
         {
-            string normalizedPath = Normalize(Path.GetFullPath(path));
-            string normalizedDir = Normalize(Path.GetFullPath(directory));
-
-            return normalizedPath.StartsWith(normalizedDir, StringComparison.OrdinalIgnoreCase);
+            return Path.Combine(parts.Where(p => !string.IsNullOrEmpty(p)).ToArray());
         }
 
         /// <summary>
-        /// 获取路径层级（相对于基础路径）
+        /// 验证路径是否有效
         /// </summary>
-        public static string GetPathLevel(string basePath, string targetPath, int level)
+        public static bool IsValid(string path)
         {
-            string relative = GetRelativePath(basePath, targetPath);
-            var parts = relative.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+            if (string.IsNullOrEmpty(path))
+                return false;
 
-            if (level < 0 || level >= parts.Length)
-                return null;
+            var invalidChars = Path.GetInvalidPathChars();
+            return path.IndexOfAny(invalidChars) < 0;
+        }
 
-            return parts[level];
+        /// <summary>
+        /// 验证文件名是否有效
+        /// </summary>
+        public static bool IsValidFileName(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return false;
+
+            var invalidChars = Path.GetInvalidFileNameChars();
+            return fileName.IndexOfAny(invalidChars) < 0;
+        }
+
+        /// <summary>
+        /// 清理文件名（移除无效字符）
+        /// </summary>
+        public static string SanitizeFileName(string fileName, char replacement = '_')
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return fileName;
+
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var result = new StringBuilder(fileName);
+
+            foreach (var c in invalidChars)
+            {
+                result.Replace(c, replacement);
+            }
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// 获取路径大小（文件或目录）
+        /// </summary>
+        public static long GetSize(string path)
+        {
+            if (File.Exists(path))
+            {
+                return new FileInfo(path).Length;
+            }
+
+            if (Directory.Exists(path))
+            {
+                var dirInfo = new DirectoryInfo(path);
+                return dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(f => f.Length);
+            }
+
+            return 0;
         }
     }
 }

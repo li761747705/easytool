@@ -133,7 +133,54 @@ public static class NPOIUtil
                 var property = t.GetType().GetProperty(headerRow.GetCell(m).StringCellValue);
                 if (property == null)
                     continue;
-                property.SetValue(t, value, null);
+                var targetType = property.PropertyType;
+                var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+                object? convertedValue = null;
+                if (underlyingType == typeof(string))
+                {
+                    convertedValue = value;
+                }
+                else if (string.IsNullOrWhiteSpace(value))
+                {
+                    convertedValue = null;
+                }
+                else if (underlyingType == typeof(int))
+                {
+                    convertedValue = int.Parse(value);
+                }
+                else if (underlyingType == typeof(long))
+                {
+                    convertedValue = long.Parse(value);
+                }
+                else if (underlyingType == typeof(double))
+                {
+                    convertedValue = double.Parse(value);
+                }
+                else if (underlyingType == typeof(decimal))
+                {
+                    convertedValue = decimal.Parse(value);
+                }
+                else if (underlyingType == typeof(float))
+                {
+                    convertedValue = float.Parse(value);
+                }
+                else if (underlyingType == typeof(bool))
+                {
+                    convertedValue = bool.Parse(value);
+                }
+                else if (underlyingType == typeof(DateTime))
+                {
+                    convertedValue = DateTime.Parse(value);
+                }
+                else if (underlyingType == typeof(Guid))
+                {
+                    convertedValue = Guid.Parse(value);
+                }
+                else
+                {
+                    convertedValue = Convert.ChangeType(value, underlyingType);
+                }
+                property.SetValue(t, convertedValue, null);
             }
             list.Add(t);
         }

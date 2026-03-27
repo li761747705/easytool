@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,684 +12,450 @@ namespace EasyTool.ToolCategory
     public class ValidationResult
     {
         /// <summary>
-        /// 是否验证通过
+        /// 是否有效
         /// </summary>
         public bool IsValid { get; set; }
 
         /// <summary>
-        /// 错误信息列表
+        /// 错误消息列表
         /// </summary>
         public List<string> Errors { get; set; } = new();
 
         /// <summary>
-        /// 创建成功结果
+        /// 错误字段列表
         /// </summary>
-        public static ValidationResult Success => new() { IsValid = true };
+        public List<string> ErrorFields { get; set; } = new();
 
-        /// <summary>
-        /// 创建失败结果
-        /// </summary>
-        public static ValidationResult Fail(params string[] errors) => new()
-        {
-            IsValid = false,
-            Errors = errors.ToList()
-        };
-
-        /// <summary>
-        /// 合并多个验证结果
-        /// </summary>
-        public static ValidationResult Combine(params ValidationResult[] results)
-        {
-            var combined = new ValidationResult { IsValid = true };
-
-            foreach (var result in results)
-            {
-                if (!result.IsValid)
-                {
-                    combined.IsValid = false;
-                    combined.Errors.AddRange(result.Errors);
-                }
-            }
-
-            return combined;
-        }
+        public static ValidationResult Success() => new() { IsValid = true };
+        public static ValidationResult Failure(params string[] errors) => new() { IsValid = false, Errors = errors.ToList() };
     }
 
     /// <summary>
-    /// 验证规则构建器
-    /// </summary>
-    /// <typeparam name="T">值类型</typeparam>
-    public class ValidatorBuilder<T>
-    {
-        private readonly List<Func<T, ValidationResult>> _rules = new();
-        protected readonly string _fieldName;
-
-        public ValidatorBuilder(string fieldName = "value")
-        {
-            _fieldName = fieldName;
-        }
-
-        /// <summary>
-        /// 添加自定义验证规则
-        /// </summary>
-        public ValidatorBuilder<T> AddRule(Func<T, bool> rule, string errorMessage)
-        {
-            _rules.Add(value => rule(value)
-                ? ValidationResult.Success
-                : ValidationResult.Fail(errorMessage));
-            return this;
-        }
-
-        /// <summary>
-        /// 添加自定义验证规则
-        /// </summary>
-        public ValidatorBuilder<T> AddRule(Func<T, ValidationResult> rule)
-        {
-            _rules.Add(rule);
-            return this;
-        }
-
-        #region 通用规则
-
-        /// <summary>
-        /// 不能为默认值
-        /// </summary>
-        public ValidatorBuilder<T> NotDefault(string? message = null)
-        {
-            _rules.Add(value => !EqualityComparer<T>.Default.Equals(value, default!)
-                ? ValidationResult.Success
-                : ValidationResult.Fail(message ?? $"{_fieldName}不能为默认值"));
-            return this;
-        }
-
-        /// <summary>
-        /// 满足条件
-        /// </summary>
-        public ValidatorBuilder<T> Must(Func<T, bool> predicate, string? message = null)
-        {
-            _rules.Add(value => predicate(value)
-                ? ValidationResult.Success
-                : ValidationResult.Fail(message ?? $"{_fieldName}不满足条件"));
-            return this;
-        }
-
-        /// <summary>
-        /// 枚举值验证
-        /// </summary>
-        public ValidatorBuilder<T> IsEnum(string? message = null)
-        {
-            _rules.Add(value =>
-            {
-                if (value == null)
-                    return ValidationResult.Fail(message ?? $"{_fieldName}不能为空");
-
-                var type = typeof(T);
-                if (!type.IsEnum && (!Nullable.GetUnderlyingType(type)?.IsEnum ?? true))
-                    return ValidationResult.Fail($"{_fieldName}不是枚举类型");
-
-                var enumType = Nullable.GetUnderlyingType(type) ?? type;
-                return Enum.IsDefined(enumType, value)
-                    ? ValidationResult.Success
-                    : ValidationResult.Fail(message ?? $"{_fieldName}不是有效的枚举值");
-            });
-            return this;
-        }
-
-        #endregion
-
-        #region 数值规则
-
-        /// <summary>
-        /// 大于指定值
-        /// </summary>
-        public ValidatorBuilder<T> GreaterThan(T compareValue, string? message = null)
-        {
-            _rules.Add(value =>
-            {
-                if (value is IComparable<T> comparable)
-                {
-                    return comparable.CompareTo(compareValue) > 0
-                        ? ValidationResult.Success
-                        : ValidationResult.Fail(message ?? $"{_fieldName}必须大于 {compareValue}");
-                }
-                return ValidationResult.Fail($"{_fieldName}类型不可比较");
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// 大于等于指定值
-        /// </summary>
-        public ValidatorBuilder<T> GreaterThanOrEqual(T compareValue, string? message = null)
-        {
-            _rules.Add(value =>
-            {
-                if (value is IComparable<T> comparable)
-                {
-                    return comparable.CompareTo(compareValue) >= 0
-                        ? ValidationResult.Success
-                        : ValidationResult.Fail(message ?? $"{_fieldName}必须大于等于 {compareValue}");
-                }
-                return ValidationResult.Fail($"{_fieldName}类型不可比较");
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// 小于指定值
-        /// </summary>
-        public ValidatorBuilder<T> LessThan(T compareValue, string? message = null)
-        {
-            _rules.Add(value =>
-            {
-                if (value is IComparable<T> comparable)
-                {
-                    return comparable.CompareTo(compareValue) < 0
-                        ? ValidationResult.Success
-                        : ValidationResult.Fail(message ?? $"{_fieldName}必须小于 {compareValue}");
-                }
-                return ValidationResult.Fail($"{_fieldName}类型不可比较");
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// 小于等于指定值
-        /// </summary>
-        public ValidatorBuilder<T> LessThanOrEqual(T compareValue, string? message = null)
-        {
-            _rules.Add(value =>
-            {
-                if (value is IComparable<T> comparable)
-                {
-                    return comparable.CompareTo(compareValue) <= 0
-                        ? ValidationResult.Success
-                        : ValidationResult.Fail(message ?? $"{_fieldName}必须小于等于 {compareValue}");
-                }
-                return ValidationResult.Fail($"{_fieldName}类型不可比较");
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// 在指定范围内
-        /// </summary>
-        public ValidatorBuilder<T> InRange(T min, T max, string? message = null)
-        {
-            _rules.Add(value =>
-            {
-                if (value is IComparable<T> comparable)
-                {
-                    var valid = comparable.CompareTo(min) >= 0 && comparable.CompareTo(max) <= 0;
-                    return valid
-                        ? ValidationResult.Success
-                        : ValidationResult.Fail(message ?? $"{_fieldName}必须在 {min} 和 {max} 之间");
-                }
-                return ValidationResult.Fail($"{_fieldName}类型不可比较");
-            });
-            return this;
-        }
-
-        #endregion
-
-        #region 构建验证器
-
-        /// <summary>
-        /// 构建验证器
-        /// </summary>
-        public Func<T, ValidationResult> Build()
-        {
-            var rules = _rules.ToList();
-            return value =>
-            {
-                var result = ValidationResult.Success;
-                foreach (var rule in rules)
-                {
-                    var ruleResult = rule(value);
-                    if (!ruleResult.IsValid)
-                    {
-                        result.IsValid = false;
-                        result.Errors.AddRange(ruleResult.Errors);
-                    }
-                }
-                return result;
-            };
-        }
-
-        /// <summary>
-        /// 验证值
-        /// </summary>
-        public ValidationResult Validate(T value)
-        {
-            return Build()(value);
-        }
-
-        #endregion
-    }
-
-    /// <summary>
-    /// 字符串验证规则构建器
-    /// </summary>
-    public class StringValidatorBuilder : ValidatorBuilder<string?>
-    {
-        public StringValidatorBuilder(string fieldName = "value") : base(fieldName) { }
-
-        /// <summary>
-        /// 不能为空或空白
-        /// </summary>
-        public StringValidatorBuilder NotEmpty(string? message = null)
-        {
-            AddRule(value => !string.IsNullOrWhiteSpace(value),
-                message ?? $"{_fieldName}不能为空");
-            return this;
-        }
-
-        /// <summary>
-        /// 最小长度
-        /// </summary>
-        public StringValidatorBuilder MinLength(int minLength, string? message = null)
-        {
-            AddRule(value => value != null && value.Length >= minLength,
-                message ?? $"{_fieldName}长度不能小于 {minLength}");
-            return this;
-        }
-
-        /// <summary>
-        /// 最大长度
-        /// </summary>
-        public StringValidatorBuilder MaxLength(int maxLength, string? message = null)
-        {
-            AddRule(value => value == null || value.Length <= maxLength,
-                message ?? $"{_fieldName}长度不能超过 {maxLength}");
-            return this;
-        }
-
-        /// <summary>
-        /// 长度范围
-        /// </summary>
-        public StringValidatorBuilder Length(int minLength, int maxLength, string? message = null)
-        {
-            AddRule(value => value != null && value.Length >= minLength && value.Length <= maxLength,
-                message ?? $"{_fieldName}长度必须在 {minLength} 到 {maxLength} 之间");
-            return this;
-        }
-
-        /// <summary>
-        /// 匹配正则表达式
-        /// </summary>
-        public StringValidatorBuilder Matches(string pattern, string? message = null)
-        {
-            AddRule(value => value != null && Regex.IsMatch(value, pattern),
-                message ?? $"{_fieldName}格式不正确");
-            return this;
-        }
-
-        /// <summary>
-        /// 匹配正则表达式
-        /// </summary>
-        public StringValidatorBuilder Matches(Regex regex, string? message = null)
-        {
-            AddRule(value => value != null && regex.IsMatch(value),
-                message ?? $"{_fieldName}格式不正确");
-            return this;
-        }
-
-        /// <summary>
-        /// 邮箱格式
-        /// </summary>
-        public StringValidatorBuilder Email(string? message = null)
-        {
-            const string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-            return Matches(emailPattern, message ?? $"{_fieldName}不是有效的邮箱地址");
-        }
-
-        /// <summary>
-        /// 手机号格式（中国大陆）
-        /// </summary>
-        public StringValidatorBuilder Phone(string? message = null)
-        {
-            const string phonePattern = @"^1[3-9]\d{9}$";
-            return Matches(phonePattern, message ?? $"{_fieldName}不是有效的手机号");
-        }
-
-        /// <summary>
-        /// 身份证号格式（中国大陆）
-        /// </summary>
-        public StringValidatorBuilder IdCard(string? message = null)
-        {
-            const string idCardPattern = @"^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$";
-            return Matches(idCardPattern, message ?? $"{_fieldName}不是有效的身份证号");
-        }
-
-        /// <summary>
-        /// URL格式
-        /// </summary>
-        public StringValidatorBuilder Url(string? message = null)
-        {
-            const string urlPattern = @"^https?://[^\s/$.?#].[^\s]*$";
-            return Matches(urlPattern, message ?? $"{_fieldName}不是有效的URL");
-        }
-
-        /// <summary>
-        /// 纯数字
-        /// </summary>
-        public StringValidatorBuilder Numeric(string? message = null)
-        {
-            return Matches(@"^\d+$", message ?? $"{_fieldName}必须为纯数字");
-        }
-
-        /// <summary>
-        /// 纯字母
-        /// </summary>
-        public StringValidatorBuilder Alpha(string? message = null)
-        {
-            return Matches(@"^[a-zA-Z]+$", message ?? $"{_fieldName}必须为纯字母");
-        }
-
-        /// <summary>
-        /// 字母数字
-        /// </summary>
-        public StringValidatorBuilder Alphanumeric(string? message = null)
-        {
-            return Matches(@"^[a-zA-Z0-9]+$", message ?? $"{_fieldName}必须为字母或数字");
-        }
-
-        /// <summary>
-        /// 包含数字
-        /// </summary>
-        public StringValidatorBuilder ContainsDigit(string? message = null)
-        {
-            return Matches(@"\d", message ?? $"{_fieldName}必须包含数字");
-        }
-
-        /// <summary>
-        /// 包含小写字母
-        /// </summary>
-        public StringValidatorBuilder ContainsLower(string? message = null)
-        {
-            return Matches(@"[a-z]", message ?? $"{_fieldName}必须包含小写字母");
-        }
-
-        /// <summary>
-        /// 包含大写字母
-        /// </summary>
-        public StringValidatorBuilder ContainsUpper(string? message = null)
-        {
-            return Matches(@"[A-Z]", message ?? $"{_fieldName}必须包含大写字母");
-        }
-
-        /// <summary>
-        /// 包含特殊字符
-        /// </summary>
-        public StringValidatorBuilder ContainsSpecial(string? message = null)
-        {
-            return Matches(@"[!@#$%^&*(),.?"":{}|<>]", message ?? $"{_fieldName}必须包含特殊字符");
-        }
-
-        /// <summary>
-        /// 密码强度验证
-        /// </summary>
-        /// <param name="minLength">最小长度</param>
-        /// <param name="requireDigit">需要数字</param>
-        /// <param name="requireLower">需要小写字母</param>
-        /// <param name="requireUpper">需要大写字母</param>
-        /// <param name="requireSpecial">需要特殊字符</param>
-        /// <param name="message">错误消息</param>
-        public StringValidatorBuilder Password(
-            int minLength = 8,
-            bool requireDigit = true,
-            bool requireLower = true,
-            bool requireUpper = true,
-            bool requireSpecial = false,
-            string? message = null)
-        {
-            MinLength(minLength);
-
-            if (requireDigit) ContainsDigit();
-            if (requireLower) ContainsLower();
-            if (requireUpper) ContainsUpper();
-            if (requireSpecial) ContainsSpecial();
-
-            if (!string.IsNullOrEmpty(message))
-            {
-                AddRule(_ => false, message);
-            }
-
-            return this;
-        }
-    }
-
-    /// <summary>
-    /// 集合验证规则构建器
-    /// </summary>
-    public class CollectionValidatorBuilder<T> : ValidatorBuilder<IEnumerable<T>?>
-    {
-        public CollectionValidatorBuilder(string fieldName = "collection") : base(fieldName) { }
-
-        /// <summary>
-        /// 不能为空集合
-        /// </summary>
-        public CollectionValidatorBuilder<T> NotEmpty(string? message = null)
-        {
-            AddRule(value => value != null && value.Any(),
-                message ?? $"{_fieldName}不能为空");
-            return this;
-        }
-
-        /// <summary>
-        /// 最小元素数量
-        /// </summary>
-        public CollectionValidatorBuilder<T> MinCount(int minCount, string? message = null)
-        {
-            AddRule(value => value != null && value.Count() >= minCount,
-                message ?? $"{_fieldName}元素数量不能少于 {minCount}");
-            return this;
-        }
-
-        /// <summary>
-        /// 最大元素数量
-        /// </summary>
-        public CollectionValidatorBuilder<T> MaxCount(int maxCount, string? message = null)
-        {
-            AddRule(value => value == null || value.Count() <= maxCount,
-                message ?? $"{_fieldName}元素数量不能超过 {maxCount}");
-            return this;
-        }
-
-        /// <summary>
-        /// 元素数量范围
-        /// </summary>
-        public CollectionValidatorBuilder<T> Count(int minCount, int maxCount, string? message = null)
-        {
-            AddRule(value =>
-            {
-                if (value == null) return false;
-                var count = value.Count();
-                return count >= minCount && count <= maxCount;
-            }, message ?? $"{_fieldName}元素数量必须在 {minCount} 到 {maxCount} 之间");
-            return this;
-        }
-
-        /// <summary>
-        /// 所有元素满足条件
-        /// </summary>
-        public CollectionValidatorBuilder<T> All(Func<T, bool> predicate, string? message = null)
-        {
-            AddRule(value => value == null || value.All(predicate),
-                message ?? $"{_fieldName}中存在不满足条件的元素");
-            return this;
-        }
-
-        /// <summary>
-        /// 至少一个元素满足条件
-        /// </summary>
-        public CollectionValidatorBuilder<T> Any(Func<T, bool> predicate, string? message = null)
-        {
-            AddRule(value => value != null && value.Any(predicate),
-                message ?? $"{_fieldName}中没有满足条件的元素");
-            return this;
-        }
-
-        /// <summary>
-        /// 不包含重复元素
-        /// </summary>
-        public CollectionValidatorBuilder<T> Distinct(string? message = null)
-        {
-            AddRule(value =>
-            {
-                if (value == null) return true;
-                var list = value.ToList();
-                return list.Count == list.Distinct().Count();
-            }, message ?? $"{_fieldName}包含重复元素");
-            return this;
-        }
-
-        /// <summary>
-        /// 包含指定元素
-        /// </summary>
-        public CollectionValidatorBuilder<T> Contains(T item, string? message = null)
-        {
-            AddRule(value => value != null && value.Contains(item),
-                message ?? $"{_fieldName}不包含指定元素");
-            return this;
-        }
-
-    }
-
-    /// <summary>
-    /// 通用验证工具类
+    /// 验证工具类
+    /// 提供常用的数据验证功能
     /// </summary>
     public static class ValidatorUtil
     {
+        #region 字符串验证
+
         /// <summary>
-        /// 创建字符串验证器
+        /// 检查字符串是否为空或空白
         /// </summary>
-        public static StringValidatorBuilder ForString(string fieldName = "value")
+        public static bool IsNullOrWhiteSpace(string? value)
         {
-            return new StringValidatorBuilder(fieldName);
+            return string.IsNullOrWhiteSpace(value);
         }
 
         /// <summary>
-        /// 创建数值验证器
+        /// 检查字符串是否为空
         /// </summary>
-        public static ValidatorBuilder<T> ForNumber<T>(string fieldName = "value") where T : IComparable<T>
+        public static bool IsNullOrEmpty(string? value)
         {
-            return new ValidatorBuilder<T>(fieldName);
+            return string.IsNullOrEmpty(value);
         }
 
         /// <summary>
-        /// 创建集合验证器
+        /// 检查字符串是否不为空
         /// </summary>
-        public static CollectionValidatorBuilder<T> ForCollection<T>(string fieldName = "collection")
+        public static bool IsNotNullOrEmpty(string? value)
         {
-            return new CollectionValidatorBuilder<T>(fieldName);
+            return !string.IsNullOrEmpty(value);
         }
 
         /// <summary>
-        /// 创建自定义验证器
+        /// 检查字符串长度是否在指定范围内
         /// </summary>
-        public static ValidatorBuilder<T> For<T>(string fieldName = "value")
-        {
-            return new ValidatorBuilder<T>(fieldName);
-        }
-
-        #region 快捷验证方法
-
-        /// <summary>
-        /// 验证字符串不为空
-        /// </summary>
-        public static bool IsNotEmpty(string? value)
-        {
-            return !string.IsNullOrWhiteSpace(value);
-        }
-
-        /// <summary>
-        /// 验证邮箱格式
-        /// </summary>
-        public static bool IsEmail(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-            return Regex.IsMatch(value, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-        }
-
-        /// <summary>
-        /// 验证手机号格式（中国大陆）
-        /// </summary>
-        public static bool IsPhone(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-            return Regex.IsMatch(value, @"^1[3-9]\d{9}$");
-        }
-
-        /// <summary>
-        /// 验证身份证号格式（中国大陆）
-        /// </summary>
-        public static bool IsIdCard(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-            return Regex.IsMatch(value, @"^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$");
-        }
-
-        /// <summary>
-        /// 验证URL格式
-        /// </summary>
-        public static bool IsUrl(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-            return Regex.IsMatch(value, @"^https?://[^\s/$.?#].[^\s]*$", RegexOptions.IgnoreCase);
-        }
-
-        /// <summary>
-        /// 验证是否为纯数字
-        /// </summary>
-        public static bool IsNumeric(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-            return Regex.IsMatch(value, @"^\d+$");
-        }
-
-        /// <summary>
-        /// 验证是否在范围内
-        /// </summary>
-        public static bool InRange<T>(T value, T min, T max) where T : IComparable<T>
-        {
-            if (value == null)
-                return false;
-            return value.CompareTo(min) >= 0 && value.CompareTo(max) <= 0;
-        }
-
-        /// <summary>
-        /// 验证字符串长度
-        /// </summary>
-        public static bool LengthInRange(string? value, int minLength, int maxLength)
+        public static bool IsLengthBetween(string? value, int minLength, int maxLength)
         {
             if (value == null)
                 return minLength <= 0;
+
             return value.Length >= minLength && value.Length <= maxLength;
         }
 
         /// <summary>
-        /// 验证集合不为空
+        /// 检查字符串长度是否等于指定值
         /// </summary>
-        public static bool IsNotEmpty<T>(IEnumerable<T>? collection)
+        public static bool IsLength(string? value, int length)
         {
-            return collection != null && collection.Any();
+            return value?.Length == length;
         }
 
         /// <summary>
-        /// 验证集合元素数量
+        /// 检查字符串是否只包含数字
         /// </summary>
-        public static bool CountInRange<T>(IEnumerable<T>? collection, int minCount, int maxCount)
+        public static bool IsNumeric(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return false;
+
+            return value.All(char.IsDigit);
+        }
+
+        /// <summary>
+        /// 检查字符串是否只包含字母
+        /// </summary>
+        public static bool IsAlpha(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return false;
+
+            return value.All(char.IsLetter);
+        }
+
+        /// <summary>
+        /// 检查字符串是否只包含字母和数字
+        /// </summary>
+        public static bool IsAlphanumeric(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return false;
+
+            return value.All(c => char.IsLetterOrDigit(c));
+        }
+
+        /// <summary>
+        /// 检查字符串是否匹配正则表达式
+        /// </summary>
+        public static bool IsMatch(string? value, string pattern)
+        {
+            if (string.IsNullOrEmpty(value))
+                return false;
+
+            return Regex.IsMatch(value, pattern);
+        }
+
+        /// <summary>
+        /// 检查字符串是否在指定值列表中
+        /// </summary>
+        public static bool IsIn(string? value, params string[] allowedValues)
+        {
+            return allowedValues.Contains(value);
+        }
+
+        /// <summary>
+        /// 检查字符串是否以指定前缀开头
+        /// </summary>
+        public static bool StartsWith(string? value, string prefix, StringComparison comparison = StringComparison.Ordinal)
+        {
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(prefix))
+                return false;
+
+            return value.StartsWith(prefix, comparison);
+        }
+
+        /// <summary>
+        /// 检查字符串是否以指定后缀结尾
+        /// </summary>
+        public static bool EndsWith(string? value, string suffix, StringComparison comparison = StringComparison.Ordinal)
+        {
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(suffix))
+                return false;
+
+            return value.EndsWith(suffix, comparison);
+        }
+
+        /// <summary>
+        /// 检查字符串是否包含指定子串
+        /// </summary>
+        public static bool Contains(string? value, string substring, StringComparison comparison = StringComparison.Ordinal)
+        {
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(substring))
+                return false;
+
+            return value.Contains(substring, comparison);
+        }
+
+        #endregion
+
+        #region 数字验证
+
+        /// <summary>
+        /// 检查值是否在指定范围内
+        /// </summary>
+        public static bool IsBetween<T>(T value, T min, T max) where T : IComparable<T>
+        {
+            return value.CompareTo(min) >= 0 && value.CompareTo(max) <= 0;
+        }
+
+        /// <summary>
+        /// 检查值是否大于指定值
+        /// </summary>
+        public static bool IsGreaterThan<T>(T value, T compare) where T : IComparable<T>
+        {
+            return value.CompareTo(compare) > 0;
+        }
+
+        /// <summary>
+        /// 检查值是否大于等于指定值
+        /// </summary>
+        public static bool IsGreaterThanOrEqual<T>(T value, T compare) where T : IComparable<T>
+        {
+            return value.CompareTo(compare) >= 0;
+        }
+
+        /// <summary>
+        /// 检查值是否小于指定值
+        /// </summary>
+        public static bool IsLessThan<T>(T value, T compare) where T : IComparable<T>
+        {
+            return value.CompareTo(compare) < 0;
+        }
+
+        /// <summary>
+        /// 检查值是否小于等于指定值
+        /// </summary>
+        public static bool IsLessThanOrEqual<T>(T value, T compare) where T : IComparable<T>
+        {
+            return value.CompareTo(compare) <= 0;
+        }
+
+        /// <summary>
+        /// 检查是否为正数
+        /// </summary>
+        public static bool IsPositive<T>(T value) where T : IComparable<T>
+        {
+            return value.CompareTo(default!) > 0;
+        }
+
+        /// <summary>
+        /// 检查是否为负数
+        /// </summary>
+        public static bool IsNegative<T>(T value) where T : IComparable<T>
+        {
+            return value.CompareTo(default!) < 0;
+        }
+
+        /// <summary>
+        /// 检查是否为零
+        /// </summary>
+        public static bool IsZero<T>(T value) where T : IComparable<T>
+        {
+            return value.CompareTo(default!) == 0;
+        }
+
+        /// <summary>
+        /// 检查是否为偶数
+        /// </summary>
+        public static bool IsEven(int value)
+        {
+            return value % 2 == 0;
+        }
+
+        /// <summary>
+        /// 检查是否为奇数
+        /// </summary>
+        public static bool IsOdd(int value)
+        {
+            return value % 2 != 0;
+        }
+
+        #endregion
+
+        #region 集合验证
+
+        /// <summary>
+        /// 检查集合是否为空
+        /// </summary>
+        public static bool IsEmpty(IEnumerable? collection)
+        {
+            if (collection == null)
+                return true;
+
+            if (collection is ICollection col)
+                return col.Count == 0;
+
+            return !collection.Cast<object>().Any();
+        }
+
+        /// <summary>
+        /// 检查集合是否不为空
+        /// </summary>
+        public static bool IsNotEmpty(IEnumerable? collection)
+        {
+            return !IsEmpty(collection);
+        }
+
+        /// <summary>
+        /// 检查集合元素数量是否在指定范围内
+        /// </summary>
+        public static bool IsCountBetween(IEnumerable? collection, int minCount, int maxCount)
         {
             if (collection == null)
                 return minCount <= 0;
-            var count = collection.Count();
+
+            int count;
+            if (collection is ICollection col)
+            {
+                count = col.Count;
+            }
+            else
+            {
+                count = collection.Cast<object>().Count();
+            }
+
             return count >= minCount && count <= maxCount;
+        }
+
+        /// <summary>
+        /// 检查集合是否包含指定元素
+        /// </summary>
+        public static bool Contains<T>(IEnumerable<T>? collection, T item)
+        {
+            if (collection == null)
+                return false;
+
+            return collection.Contains(item);
+        }
+
+        /// <summary>
+        /// 检查集合是否包含所有指定元素
+        /// </summary>
+        public static bool ContainsAll<T>(IEnumerable<T>? collection, params T[] items)
+        {
+            if (collection == null || items == null)
+                return false;
+
+            return items.All(item => collection.Contains(item));
+        }
+
+        /// <summary>
+        /// 检查集合是否包含任一指定元素
+        /// </summary>
+        public static bool ContainsAny<T>(IEnumerable<T>? collection, params T[] items)
+        {
+            if (collection == null || items == null)
+                return false;
+
+            return items.Any(item => collection.Contains(item));
+        }
+
+        #endregion
+
+        #region 日期验证
+
+        /// <summary>
+        /// 检查日期是否在指定范围内
+        /// </summary>
+        public static bool IsBetween(DateTime value, DateTime min, DateTime max)
+        {
+            return value >= min && value <= max;
+        }
+
+        /// <summary>
+        /// 检查是否为工作日（周一至周五）
+        /// </summary>
+        public static bool IsWeekday(DateTime value)
+        {
+            return value.DayOfWeek != DayOfWeek.Saturday && value.DayOfWeek != DayOfWeek.Sunday;
+        }
+
+        /// <summary>
+        /// 检查是否为周末
+        /// </summary>
+        public static bool IsWeekend(DateTime value)
+        {
+            return value.DayOfWeek == DayOfWeek.Saturday || value.DayOfWeek == DayOfWeek.Sunday;
+        }
+
+        /// <summary>
+        /// 检查是否为今天
+        /// </summary>
+        public static bool IsToday(DateTime value)
+        {
+            return value.Date == DateTime.Today;
+        }
+
+        /// <summary>
+        /// 检查是否为过去的时间
+        /// </summary>
+        public static bool IsPast(DateTime value)
+        {
+            return value < DateTime.Now;
+        }
+
+        /// <summary>
+        /// 检查是否为未来的时间
+        /// </summary>
+        public static bool IsFuture(DateTime value)
+        {
+            return value > DateTime.Now;
+        }
+
+        #endregion
+
+        #region 类型验证
+
+        /// <summary>
+        /// 检查值是否为指定类型
+        /// </summary>
+        public static bool IsType<T>(object? value)
+        {
+            return value is T;
+        }
+
+        /// <summary>
+        /// 检查值是否为 null
+        /// </summary>
+        public static bool IsNull(object? value)
+        {
+            return value == null;
+        }
+
+        /// <summary>
+        /// 检查值是否不为 null
+        /// </summary>
+        public static bool IsNotNull(object? value)
+        {
+            return value != null;
+        }
+
+        /// <summary>
+        /// 检查是否为默认值
+        /// </summary>
+        public static bool IsDefault<T>(T value)
+        {
+            return EqualityComparer<T>.Default.Equals(value, default);
+        }
+
+        #endregion
+
+        #region 组合验证
+
+        /// <summary>
+        /// 组合多个验证条件（全部满足）
+        /// </summary>
+        public static bool All(params Func<bool>[] validators)
+        {
+            return validators.All(v => v());
+        }
+
+        /// <summary>
+        /// 组合多个验证条件（任一满足）
+        /// </summary>
+        public static bool Any(params Func<bool>[] validators)
+        {
+            return validators.Any(v => v());
+        }
+
+        /// <summary>
+        /// 验证并返回结果
+        /// </summary>
+        public static ValidationResult Validate(params (string Field, Func<bool> Validator, string ErrorMessage)[] rules)
+        {
+            var result = new ValidationResult { IsValid = true };
+
+            foreach (var (field, validator, errorMessage) in rules)
+            {
+                if (!validator())
+                {
+                    result.IsValid = false;
+                    result.Errors.Add(errorMessage);
+                    result.ErrorFields.Add(field);
+                }
+            }
+
+            return result;
         }
 
         #endregion

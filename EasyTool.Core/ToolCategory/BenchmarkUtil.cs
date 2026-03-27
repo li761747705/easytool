@@ -2,298 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace EasyTool.ToolCategory
 {
     /// <summary>
-    /// 性能计时工具类
-    /// 提供代码执行时间测量和性能分析功能
-    /// </summary>
-    public static class BenchmarkUtil
-    {
-        /// <summary>
-        /// 测量操作执行时间
-        /// </summary>
-        /// <param name="action">要测量的操作</param>
-        /// <param name="name">操作名称</param>
-        /// <returns>测量结果</returns>
-        public static BenchmarkResult Measure(Action action, string? name = null)
-        {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            var stopwatch = Stopwatch.StartNew();
-            action();
-            stopwatch.Stop();
-
-            return new BenchmarkResult
-            {
-                Name = name ?? "Operation",
-                ElapsedTicks = stopwatch.ElapsedTicks,
-                ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
-                ElapsedTime = stopwatch.Elapsed
-            };
-        }
-
-        /// <summary>
-        /// 测量异步操作执行时间
-        /// </summary>
-        /// <param name="func">要测量的异步操作</param>
-        /// <param name="name">操作名称</param>
-        /// <returns>测量结果</returns>
-        public static async Task<BenchmarkResult> MeasureAsync(Func<Task> func, string? name = null)
-        {
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-
-            var stopwatch = Stopwatch.StartNew();
-            await func();
-            stopwatch.Stop();
-
-            return new BenchmarkResult
-            {
-                Name = name ?? "Operation",
-                ElapsedTicks = stopwatch.ElapsedTicks,
-                ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
-                ElapsedTime = stopwatch.Elapsed
-            };
-        }
-
-        /// <summary>
-        /// 测量带返回值的操作执行时间
-        /// </summary>
-        /// <typeparam name="T">返回值类型</typeparam>
-        /// <param name="func">要测量的操作</param>
-        /// <param name="name">操作名称</param>
-        /// <returns>带返回值的测量结果</returns>
-        public static BenchmarkResult<T> Measure<T>(Func<T> func, string? name = null)
-        {
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-
-            var stopwatch = Stopwatch.StartNew();
-            var result = func();
-            stopwatch.Stop();
-
-            return new BenchmarkResult<T>
-            {
-                Name = name ?? "Operation",
-                ElapsedTicks = stopwatch.ElapsedTicks,
-                ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
-                ElapsedTime = stopwatch.Elapsed,
-                Value = result
-            };
-        }
-
-        /// <summary>
-        /// 测量带返回值的异步操作执行时间
-        /// </summary>
-        /// <typeparam name="T">返回值类型</typeparam>
-        /// <param name="func">要测量的异步操作</param>
-        /// <param name="name">操作名称</param>
-        /// <returns>带返回值的测量结果</returns>
-        public static async Task<BenchmarkResult<T>> MeasureAsync<T>(Func<Task<T>> func, string? name = null)
-        {
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-
-            var stopwatch = Stopwatch.StartNew();
-            var result = await func();
-            stopwatch.Stop();
-
-            return new BenchmarkResult<T>
-            {
-                Name = name ?? "Operation",
-                ElapsedTicks = stopwatch.ElapsedTicks,
-                ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
-                ElapsedTime = stopwatch.Elapsed,
-                Value = result
-            };
-        }
-
-        /// <summary>
-        /// 多次执行并计算平均执行时间
-        /// </summary>
-        /// <param name="action">要测量的操作</param>
-        /// <param name="iterations">迭代次数</param>
-        /// <param name="name">操作名称</param>
-        /// <returns>统计结果</returns>
-        public static BenchmarkStatistics Benchmark(Action action, int iterations = 100, string? name = null)
-        {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-            if (iterations < 1)
-                throw new ArgumentOutOfRangeException(nameof(iterations));
-
-            // 预热
-            action();
-
-            var times = new List<long>(iterations);
-            var stopwatch = new Stopwatch();
-
-            for (int i = 0; i < iterations; i++)
-            {
-                stopwatch.Restart();
-                action();
-                stopwatch.Stop();
-                times.Add(stopwatch.ElapsedTicks);
-            }
-
-            return CalculateStatistics(name ?? "Operation", times, iterations);
-        }
-
-        /// <summary>
-        /// 多次执行异步操作并计算平均执行时间
-        /// </summary>
-        /// <param name="func">要测量的异步操作</param>
-        /// <param name="iterations">迭代次数</param>
-        /// <param name="name">操作名称</param>
-        /// <returns>统计结果</returns>
-        public static async Task<BenchmarkStatistics> BenchmarkAsync(Func<Task> func, int iterations = 100, string? name = null)
-        {
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-            if (iterations < 1)
-                throw new ArgumentOutOfRangeException(nameof(iterations));
-
-            // 预热
-            await func();
-
-            var times = new List<long>(iterations);
-            var stopwatch = new Stopwatch();
-
-            for (int i = 0; i < iterations; i++)
-            {
-                stopwatch.Restart();
-                await func();
-                stopwatch.Stop();
-                times.Add(stopwatch.ElapsedTicks);
-            }
-
-            return CalculateStatistics(name ?? "Operation", times, iterations);
-        }
-
-        /// <summary>
-        /// 比较多个操作的执行时间
-        /// </summary>
-        /// <param name="operations">操作列表（名称和操作）</param>
-        /// <param name="iterations">每个操作的迭代次数</param>
-        /// <returns>比较结果列表</returns>
-        public static List<BenchmarkStatistics> Compare(IEnumerable<(string Name, Action Action)> operations, int iterations = 100)
-        {
-            if (operations == null)
-                throw new ArgumentNullException(nameof(operations));
-
-            var results = new List<BenchmarkStatistics>();
-            foreach (var (name, action) in operations)
-            {
-                results.Add(Benchmark(action, iterations, name));
-            }
-
-            return results.OrderBy(r => r.AverageMilliseconds).ToList();
-        }
-
-        /// <summary>
-        /// 比较多个异步操作的执行时间
-        /// </summary>
-        /// <param name="operations">操作列表（名称和操作）</param>
-        /// <param name="iterations">每个操作的迭代次数</param>
-        /// <returns>比较结果列表</returns>
-        public static async Task<List<BenchmarkStatistics>> CompareAsync(
-            IEnumerable<(string Name, Func<Task> Func)> operations,
-            int iterations = 100)
-        {
-            if (operations == null)
-                throw new ArgumentNullException(nameof(operations));
-
-            var results = new List<BenchmarkStatistics>();
-            foreach (var (name, func) in operations)
-            {
-                results.Add(await BenchmarkAsync(func, iterations, name));
-            }
-
-            return results.OrderBy(r => r.AverageMilliseconds).ToList();
-        }
-
-        /// <summary>
-        /// 创建一个可多次记录的计时器
-        /// </summary>
-        /// <param name="name">计时器名称</param>
-        /// <returns>计时器实例</returns>
-        public static BenchmarkTimer CreateTimer(string? name = null)
-        {
-            return new BenchmarkTimer(name);
-        }
-
-        /// <summary>
-        /// 内存使用测量
-        /// </summary>
-        /// <param name="action">要测量的操作</param>
-        /// <param name="name">操作名称</param>
-        /// <returns>测量结果</returns>
-        public static MemoryBenchmarkResult MeasureMemory(Action action, string? name = null)
-        {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
-            // 强制GC以获得更准确的内存测量
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-
-            var beforeMemory = GC.GetTotalMemory(forceFullCollection: true);
-
-            var stopwatch = Stopwatch.StartNew();
-            action();
-            stopwatch.Stop();
-
-            var afterMemory = GC.GetTotalMemory(forceFullCollection: false);
-
-            return new MemoryBenchmarkResult
-            {
-                Name = name ?? "Operation",
-                ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
-                MemoryBefore = beforeMemory,
-                MemoryAfter = afterMemory,
-                MemoryDelta = afterMemory - beforeMemory
-            };
-        }
-
-        private static BenchmarkStatistics CalculateStatistics(string name, List<long> times, int iterations)
-        {
-            times.Sort();
-            var frequency = Stopwatch.Frequency;
-
-            var avgTicks = times.Average();
-            var minTicks = times[0];
-            var maxTicks = times[times.Count - 1];
-            var medianTicks = times[times.Count / 2];
-            var stdDev = Math.Sqrt(times.Average(t => Math.Pow(t - avgTicks, 2)));
-
-            var p95Index = (int)(iterations * 0.95);
-            var p99Index = (int)(iterations * 0.99);
-
-            return new BenchmarkStatistics
-            {
-                Name = name,
-                Iterations = iterations,
-                TotalMilliseconds = (long)times.Sum(t => t * 1000.0 / frequency),
-                AverageMilliseconds = avgTicks * 1000.0 / frequency,
-                MinMilliseconds = minTicks * 1000.0 / frequency,
-                MaxMilliseconds = maxTicks * 1000.0 / frequency,
-                MedianMilliseconds = medianTicks * 1000.0 / frequency,
-                StdDevMilliseconds = stdDev * 1000.0 / frequency,
-                P95Milliseconds = times[Math.Min(p95Index, times.Count - 1)] * 1000.0 / frequency,
-                P99Milliseconds = times[Math.Min(p99Index, times.Count - 1)] * 1000.0 / frequency,
-                OperationsPerSecond = 1000.0 / (avgTicks * 1000.0 / frequency)
-            };
-        }
-    }
-
-    /// <summary>
-    /// 基准测试结果
+    /// 性能测试结果
     /// </summary>
     public class BenchmarkResult
     {
@@ -303,241 +17,301 @@ namespace EasyTool.ToolCategory
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 执行时间（Tick数）
-        /// </summary>
-        public long ElapsedTicks { get; set; }
-
-        /// <summary>
-        /// 执行时间（毫秒）
-        /// </summary>
-        public long ElapsedMilliseconds { get; set; }
-
-        /// <summary>
-        /// 执行时间
-        /// </summary>
-        public TimeSpan ElapsedTime { get; set; }
-
-        /// <summary>
-        /// 执行时间（微秒）
-        /// </summary>
-        public double ElapsedMicroseconds => ElapsedTicks * 1_000_000.0 / Stopwatch.Frequency;
-
-        /// <summary>
-        /// 执行时间（纳秒）
-        /// </summary>
-        public double ElapsedNanoseconds => ElapsedTicks * 1_000_000_000.0 / Stopwatch.Frequency;
-
-        public override string ToString()
-        {
-            if (ElapsedMilliseconds > 0)
-                return $"{Name}: {ElapsedMilliseconds}ms";
-            return $"{Name}: {ElapsedMicroseconds:F2}μs";
-        }
-    }
-
-    /// <summary>
-    /// 带返回值的基准测试结果
-    /// </summary>
-    /// <typeparam name="T">返回值类型</typeparam>
-    public class BenchmarkResult<T> : BenchmarkResult
-    {
-        /// <summary>
-        /// 返回值
-        /// </summary>
-        public T? Value { get; set; }
-    }
-
-    /// <summary>
-    /// 基准测试统计信息
-    /// </summary>
-    public class BenchmarkStatistics
-    {
-        /// <summary>
-        /// 操作名称
-        /// </summary>
-        public string Name { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 迭代次数
+        /// 执行次数
         /// </summary>
         public int Iterations { get; set; }
 
         /// <summary>
-        /// 总执行时间（毫秒）
+        /// 总耗时
         /// </summary>
-        public long TotalMilliseconds { get; set; }
+        public TimeSpan TotalTime { get; set; }
 
         /// <summary>
-        /// 平均执行时间（毫秒）
+        /// 平均耗时
         /// </summary>
-        public double AverageMilliseconds { get; set; }
+        public TimeSpan AverageTime => Iterations > 0 ? TimeSpan.FromTicks(TotalTime.Ticks / Iterations) : TimeSpan.Zero;
 
         /// <summary>
-        /// 最小执行时间（毫秒）
+        /// 最小耗时
         /// </summary>
-        public double MinMilliseconds { get; set; }
+        public TimeSpan MinTime { get; set; }
 
         /// <summary>
-        /// 最大执行时间（毫秒）
+        /// 最大耗时
         /// </summary>
-        public double MaxMilliseconds { get; set; }
-
-        /// <summary>
-        /// 中位数执行时间（毫秒）
-        /// </summary>
-        public double MedianMilliseconds { get; set; }
-
-        /// <summary>
-        /// 标准差（毫秒）
-        /// </summary>
-        public double StdDevMilliseconds { get; set; }
-
-        /// <summary>
-        /// 第95百分位执行时间（毫秒）
-        /// </summary>
-        public double P95Milliseconds { get; set; }
-
-        /// <summary>
-        /// 第99百分位执行时间（毫秒）
-        /// </summary>
-        public double P99Milliseconds { get; set; }
+        public TimeSpan MaxTime { get; set; }
 
         /// <summary>
         /// 每秒操作数
         /// </summary>
-        public double OperationsPerSecond { get; set; }
+        public double OperationsPerSecond => TotalTime.TotalSeconds > 0 ? Iterations / TotalTime.TotalSeconds : 0;
+
+        /// <summary>
+        /// 详细耗时记录
+        /// </summary>
+        public List<TimeSpan> DetailedTimes { get; set; } = new();
 
         public override string ToString()
         {
-            return $"{Name}: Avg={AverageMilliseconds:F3}ms, Min={MinMilliseconds:F3}ms, Max={MaxMilliseconds:F3}ms, Ops/s={OperationsPerSecond:F0}";
+            return $"[{Name}] {Iterations} 次, 总计: {TotalTime.TotalMilliseconds:F2}ms, 平均: {AverageTime.TotalMilliseconds:F4}ms, " +
+                   $"最小: {MinTime.TotalMilliseconds:F4}ms, 最大: {MaxTime.TotalMilliseconds:F4}ms, {OperationsPerSecond:F0} ops/s";
         }
     }
 
     /// <summary>
-    /// 内存基准测试结果
+    /// 性能测试工具类
+    /// 提供代码执行性能测量功能
     /// </summary>
-    public class MemoryBenchmarkResult
+    public static class BenchmarkUtil
     {
         /// <summary>
-        /// 操作名称
+        /// 测量单次执行时间
         /// </summary>
-        public string Name { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 执行时间（毫秒）
-        /// </summary>
-        public long ElapsedMilliseconds { get; set; }
-
-        /// <summary>
-        /// 执行前内存（字节）
-        /// </summary>
-        public long MemoryBefore { get; set; }
-
-        /// <summary>
-        /// 执行后内存（字节）
-        /// </summary>
-        public long MemoryAfter { get; set; }
-
-        /// <summary>
-        /// 内存变化（字节）
-        /// </summary>
-        public long MemoryDelta { get; set; }
-
-        /// <summary>
-        /// 内存变化（MB）
-        /// </summary>
-        public double MemoryDeltaMB => MemoryDelta / (1024.0 * 1024.0);
-
-        public override string ToString()
+        /// <param name="action">要测量的操作</param>
+        /// <returns>执行时间</returns>
+        public static TimeSpan Measure(Action action)
         {
-            var sign = MemoryDelta >= 0 ? "+" : "";
-            return $"{Name}: {ElapsedMilliseconds}ms, Memory: {sign}{MemoryDeltaMB:F2}MB";
-        }
-    }
-
-    /// <summary>
-    /// 可记录多个时间点的计时器
-    /// </summary>
-    public class BenchmarkTimer
-    {
-        private readonly Stopwatch _stopwatch;
-        private readonly List<(string Label, long Ticks)> _laps;
-        private readonly string? _name;
-
-        public BenchmarkTimer(string? name = null)
-        {
-            _name = name;
-            _stopwatch = new Stopwatch();
-            _laps = new List<(string, long)>();
+            var stopwatch = Stopwatch.StartNew();
+            action();
+            stopwatch.Stop();
+            return stopwatch.Elapsed;
         }
 
         /// <summary>
-        /// 开始计时
+        /// 测量单次执行时间（带返回值）
         /// </summary>
-        public BenchmarkTimer Start()
+        /// <typeparam name="T">返回值类型</typeparam>
+        /// <param name="func">要测量的操作</param>
+        /// <param name="result">执行结果</param>
+        /// <returns>执行时间</returns>
+        public static TimeSpan Measure<T>(Func<T> func, out T result)
         {
-            _stopwatch.Start();
-            return this;
+            var stopwatch = Stopwatch.StartNew();
+            result = func();
+            stopwatch.Stop();
+            return stopwatch.Elapsed;
         }
 
         /// <summary>
-        /// 记录一个时间点
+        /// 异步测量单次执行时间
         /// </summary>
-        /// <param name="label">标签</param>
-        public BenchmarkTimer Lap(string label)
+        /// <param name="action">要测量的操作</param>
+        /// <returns>执行时间</returns>
+        public static async Task<TimeSpan> MeasureAsync(Func<Task> action)
         {
-            _laps.Add((label, _stopwatch.ElapsedTicks));
-            return this;
+            var stopwatch = Stopwatch.StartNew();
+            await action();
+            stopwatch.Stop();
+            return stopwatch.Elapsed;
         }
 
         /// <summary>
-        /// 停止计时
+        /// 异步测量单次执行时间（带返回值）
         /// </summary>
-        public BenchmarkTimer Stop()
+        /// <typeparam name="T">返回值类型</typeparam>
+        /// <param name="func">要测量的操作</param>
+        /// <returns>执行时间和结果</returns>
+        public static async Task<(TimeSpan Elapsed, T Result)> MeasureAsync<T>(Func<Task<T>> func)
         {
-            _stopwatch.Stop();
-            return this;
+            var stopwatch = Stopwatch.StartNew();
+            var result = await func();
+            stopwatch.Stop();
+            return (stopwatch.Elapsed, result);
         }
 
         /// <summary>
-        /// 重置计时器
+        /// 基准测试
         /// </summary>
-        public BenchmarkTimer Reset()
+        /// <param name="name">测试名称</param>
+        /// <param name="action">要测试的操作</param>
+        /// <param name="iterations">迭代次数</param>
+        /// <param name="warmupIterations">预热次数</param>
+        /// <returns>测试结果</returns>
+        public static BenchmarkResult Run(string name, Action action, int iterations = 1000, int warmupIterations = 10)
         {
-            _stopwatch.Reset();
-            _laps.Clear();
-            return this;
+            // 预热
+            for (int i = 0; i < warmupIterations; i++)
+            {
+                action();
+            }
+
+            // 正式测试
+            var times = new List<TimeSpan>(iterations);
+            var totalTime = TimeSpan.Zero;
+            var minTime = TimeSpan.MaxValue;
+            var maxTime = TimeSpan.Zero;
+
+            for (int i = 0; i < iterations; i++)
+            {
+                var time = Measure(action);
+                times.Add(time);
+                totalTime += time;
+
+                if (time < minTime) minTime = time;
+                if (time > maxTime) maxTime = time;
+            }
+
+            return new BenchmarkResult
+            {
+                Name = name,
+                Iterations = iterations,
+                TotalTime = totalTime,
+                MinTime = minTime,
+                MaxTime = maxTime,
+                DetailedTimes = times
+            };
         }
 
         /// <summary>
-        /// 获取所有记录点
+        /// 异步基准测试
         /// </summary>
-        /// <returns>记录点列表</returns>
-        public List<(string Label, double Milliseconds)> GetLaps()
+        /// <param name="name">测试名称</param>
+        /// <param name="action">要测试的操作</param>
+        /// <param name="iterations">迭代次数</param>
+        /// <param name="warmupIterations">预热次数</param>
+        /// <returns>测试结果</returns>
+        public static async Task<BenchmarkResult> RunAsync(string name, Func<Task> action, int iterations = 1000, int warmupIterations = 10)
         {
-            return _laps.Select(l => (l.Label, l.Ticks * 1000.0 / Stopwatch.Frequency)).ToList();
+            // 预热
+            for (int i = 0; i < warmupIterations; i++)
+            {
+                await action();
+            }
+
+            // 正式测试
+            var times = new List<TimeSpan>(iterations);
+            var totalTime = TimeSpan.Zero;
+            var minTime = TimeSpan.MaxValue;
+            var maxTime = TimeSpan.Zero;
+
+            for (int i = 0; i < iterations; i++)
+            {
+                var time = await MeasureAsync(action);
+                times.Add(time);
+                totalTime += time;
+
+                if (time < minTime) minTime = time;
+                if (time > maxTime) maxTime = time;
+            }
+
+            return new BenchmarkResult
+            {
+                Name = name,
+                Iterations = iterations,
+                TotalTime = totalTime,
+                MinTime = minTime,
+                MaxTime = maxTime,
+                DetailedTimes = times
+            };
         }
 
         /// <summary>
-        /// 获取总执行时间（毫秒）
+        /// 比较多个操作的性能
         /// </summary>
-        public double TotalMilliseconds => _stopwatch.ElapsedTicks * 1000.0 / Stopwatch.Frequency;
-
-        /// <summary>
-        /// 获取执行时间
-        /// </summary>
-        public TimeSpan Elapsed => _stopwatch.Elapsed;
-
-        /// <summary>
-        /// 是否正在运行
-        /// </summary>
-        public bool IsRunning => _stopwatch.IsRunning;
-
-        public override string ToString()
+        /// <param name="iterations">迭代次数</param>
+        /// <param name="actions">操作列表</param>
+        /// <returns>测试结果列表</returns>
+        public static List<BenchmarkResult> Compare(int iterations, params (string Name, Action Action)[] actions)
         {
-            return _name != null
-                ? $"{_name}: {TotalMilliseconds:F2}ms"
-                : $"{TotalMilliseconds:F2}ms";
+            var results = new List<BenchmarkResult>();
+
+            foreach (var (name, action) in actions)
+            {
+                results.Add(Run(name, action, iterations));
+            }
+
+            return results.OrderBy(r => r.AverageTime).ToList();
+        }
+
+        /// <summary>
+        /// 异步比较多个操作的性能
+        /// </summary>
+        /// <param name="iterations">迭代次数</param>
+        /// <param name="actions">操作列表</param>
+        /// <returns>测试结果列表</returns>
+        public static async Task<List<BenchmarkResult>> CompareAsync(int iterations, params (string Name, Func<Task> Action)[] actions)
+        {
+            var results = new List<BenchmarkResult>();
+
+            foreach (var (name, action) in actions)
+            {
+                results.Add(await RunAsync(name, action, iterations));
+            }
+
+            return results.OrderBy(r => r.AverageTime).ToList();
+        }
+
+        /// <summary>
+        /// 使用计时器测量操作
+        /// </summary>
+        /// <param name="action">要测量的操作</param>
+        /// <param name="elapsed">耗时回调</param>
+        public static void WithTimer(Action action, Action<TimeSpan> elapsed)
+        {
+            var time = Measure(action);
+            elapsed(time);
+        }
+
+        /// <summary>
+        /// 异步使用计时器测量操作
+        /// </summary>
+        /// <param name="action">要测量的操作</param>
+        /// <param name="elapsed">耗时回调</param>
+        public static async Task WithTimerAsync(Func<Task> action, Action<TimeSpan> elapsed)
+        {
+            var time = await MeasureAsync(action);
+            elapsed(time);
+        }
+
+        /// <summary>
+        /// 格式化时间输出
+        /// </summary>
+        /// <param name="time">时间</param>
+        /// <returns>格式化字符串</returns>
+        public static string FormatTime(TimeSpan time)
+        {
+            if (time.TotalSeconds >= 1)
+                return $"{time.TotalSeconds:F2}s";
+            if (time.TotalMilliseconds >= 1)
+                return $"{time.TotalMilliseconds:F2}ms";
+#if NET7_0_OR_GREATER
+            if (time.TotalMicroseconds >= 1)
+                return $"{time.TotalMicroseconds:F2}μs";
+            return $"{time.TotalNanoseconds:F2}ns";
+#else
+            // For older frameworks, use ticks for sub-millisecond precision
+            var ticks = time.Ticks;
+            if (ticks >= 10) // >= 1 microsecond (10 ticks = 1 μs)
+                return $"{ticks / 10.0:F2}μs";
+            return $"{ticks * 100.0:F2}ns";
+#endif
+        }
+
+        /// <summary>
+        /// 打印比较结果
+        /// </summary>
+        /// <param name="results">测试结果列表</param>
+        public static void PrintComparison(List<BenchmarkResult> results)
+        {
+            if (results.Count == 0)
+                return;
+
+            Console.WriteLine("=== 性能比较结果 ===");
+            Console.WriteLine();
+
+            var baseline = results[0].AverageTime;
+
+            for (int i = 0; i < results.Count; i++)
+            {
+                var result = results[i];
+                var ratio = i == 0 ? 1.0 : result.AverageTime.TotalMilliseconds / baseline.TotalMilliseconds;
+
+                Console.WriteLine($"{i + 1}. {result.Name}");
+                Console.WriteLine($"   平均: {FormatTime(result.AverageTime)}");
+                Console.WriteLine($"   比率: {ratio:F2}x");
+                Console.WriteLine($"   吞吐: {result.OperationsPerSecond:F0} ops/s");
+                Console.WriteLine();
+            }
         }
     }
 }

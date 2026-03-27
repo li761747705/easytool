@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,34 +7,70 @@ namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// 重试工具类
-    /// 提供可配置的重试机制
     /// </summary>
     public static class RetryUtil
     {
         /// <summary>
-        /// 执行带重试的操作
+        /// 重试执行操作
         /// </summary>
         /// <param name="action">要执行的操作</param>
         /// <param name="maxRetries">最大重试次数</param>
-        /// <param name="delay">重试间隔（毫秒）</param>
-        /// <param name="exponentialBackoff">是否使用指数退避</param>
-        public static void Execute(Action action, int maxRetries = 3, int delay = 1000, bool exponentialBackoff = true)
+        /// <param name="delay">重试间隔</param>
+        /// <param name="onRetry">重试时的回调</param>
+        public static void Execute(
+            Action action,
+            int maxRetries = 3,
+            TimeSpan? delay = null,
+            Action<Exception, int>? onRetry = null)
         {
-            Execute<object>(() =>
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            Exception? lastException = null;
+            var delayValue = delay ?? TimeSpan.FromSeconds(1);
+
+            for (int i = 0; i <= maxRetries; i++)
             {
-                action();
-                return null;
-            }, maxRetries, delay, exponentialBackoff);
+                try
+                {
+                    action();
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+
+                    if (i < maxRetries)
+                    {
+                        onRetry?.Invoke(ex, i + 1);
+
+                        if (delayValue > TimeSpan.Zero)
+                        {
+                            Thread.Sleep(delayValue);
+                        }
+                    }
+                }
+            }
+
+            throw lastException ?? new Exception("重试失败");
         }
 
         /// <summary>
-        /// 执行带重试的函数
+        /// 重试执行操作（带返回值）
         /// </summary>
-        public static T Execute<T>(Func<T> func, int maxRetries = 3, int delay = 1000, bool exponentialBackoff = true)
+        public static T Execute<T>(
+            Func<T> func,
+            int maxRetries = 3,
+            TimeSpan? delay = null,
+            Action<Exception, int>? onRetry = null)
         {
-            Exception lastException = null;
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
 
-            for (int attempt = 0; attempt <= maxRetries; attempt++)
+            Exception? lastException = null;
+            var delayValue = delay ?? TimeSpan.FromSeconds(1);
+
+            for (int i = 0; i <= maxRetries; i++)
             {
                 try
                 {
@@ -43,38 +80,86 @@ namespace EasyTool.ToolCategory
                 {
                     lastException = ex;
 
-                    if (attempt < maxRetries)
+                    if (i < maxRetries)
                     {
-                        int currentDelay = exponentialBackoff ? delay * (int)Math.Pow(2, attempt) : delay;
-                        Thread.Sleep(currentDelay);
+                        onRetry?.Invoke(ex, i + 1);
+
+                        if (delayValue > TimeSpan.Zero)
+                        {
+                            Thread.Sleep(delayValue);
+                        }
                     }
                 }
             }
 
-            throw new RetryException($"Operation failed after {maxRetries + 1} attempts", lastException);
+            throw lastException ?? new Exception("重试失败");
         }
 
         /// <summary>
-        /// 异步执行带重试的操作
+        /// 异步重试执行
         /// </summary>
-        public static async Task ExecuteAsync(Func<Task> action, int maxRetries = 3, int delay = 1000, bool exponentialBackoff = true)
+        public static async Task ExecuteAsync(
+            Func<Task> action,
+            int maxRetries = 3,
+            TimeSpan? delay = null,
+            Func<Exception, int, Task>? onRetry = null,
+            CancellationToken cancellationToken = default)
         {
-            await ExecuteAsync<object>(async () =>
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            Exception? lastException = null;
+            var delayValue = delay ?? TimeSpan.FromSeconds(1);
+
+            for (int i = 0; i <= maxRetries; i++)
             {
-                await action();
-                return null;
-            }, maxRetries, delay, exponentialBackoff);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                try
+                {
+                    await action();
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+
+                    if (i < maxRetries)
+                    {
+                        if (onRetry != null)
+                            await onRetry(ex, i + 1);
+
+                        if (delayValue > TimeSpan.Zero)
+                        {
+                            await Task.Delay(delayValue, cancellationToken);
+                        }
+                    }
+                }
+            }
+
+            throw lastException ?? new Exception("重试失败");
         }
 
         /// <summary>
-        /// 异步执行带重试的函数
+        /// 异步重试执行（带返回值）
         /// </summary>
-        public static async Task<T> ExecuteAsync<T>(Func<Task<T>> func, int maxRetries = 3, int delay = 1000, bool exponentialBackoff = true)
+        public static async Task<T> ExecuteAsync<T>(
+            Func<Task<T>> func,
+            int maxRetries = 3,
+            TimeSpan? delay = null,
+            Func<Exception, int, Task>? onRetry = null,
+            CancellationToken cancellationToken = default)
         {
-            Exception lastException = null;
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
 
-            for (int attempt = 0; attempt <= maxRetries; attempt++)
+            Exception? lastException = null;
+            var delayValue = delay ?? TimeSpan.FromSeconds(1);
+
+            for (int i = 0; i <= maxRetries; i++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     return await func();
@@ -83,23 +168,148 @@ namespace EasyTool.ToolCategory
                 {
                     lastException = ex;
 
-                    if (attempt < maxRetries)
+                    if (i < maxRetries)
                     {
-                        int currentDelay = exponentialBackoff ? delay * (int)Math.Pow(2, attempt) : delay;
-                        await Task.Delay(currentDelay);
+                        if (onRetry != null)
+                            await onRetry(ex, i + 1);
+
+                        if (delayValue > TimeSpan.Zero)
+                        {
+                            await Task.Delay(delayValue, cancellationToken);
+                        }
                     }
                 }
             }
 
-            throw new RetryException($"Operation failed after {maxRetries + 1} attempts", lastException);
+            throw lastException ?? new Exception("重试失败");
         }
 
         /// <summary>
-        /// 创建重试策略
+        /// 指数退避重试
         /// </summary>
-        public static RetryPolicy CreatePolicy()
+        public static async Task ExecuteWithBackoffAsync(
+            Func<Task> action,
+            int maxRetries = 5,
+            TimeSpan? initialDelay = null,
+            double multiplier = 2.0,
+            TimeSpan? maxDelay = null,
+            CancellationToken cancellationToken = default)
         {
-            return new RetryPolicy();
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            var delay = initialDelay ?? TimeSpan.FromSeconds(1);
+            var max = maxDelay ?? TimeSpan.FromMinutes(5);
+            Exception? lastException = null;
+
+            for (int i = 0; i <= maxRetries; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                try
+                {
+                    await action();
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+
+                    if (i < maxRetries)
+                    {
+                        var currentDelay = delay * Math.Pow(multiplier, i);
+                        currentDelay = TimeSpan.FromTicks(Math.Min(currentDelay.Ticks, max.Ticks));
+
+                        await Task.Delay(currentDelay, cancellationToken);
+                    }
+                }
+            }
+
+            throw lastException ?? new Exception("重试失败");
+        }
+
+        /// <summary>
+        /// 带条件判断的重试
+        /// </summary>
+        public static T Execute<T>(
+            Func<T> func,
+            Func<T, bool> shouldRetry,
+            int maxRetries = 3,
+            TimeSpan? delay = null)
+        {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+            if (shouldRetry == null)
+                throw new ArgumentNullException(nameof(shouldRetry));
+
+            var delayValue = delay ?? TimeSpan.FromSeconds(1);
+
+            for (int i = 0; i <= maxRetries; i++)
+            {
+                var result = func();
+
+                if (!shouldRetry(result))
+                    return result;
+
+                if (i < maxRetries && delayValue > TimeSpan.Zero)
+                {
+                    Thread.Sleep(delayValue);
+                }
+            }
+
+            return func();
+        }
+
+        /// <summary>
+        /// 使用重试策略执行
+        /// </summary>
+        public static async Task<T> ExecuteAsync<T>(
+            Func<Task<T>> func,
+            RetryPolicy policy,
+            CancellationToken cancellationToken = default)
+        {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+            if (policy == null)
+                throw new ArgumentNullException(nameof(policy));
+
+            Exception? lastException = null;
+            var delay = policy.InitialDelay;
+
+            for (int i = 0; i <= policy.MaxRetries; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                try
+                {
+                    return await func();
+                }
+                catch (Exception ex)
+                {
+                    if (!policy.ShouldRetry(ex))
+                        throw;
+
+                    lastException = ex;
+
+                    if (i < policy.MaxRetries)
+                    {
+                        await Task.Delay(delay, cancellationToken);
+
+                        // 计算下次延迟
+                        delay = policy.BackoffStrategy switch
+                        {
+                            BackoffStrategy.Linear => policy.InitialDelay,
+                            BackoffStrategy.Exponential => TimeSpan.FromTicks(delay.Ticks * 2),
+                            BackoffStrategy.Fixed => policy.InitialDelay,
+                            _ => policy.InitialDelay
+                        };
+
+                        delay = TimeSpan.FromTicks(Math.Min(delay.Ticks, policy.MaxDelay.Ticks));
+                    }
+                }
+            }
+
+            throw lastException ?? new Exception("重试失败");
         }
     }
 
@@ -108,197 +318,80 @@ namespace EasyTool.ToolCategory
     /// </summary>
     public class RetryPolicy
     {
-        private int _maxRetries = 3;
-        private int _initialDelay = 1000;
-        private int _maxDelay = 60000;
-        private double _backoffMultiplier = 2.0;
-        private bool _useJitter = true;
-        private Type[] _retryOnExceptions = { typeof(Exception) };
-        private Action<Exception, int, TimeSpan> _onRetry;
+        /// <summary>
+        /// 最大重试次数
+        /// </summary>
+        public int MaxRetries { get; set; } = 3;
 
         /// <summary>
-        /// 设置最大重试次数
+        /// 初始延迟
         /// </summary>
-        public RetryPolicy WithMaxRetries(int maxRetries)
-        {
-            _maxRetries = maxRetries;
-            return this;
-        }
+        public TimeSpan InitialDelay { get; set; } = TimeSpan.FromSeconds(1);
 
         /// <summary>
-        /// 设置初始延迟
+        /// 最大延迟
         /// </summary>
-        public RetryPolicy WithInitialDelay(int milliseconds)
-        {
-            _initialDelay = milliseconds;
-            return this;
-        }
+        public TimeSpan MaxDelay { get; set; } = TimeSpan.FromMinutes(1);
 
         /// <summary>
-        /// 设置最大延迟
+        /// 退避策略
         /// </summary>
-        public RetryPolicy WithMaxDelay(int milliseconds)
-        {
-            _maxDelay = milliseconds;
-            return this;
-        }
+        public BackoffStrategy BackoffStrategy { get; set; } = BackoffStrategy.Exponential;
 
         /// <summary>
-        /// 设置退避倍数
+        /// 判断是否应该重试
         /// </summary>
-        public RetryPolicy WithBackoffMultiplier(double multiplier)
-        {
-            _backoffMultiplier = multiplier;
-            return this;
-        }
+        public Func<Exception, bool>? ShouldRetry { get; set; }
 
         /// <summary>
-        /// 启用或禁用抖动
+        /// 创建默认策略
         /// </summary>
-        public RetryPolicy WithJitter(bool enable = true)
-        {
-            _useJitter = enable;
-            return this;
-        }
+        public static RetryPolicy Default => new();
 
         /// <summary>
-        /// 设置要重试的异常类型
+        /// 创建快速重试策略
         /// </summary>
-        public RetryPolicy RetryOn<TException>() where TException : Exception
+        public static RetryPolicy Fast => new()
         {
-            var list = new System.Collections.Generic.List<Type>(_retryOnExceptions) { typeof(TException) };
-            _retryOnExceptions = list.ToArray();
-            return this;
-        }
+            MaxRetries = 3,
+            InitialDelay = TimeSpan.FromMilliseconds(100),
+            MaxDelay = TimeSpan.FromSeconds(5),
+            BackoffStrategy = BackoffStrategy.Linear
+        };
 
         /// <summary>
-        /// 设置重试回调
+        /// 创建网络重试策略
         /// </summary>
-        public RetryPolicy OnRetry(Action<Exception, int, TimeSpan> onRetry)
+        public static RetryPolicy Network => new()
         {
-            _onRetry = onRetry;
-            return this;
-        }
-
-        /// <summary>
-        /// 执行操作
-        /// </summary>
-        public void Execute(Action action)
-        {
-            Execute<object>(() =>
-            {
-                action();
-                return null;
-            });
-        }
-
-        /// <summary>
-        /// 执行函数
-        /// </summary>
-        public T Execute<T>(Func<T> func)
-        {
-            Exception lastException = null;
-
-            for (int attempt = 0; attempt <= _maxRetries; attempt++)
-            {
-                try
-                {
-                    return func();
-                }
-                catch (Exception ex)
-                {
-                    lastException = ex;
-
-                    if (!ShouldRetry(ex) || attempt >= _maxRetries)
-                        break;
-
-                    TimeSpan delay = CalculateDelay(attempt);
-                    _onRetry?.Invoke(ex, attempt + 1, delay);
-                    Thread.Sleep(delay);
-                }
-            }
-
-            throw new RetryException($"Operation failed after {_maxRetries + 1} attempts", lastException);
-        }
-
-        /// <summary>
-        /// 异步执行操作
-        /// </summary>
-        public async Task ExecuteAsync(Func<Task> action)
-        {
-            await ExecuteAsync<object>(async () =>
-            {
-                await action();
-                return null;
-            });
-        }
-
-        /// <summary>
-        /// 异步执行函数
-        /// </summary>
-        public async Task<T> ExecuteAsync<T>(Func<Task<T>> func)
-        {
-            Exception lastException = null;
-
-            for (int attempt = 0; attempt <= _maxRetries; attempt++)
-            {
-                try
-                {
-                    return await func();
-                }
-                catch (Exception ex)
-                {
-                    lastException = ex;
-
-                    if (!ShouldRetry(ex) || attempt >= _maxRetries)
-                        break;
-
-                    TimeSpan delay = CalculateDelay(attempt);
-                    _onRetry?.Invoke(ex, attempt + 1, delay);
-                    await Task.Delay(delay);
-                }
-            }
-
-            throw new RetryException($"Operation failed after {_maxRetries + 1} attempts", lastException);
-        }
-
-        private bool ShouldRetry(Exception ex)
-        {
-            foreach (var type in _retryOnExceptions)
-            {
-                if (type.IsAssignableFrom(ex.GetType()))
-                    return true;
-            }
-            return false;
-        }
-
-        private TimeSpan CalculateDelay(int attempt)
-        {
-            double delay = _initialDelay * Math.Pow(_backoffMultiplier, attempt);
-
-            if (_useJitter)
-            {
-                // 添加随机抖动 (±20%)
-                var random = new Random();
-                double jitter = 0.8 + random.NextDouble() * 0.4;
-                delay *= jitter;
-            }
-
-            return TimeSpan.FromMilliseconds(Math.Min(delay, _maxDelay));
-        }
+            MaxRetries = 5,
+            InitialDelay = TimeSpan.FromSeconds(1),
+            MaxDelay = TimeSpan.FromSeconds(30),
+            BackoffStrategy = BackoffStrategy.Exponential,
+            ShouldRetry = ex => ex is TimeoutException ||
+                               ex is System.Net.WebException ||
+                               ex is System.Net.Http.HttpRequestException
+        };
     }
 
     /// <summary>
-    /// 重试异常
+    /// 退避策略
     /// </summary>
-    public class RetryException : Exception
+    public enum BackoffStrategy
     {
         /// <summary>
-        /// 创建重试异常
+        /// 固定延迟
         /// </summary>
-        public RetryException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
+        Fixed,
+
+        /// <summary>
+        /// 线性递增
+        /// </summary>
+        Linear,
+
+        /// <summary>
+        /// 指数递增
+        /// </summary>
+        Exponential
     }
 }

@@ -132,7 +132,7 @@ namespace EasyTool.CollectionsCategory
                 return Enumerable.Empty<T>();
 
 #if NETSTANDARD2_1
-            var minHeap = new PriorityQueue<T, T>(Comparer<T>.Default, false);
+            var minHeap = new PriorityQueue<T, T>(Comparer<T>.Default);
 
             foreach (var item in source)
             {

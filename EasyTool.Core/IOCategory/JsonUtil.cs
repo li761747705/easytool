@@ -18,41 +18,55 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 默认序列化选项（驼峰命名、缩进、忽略null）
         /// </summary>
-        public static JsonSerializerOptions DefaultOptions => new()
+        public static JsonSerializerOptions DefaultOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString,
-            Converters =
+            get
             {
-                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    NumberHandling = JsonNumberHandling.AllowReadingFromString
+                };
+                options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                return options;
             }
-        };
+        }
 
         /// <summary>
         /// 紧凑序列化选项（无缩进、忽略null、驼峰命名）
         /// </summary>
-        public static JsonSerializerOptions CompactOptions => new()
+        public static JsonSerializerOptions CompactOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
-        };
+            get
+            {
+                return new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = false,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    NumberHandling = JsonNumberHandling.AllowReadingFromString
+                };
+            }
+        }
 
         /// <summary>
         /// 宽松反序列化选项（允许不带引号的数字、允许注释、允许尾随逗号）
         /// </summary>
-        public static JsonSerializerOptions LenientOptions => new()
+        public static JsonSerializerOptions LenientOptions
         {
-            PropertyNameCaseInsensitive = true,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            AllowTrailingCommas = true
-        };
+            get
+            {
+                return new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
+                    ReadCommentHandling = JsonCommentHandling.Skip,
+                    AllowTrailingCommas = true
+                };
+            }
+        }
 
         #endregion
 
@@ -61,39 +75,30 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 将对象序列化为 JSON 字符串
         /// </summary>
-        /// <typeparam name="T">对象类型</typeparam>
-        /// <param name="obj">要序列化的对象</param>
-        /// <param name="options">序列化选项（可选）</param>
-        /// <returns>JSON 字符串</returns>
         public static string Serialize<T>(T obj, JsonSerializerOptions? options = null)
         {
             if (obj == null)
                 return "null";
 
-            return JsonSerializer.Serialize(obj, options ?? DefaultOptions);
+            // 使用泛型方法
+            return JsonSerializer.Serialize(obj);
         }
 
         /// <summary>
         /// 将对象序列化为 JSON 字符串（紧凑格式）
         /// </summary>
-        /// <typeparam name="T">对象类型</typeparam>
-        /// <param name="obj">要序列化的对象</param>
-        /// <returns>紧凑格式的 JSON 字符串</returns>
         public static string SerializeCompact<T>(T obj)
         {
-            return Serialize(obj, CompactOptions);
+            return JsonSerializer.Serialize(obj);
         }
 
         /// <summary>
         /// 将对象序列化为 JSON 字节数组
         /// </summary>
-        /// <typeparam name="T">对象类型</typeparam>
-        /// <param name="obj">要序列化的对象</param>
-        /// <param name="options">序列化选项（可选）</param>
-        /// <returns>JSON 字节数组</returns>
         public static byte[] SerializeToUtf8Bytes<T>(T obj, JsonSerializerOptions? options = null)
         {
-            return JsonSerializer.SerializeToUtf8Bytes(obj, options ?? DefaultOptions);
+            var json = JsonSerializer.Serialize(obj);
+            return Encoding.UTF8.GetBytes(json);
         }
 
         #endregion
@@ -103,41 +108,29 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 将 JSON 字符串反序列化为对象
         /// </summary>
-        /// <typeparam name="T">目标类型</typeparam>
-        /// <param name="json">JSON 字符串</param>
-        /// <param name="options">反序列化选项（可选）</param>
-        /// <returns>反序列化后的对象</returns>
         public static T? Deserialize<T>(string json, JsonSerializerOptions? options = null)
         {
             if (string.IsNullOrWhiteSpace(json))
                 return default;
 
-            return JsonSerializer.Deserialize<T>(json, options ?? LenientOptions);
+            return JsonSerializer.Deserialize<T>(json);
         }
 
         /// <summary>
         /// 将 JSON 字节数组反序列化为对象
         /// </summary>
-        /// <typeparam name="T">目标类型</typeparam>
-        /// <param name="utf8Json">JSON 字节数组</param>
-        /// <param name="options">反序列化选项（可选）</param>
-        /// <returns>反序列化后的对象</returns>
         public static T? Deserialize<T>(byte[] utf8Json, JsonSerializerOptions? options = null)
         {
             if (utf8Json == null || utf8Json.Length == 0)
                 return default;
 
-            return JsonSerializer.Deserialize<T>(utf8Json, options ?? LenientOptions);
+            var json = Encoding.UTF8.GetString(utf8Json);
+            return JsonSerializer.Deserialize<T>(json);
         }
 
         /// <summary>
         /// 尝试将 JSON 字符串反序列化为对象
         /// </summary>
-        /// <typeparam name="T">目标类型</typeparam>
-        /// <param name="json">JSON 字符串</param>
-        /// <param name="result">反序列化结果</param>
-        /// <param name="options">反序列化选项（可选）</param>
-        /// <returns>是否成功</returns>
         public static bool TryDeserialize<T>(string json, out T? result, JsonSerializerOptions? options = null)
         {
             result = default;
@@ -146,7 +139,7 @@ namespace EasyTool.IOCategory
 
             try
             {
-                result = JsonSerializer.Deserialize<T>(json, options ?? LenientOptions);
+                result = Deserialize<T>(json, options);
                 return true;
             }
             catch
@@ -158,8 +151,6 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 将 JSON 字符串反序列化为动态对象
         /// </summary>
-        /// <param name="json">JSON 字符串</param>
-        /// <returns>JsonNode 对象</returns>
         public static JsonNode? Parse(string json)
         {
             if (string.IsNullOrWhiteSpace(json))
@@ -175,9 +166,6 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 格式化 JSON 字符串（美化输出）
         /// </summary>
-        /// <param name="json">JSON 字符串</param>
-        /// <param name="indent">缩进字符（默认2个空格）</param>
-        /// <returns>格式化后的 JSON 字符串</returns>
         public static string Prettify(string json, string indent = "  ")
         {
             if (string.IsNullOrWhiteSpace(json))
@@ -186,17 +174,7 @@ namespace EasyTool.IOCategory
             try
             {
                 var node = JsonNode.Parse(json);
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                };
-#if NET9_0_OR_GREATER
-                if (indent.Length > 0)
-                {
-                    options.IndentCharacter = indent[0];
-                    options.IndentSize = indent.Length;
-                }
-#endif
+                var options = new JsonSerializerOptions { WriteIndented = true };
                 return node?.ToJsonString(options) ?? json;
             }
             catch
@@ -208,8 +186,6 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 压缩 JSON 字符串（移除空白）
         /// </summary>
-        /// <param name="json">JSON 字符串</param>
-        /// <returns>压缩后的 JSON 字符串</returns>
         public static string Minify(string json)
         {
             if (string.IsNullOrWhiteSpace(json))
@@ -229,8 +205,6 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 验证是否为有效的 JSON
         /// </summary>
-        /// <param name="json">JSON 字符串</param>
-        /// <returns>是否有效</returns>
         public static bool IsValid(string json)
         {
             if (string.IsNullOrWhiteSpace(json))
@@ -254,9 +228,6 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 从 JSON 字符串中获取指定路径的值
         /// </summary>
-        /// <param name="json">JSON 字符串</param>
-        /// <param name="path">路径（使用点号分隔，如 "user.name"）</param>
-        /// <returns>找到的值，未找到返回 null</returns>
         public static object? GetValue(string json, string path)
         {
             if (string.IsNullOrWhiteSpace(json) || string.IsNullOrWhiteSpace(path))
@@ -276,10 +247,6 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 从 JSON 字符串中获取指定路径的值并转换为指定类型
         /// </summary>
-        /// <typeparam name="T">目标类型</typeparam>
-        /// <param name="json">JSON 字符串</param>
-        /// <param name="path">路径</param>
-        /// <returns>转换后的值</returns>
         public static T? GetValue<T>(string json, string path)
         {
             var value = GetValue(json, path);
@@ -293,7 +260,7 @@ namespace EasyTool.IOCategory
 
             if (value is JsonNode jsonNode)
             {
-                return jsonNode.Deserialize<T>(LenientOptions);
+                return Deserialize<T>(jsonNode.ToJsonString());
             }
 
             return (T?)Convert.ChangeType(value, typeof(T));
@@ -302,10 +269,6 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 设置 JSON 字符串中指定路径的值
         /// </summary>
-        /// <param name="json">JSON 字符串</param>
-        /// <param name="path">路径</param>
-        /// <param name="value">要设置的值</param>
-        /// <returns>修改后的 JSON 字符串</returns>
         public static string SetValue(string json, string path, object? value)
         {
             if (string.IsNullOrWhiteSpace(json))
@@ -336,7 +299,6 @@ namespace EasyTool.IOCategory
                 if (current == null)
                     return null;
 
-                // 处理数组索引，如 items[0]
                 if (part.Contains('[') && part.EndsWith(']'))
                 {
                     var name = part.Substring(0, part.IndexOf('['));
@@ -435,55 +397,43 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 将字典转换为 JSON 对象
         /// </summary>
-        /// <typeparam name="TKey">键类型</typeparam>
-        /// <typeparam name="TValue">值类型</typeparam>
-        /// <param name="dictionary">字典</param>
-        /// <returns>JSON 字符串</returns>
         public static string FromDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
         {
             if (dictionary == null)
                 return "{}";
 
-            return JsonSerializer.Serialize(dictionary, DefaultOptions);
+            return JsonSerializer.Serialize(dictionary);
         }
 
         /// <summary>
         /// 将 JSON 对象转换为字典
         /// </summary>
-        /// <typeparam name="TValue">值类型</typeparam>
-        /// <param name="json">JSON 字符串</param>
-        /// <returns>字典</returns>
         public static Dictionary<string, TValue?>? ToDictionary<TValue>(string json)
         {
             if (string.IsNullOrWhiteSpace(json))
                 return null;
 
-            return JsonSerializer.Deserialize<Dictionary<string, TValue?>>(json, LenientOptions);
+            return JsonSerializer.Deserialize<Dictionary<string, TValue?>>(json);
         }
 
         /// <summary>
         /// 将匿名对象转换为 JSON 字符串
         /// </summary>
-        /// <param name="obj">匿名对象</param>
-        /// <returns>JSON 字符串</returns>
         public static string FromAnonymous(object obj)
         {
-            return Serialize(obj, CompactOptions);
+            return JsonSerializer.Serialize(obj);
         }
 
         /// <summary>
         /// 深拷贝对象（通过 JSON 序列化/反序列化）
         /// </summary>
-        /// <typeparam name="T">对象类型</typeparam>
-        /// <param name="obj">要拷贝的对象</param>
-        /// <returns>拷贝后的对象</returns>
         public static T? DeepClone<T>(T obj)
         {
             if (obj == null)
                 return default;
 
-            var json = JsonSerializer.Serialize(obj, DefaultOptions);
-            return JsonSerializer.Deserialize<T>(json, LenientOptions);
+            var json = JsonSerializer.Serialize(obj);
+            return JsonSerializer.Deserialize<T>(json);
         }
 
         #endregion
@@ -493,9 +443,6 @@ namespace EasyTool.IOCategory
         /// <summary>
         /// 合并两个 JSON 对象
         /// </summary>
-        /// <param name="json1">第一个 JSON</param>
-        /// <param name="json2">第二个 JSON（优先级更高）</param>
-        /// <returns>合并后的 JSON</returns>
         public static string Merge(string json1, string json2)
         {
             if (string.IsNullOrWhiteSpace(json1))

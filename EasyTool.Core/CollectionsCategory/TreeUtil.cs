@@ -5,238 +5,230 @@ using System.Linq;
 namespace EasyTool.CollectionsCategory
 {
     /// <summary>
-    /// 树工具类
+    /// 树节点接口
     /// </summary>
-    public static class TreeUtil
+    /// <typeparam name="T">节点数据类型</typeparam>
+    public interface ITreeNode<T> where T : ITreeNode<T>
     {
         /// <summary>
-        /// 创建通用树
+        /// 节点ID
         /// </summary>
-        public static Tree<T> Create<T>(T value)
-        {
-            return new Tree<T>(value);
-        }
+        string Id { get; }
 
         /// <summary>
-        /// 从层次结构创建树
+        /// 父节点ID
         /// </summary>
-        public static Tree<T> FromHierarchy<T, TKey>(
-            IEnumerable<T> items,
-            Func<T, TKey> keySelector,
-            Func<T, TKey> parentKeySelector,
-            TKey rootParentKey = default) where TKey : IEquatable<TKey>
-        {
-            var itemDict = items.ToDictionary(keySelector);
-            var childrenDict = items.GroupBy(parentKeySelector).ToDictionary(g => g.Key, g => g.ToList());
+        string? ParentId { get; }
 
-            T rootItem;
-            if (rootParentKey == null || rootParentKey.Equals(default))
-            {
-                rootItem = items.FirstOrDefault(i => parentKeySelector(i) == null || parentKeySelector(i).Equals(default));
-            }
-            else
-            {
-                rootItem = items.FirstOrDefault(i => parentKeySelector(i).Equals(rootParentKey));
-            }
-
-            if (rootItem == null)
-                throw new ArgumentException("Cannot find root item");
-
-            var root = new Tree<T>(rootItem);
-            BuildTree(root, keySelector(rootItem), keySelector, childrenDict);
-            return root;
-        }
-
-        private static void BuildTree<T, TKey>(
-            Tree<T> parent,
-            TKey parentKey,
-            Func<T, TKey> keySelector,
-            Dictionary<TKey, List<T>> childrenDict) where TKey : IEquatable<TKey>
-        {
-            if (!childrenDict.TryGetValue(parentKey, out var children))
-                return;
-
-            foreach (var child in children)
-            {
-                var childNode = parent.AddChild(child);
-                BuildTree(childNode, keySelector(child), keySelector, childrenDict);
-            }
-        }
+        /// <summary>
+        /// 子节点列表
+        /// </summary>
+        List<T> Children { get; set; }
     }
 
     /// <summary>
-    /// 通用树节点
+    /// 树节点基类
     /// </summary>
-    public class Tree<T>
+    public class TreeNodeBase : ITreeNode<TreeNodeBase>
     {
-        private readonly List<Tree<T>> _children;
+        public string Id { get; set; } = string.Empty;
+        public string? ParentId { get; set; }
+        public List<TreeNodeBase> Children { get; set; } = new();
+    }
+
+    /// <summary>
+    /// 树形结构工具类
+    /// 提供树形数据的构建、遍历、搜索等功能
+    /// </summary>
+    public static class TreeUtil
+    {
+        #region 构建树
 
         /// <summary>
-        /// 节点值
+        /// 将扁平列表构建为树形结构
         /// </summary>
-        public T Value { get; set; }
-
-        /// <summary>
-        /// 父节点
-        /// </summary>
-        public Tree<T> Parent { get; private set; }
-
-        /// <summary>
-        /// 子节点
-        /// </summary>
-        public IReadOnlyList<Tree<T>> Children => _children;
-
-        /// <summary>
-        /// 深度
-        /// </summary>
-        public int Depth
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="flatList">扁平列表</param>
+        /// <param name="idSelector">ID选择器</param>
+        /// <param name="parentIdSelector">父ID选择器</param>
+        /// <param name="rootParentId">根节点的父ID值</param>
+        /// <returns>树形结构的根节点列表</returns>
+        public static List<T> BuildTree<T>(IEnumerable<T> flatList, Func<T, string> idSelector, Func<T, string?> parentIdSelector, string? rootParentId = null)
         {
-            get
+            if (flatList == null)
+                return new List<T>();
+
+            var lookup = flatList.ToLookup(parentIdSelector);
+            var roots = lookup[rootParentId].ToList();
+
+            void AddChildren(T parent)
             {
-                int depth = 0;
-                var current = Parent;
-                while (current != null)
+                var parentId = idSelector(parent);
+                var children = lookup[parentId];
+                var childrenProperty = typeof(T).GetProperty("Children");
+
+                if (childrenProperty != null)
                 {
-                    depth++;
-                    current = current.Parent;
-                }
-                return depth;
-            }
-        }
+                    var childrenList = childrenProperty.GetValue(parent);
+                    if (childrenList == null)
+                    {
+                        childrenList = new List<T>();
+                        childrenProperty.SetValue(parent, childrenList);
+                    }
 
-        /// <summary>
-        /// 高度
-        /// </summary>
-        public int Height
-        {
-            get
-            {
-                if (_children.Count == 0)
-                    return 0;
-                return 1 + _children.Max(c => c.Height);
-            }
-        }
+                    var addMethod = childrenList.GetType().GetMethod("AddRange");
+                    addMethod?.Invoke(childrenList, new object[] { children });
 
-        /// <summary>
-        /// 是否为根节点
-        /// </summary>
-        public bool IsRoot => Parent == null;
-
-        /// <summary>
-        /// 是否为叶节点
-        /// </summary>
-        public bool IsLeaf => _children.Count == 0;
-
-        /// <summary>
-        /// 子节点数量
-        /// </summary>
-        public int ChildCount => _children.Count;
-
-        /// <summary>
-        /// 创建树节点
-        /// </summary>
-        public Tree(T value)
-        {
-            Value = value;
-            _children = new List<Tree<T>>();
-        }
-
-        /// <summary>
-        /// 添加子节点
-        /// </summary>
-        public Tree<T> AddChild(T value)
-        {
-            var child = new Tree<T>(value) { Parent = this };
-            _children.Add(child);
-            return child;
-        }
-
-        /// <summary>
-        /// 添加子节点
-        /// </summary>
-        public void AddChild(Tree<T> child)
-        {
-            child.Parent = this;
-            _children.Add(child);
-        }
-
-        /// <summary>
-        /// 移除子节点
-        /// </summary>
-        public bool RemoveChild(Tree<T> child)
-        {
-            if (_children.Remove(child))
-            {
-                child.Parent = null;
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 清空子节点
-        /// </summary>
-        public void ClearChildren()
-        {
-            foreach (var child in _children)
-            {
-                child.Parent = null;
-            }
-            _children.Clear();
-        }
-
-        /// <summary>
-        /// 获取根节点
-        /// </summary>
-        public Tree<T> GetRoot()
-        {
-            var current = this;
-            while (current.Parent != null)
-            {
-                current = current.Parent;
-            }
-            return current;
-        }
-
-        /// <summary>
-        /// 获取所有祖先
-        /// </summary>
-        public IEnumerable<Tree<T>> GetAncestors()
-        {
-            var current = Parent;
-            while (current != null)
-            {
-                yield return current;
-                current = current.Parent;
-            }
-        }
-
-        /// <summary>
-        /// 获取所有后代
-        /// </summary>
-        public IEnumerable<Tree<T>> GetDescendants()
-        {
-            foreach (var child in _children)
-            {
-                yield return child;
-                foreach (var descendant in child.GetDescendants())
-                {
-                    yield return descendant;
+                    foreach (var child in children)
+                    {
+                        AddChildren(child);
+                    }
                 }
             }
+
+            foreach (var root in roots)
+            {
+                AddChildren(root);
+            }
+
+            return roots;
         }
 
         /// <summary>
-        /// 前序遍历
+        /// 将扁平列表构建为树形结构（使用 ITreeNode 接口）
         /// </summary>
-        public IEnumerable<Tree<T>> PreOrderTraversal()
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="flatList">扁平列表</param>
+        /// <param name="rootParentId">根节点的父ID值</param>
+        /// <returns>树形结构的根节点列表</returns>
+        public static List<T> BuildTree<T>(IEnumerable<T> flatList, string? rootParentId = null) where T : ITreeNode<T>
         {
-            yield return this;
-            foreach (var child in _children)
+            if (flatList == null)
+                return new List<T>();
+
+            var lookup = flatList.ToLookup(x => x.ParentId);
+            var roots = lookup[rootParentId].ToList();
+
+            void AddChildren(T parent)
             {
-                foreach (var node in child.PreOrderTraversal())
+                var children = lookup[parent.Id].ToList();
+                parent.Children = children;
+
+                foreach (var child in children)
                 {
-                    yield return node;
+                    AddChildren(child);
+                }
+            }
+
+            foreach (var root in roots)
+            {
+                AddChildren(root);
+            }
+
+            return roots;
+        }
+
+        #endregion
+
+        #region 展平树
+
+        /// <summary>
+        /// 将树形结构展平为列表
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <returns>扁平列表</returns>
+        public static List<T> Flatten<T>(IEnumerable<T> roots) where T : ITreeNode<T>
+        {
+            var result = new List<T>();
+
+            void FlattenNode(T node)
+            {
+                result.Add(node);
+
+                if (node.Children != null)
+                {
+                    foreach (var child in node.Children)
+                    {
+                        FlattenNode(child);
+                    }
+                }
+            }
+
+            foreach (var root in roots)
+            {
+                FlattenNode(root);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 将树形结构展平为列表（指定子节点选择器）
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="childrenSelector">子节点选择器</param>
+        /// <returns>扁平列表</returns>
+        public static List<T> Flatten<T>(IEnumerable<T> roots, Func<T, IEnumerable<T>> childrenSelector)
+        {
+            var result = new List<T>();
+
+            void FlattenNode(T node)
+            {
+                result.Add(node);
+
+                var children = childrenSelector(node);
+                if (children != null)
+                {
+                    foreach (var child in children)
+                    {
+                        FlattenNode(child);
+                    }
+                }
+            }
+
+            foreach (var root in roots)
+            {
+                FlattenNode(root);
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region 遍历树
+
+        /// <summary>
+        /// 前序遍历（深度优先）
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="action">访问操作</param>
+        public static void PreOrderTraversal<T>(IEnumerable<T> roots, Action<T> action) where T : ITreeNode<T>
+        {
+            foreach (var root in roots)
+            {
+                PreOrderTraversal(root, action);
+            }
+        }
+
+        /// <summary>
+        /// 前序遍历（深度优先）
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="node">节点</param>
+        /// <param name="action">访问操作</param>
+        public static void PreOrderTraversal<T>(T node, Action<T> action) where T : ITreeNode<T>
+        {
+            action(node);
+
+            if (node.Children != null)
+            {
+                foreach (var child in node.Children)
+                {
+                    PreOrderTraversal(child, action);
                 }
             }
         }
@@ -244,994 +236,336 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 后序遍历
         /// </summary>
-        public IEnumerable<Tree<T>> PostOrderTraversal()
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="action">访问操作</param>
+        public static void PostOrderTraversal<T>(IEnumerable<T> roots, Action<T> action) where T : ITreeNode<T>
         {
-            foreach (var child in _children)
+            foreach (var root in roots)
             {
-                foreach (var node in child.PostOrderTraversal())
+                PostOrderTraversal(root, action);
+            }
+        }
+
+        /// <summary>
+        /// 后序遍历
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="node">节点</param>
+        /// <param name="action">访问操作</param>
+        public static void PostOrderTraversal<T>(T node, Action<T> action) where T : ITreeNode<T>
+        {
+            if (node.Children != null)
+            {
+                foreach (var child in node.Children)
                 {
-                    yield return node;
+                    PostOrderTraversal(child, action);
                 }
             }
-            yield return this;
+
+            action(node);
         }
 
         /// <summary>
         /// 层序遍历（广度优先）
         /// </summary>
-        public IEnumerable<Tree<T>> LevelOrderTraversal()
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="action">访问操作</param>
+        public static void LevelOrderTraversal<T>(IEnumerable<T> roots, Action<T> action) where T : ITreeNode<T>
         {
-            var queue = new Queue<Tree<T>>();
-            queue.Enqueue(this);
+            var queue = new Queue<T>();
+
+            foreach (var root in roots)
+            {
+                queue.Enqueue(root);
+            }
 
             while (queue.Count > 0)
             {
-                var current = queue.Dequeue();
-                yield return current;
+                var node = queue.Dequeue();
+                action(node);
 
-                foreach (var child in current._children)
+                if (node.Children != null)
                 {
-                    queue.Enqueue(child);
+                    foreach (var child in node.Children)
+                    {
+                        queue.Enqueue(child);
+                    }
                 }
             }
+        }
+
+        #endregion
+
+        #region 搜索树
+
+        /// <summary>
+        /// 查找节点
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="predicate">查找条件</param>
+        /// <returns>找到的节点</returns>
+        public static T? Find<T>(IEnumerable<T> roots, Func<T, bool> predicate) where T : ITreeNode<T>
+        {
+            foreach (var root in roots)
+            {
+                var result = Find(root, predicate);
+                if (result != null)
+                    return result;
+            }
+
+            return default;
         }
 
         /// <summary>
         /// 查找节点
         /// </summary>
-        public Tree<T> Find(Func<T, bool> predicate)
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="node">起始节点</param>
+        /// <param name="predicate">查找条件</param>
+        /// <returns>找到的节点</returns>
+        public static T? Find<T>(T node, Func<T, bool> predicate) where T : ITreeNode<T>
         {
-            if (predicate(Value))
-                return this;
+            if (predicate(node))
+                return node;
 
-            foreach (var child in _children)
+            if (node.Children != null)
             {
-                var found = child.Find(predicate);
-                if (found != null)
-                    return found;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// 查找所有匹配节点
-        /// </summary>
-        public IEnumerable<Tree<T>> FindAll(Func<T, bool> predicate)
-        {
-            if (predicate(Value))
-                yield return this;
-
-            foreach (var child in _children)
-            {
-                foreach (var found in child.FindAll(predicate))
+                foreach (var child in node.Children)
                 {
-                    yield return found;
+                    var result = Find(child, predicate);
+                    if (result != null)
+                        return result;
                 }
             }
+
+            return default;
         }
 
         /// <summary>
-        /// 获取路径
+        /// 查找所有匹配的节点
         /// </summary>
-        public List<Tree<T>> GetPath()
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="predicate">查找条件</param>
+        /// <returns>找到的节点列表</returns>
+        public static List<T> FindAll<T>(IEnumerable<T> roots, Func<T, bool> predicate) where T : ITreeNode<T>
         {
-            var path = new List<Tree<T>>();
-            var current = this;
-            while (current != null)
+            var result = new List<T>();
+
+            foreach (var root in roots)
             {
-                path.Insert(0, current);
-                current = current.Parent;
-            }
-            return path;
-        }
-    }
-
-    /// <summary>
-    /// 二叉树工具类
-    /// </summary>
-    public static class BinaryTreeUtil
-    {
-        /// <summary>
-        /// 创建二叉树
-        /// </summary>
-        public static BinaryTree<T> Create<T>(T value)
-        {
-            return new BinaryTree<T>(value);
-        }
-
-        /// <summary>
-        /// 从层序数组创建完全二叉树
-        /// </summary>
-        public static BinaryTree<T> FromArray<T>(T[] values) where T : class
-        {
-            if (values == null || values.Length == 0 || values[0] == null)
-                return null;
-
-            var root = new BinaryTree<T>(values[0]);
-            var queue = new Queue<BinaryTree<T>>();
-            queue.Enqueue(root);
-
-            int i = 1;
-            while (queue.Count > 0 && i < values.Length)
-            {
-                var current = queue.Dequeue();
-
-                if (i < values.Length && values[i] != null)
-                {
-                    current.Left = new BinaryTree<T>(values[i]) { Parent = current };
-                    queue.Enqueue(current.Left);
-                }
-                i++;
-
-                if (i < values.Length && values[i] != null)
-                {
-                    current.Right = new BinaryTree<T>(values[i]) { Parent = current };
-                    queue.Enqueue(current.Right);
-                }
-                i++;
+                FindAll(root, predicate, result);
             }
 
-            return root;
-        }
-    }
-
-    /// <summary>
-    /// 二叉树节点
-    /// </summary>
-    public class BinaryTree<T>
-    {
-        /// <summary>
-        /// 节点值
-        /// </summary>
-        public T Value { get; set; }
-
-        /// <summary>
-        /// 左子节点
-        /// </summary>
-        public BinaryTree<T> Left { get; set; }
-
-        /// <summary>
-        /// 右子节点
-        /// </summary>
-        public BinaryTree<T> Right { get; set; }
-
-        /// <summary>
-        /// 父节点
-        /// </summary>
-        public BinaryTree<T> Parent { get; set; }
-
-        /// <summary>
-        /// 是否为叶节点
-        /// </summary>
-        public bool IsLeaf => Left == null && Right == null;
-
-        /// <summary>
-        /// 是否为根节点
-        /// </summary>
-        public bool IsRoot => Parent == null;
-
-        /// <summary>
-        /// 高度
-        /// </summary>
-        public int Height
-        {
-            get
-            {
-                int leftHeight = Left?.Height ?? 0;
-                int rightHeight = Right?.Height ?? 0;
-                return 1 + Math.Max(leftHeight, rightHeight);
-            }
-        }
-
-        /// <summary>
-        /// 节点数量
-        /// </summary>
-        public int NodeCount
-        {
-            get
-            {
-                int count = 1;
-                if (Left != null) count += Left.NodeCount;
-                if (Right != null) count += Right.NodeCount;
-                return count;
-            }
-        }
-
-        /// <summary>
-        /// 创建二叉树节点
-        /// </summary>
-        public BinaryTree(T value)
-        {
-            Value = value;
-        }
-
-        /// <summary>
-        /// 前序遍历
-        /// </summary>
-        public IEnumerable<BinaryTree<T>> PreOrderTraversal()
-        {
-            yield return this;
-            if (Left != null)
-            {
-                foreach (var node in Left.PreOrderTraversal())
-                    yield return node;
-            }
-            if (Right != null)
-            {
-                foreach (var node in Right.PreOrderTraversal())
-                    yield return node;
-            }
-        }
-
-        /// <summary>
-        /// 中序遍历
-        /// </summary>
-        public IEnumerable<BinaryTree<T>> InOrderTraversal()
-        {
-            if (Left != null)
-            {
-                foreach (var node in Left.InOrderTraversal())
-                    yield return node;
-            }
-            yield return this;
-            if (Right != null)
-            {
-                foreach (var node in Right.InOrderTraversal())
-                    yield return node;
-            }
-        }
-
-        /// <summary>
-        /// 后序遍历
-        /// </summary>
-        public IEnumerable<BinaryTree<T>> PostOrderTraversal()
-        {
-            if (Left != null)
-            {
-                foreach (var node in Left.PostOrderTraversal())
-                    yield return node;
-            }
-            if (Right != null)
-            {
-                foreach (var node in Right.PostOrderTraversal())
-                    yield return node;
-            }
-            yield return this;
-        }
-
-        /// <summary>
-        /// 层序遍历
-        /// </summary>
-        public IEnumerable<BinaryTree<T>> LevelOrderTraversal()
-        {
-            var queue = new Queue<BinaryTree<T>>();
-            queue.Enqueue(this);
-
-            while (queue.Count > 0)
-            {
-                var current = queue.Dequeue();
-                yield return current;
-
-                if (current.Left != null)
-                    queue.Enqueue(current.Left);
-                if (current.Right != null)
-                    queue.Enqueue(current.Right);
-            }
-        }
-
-        /// <summary>
-        /// 反转二叉树
-        /// </summary>
-        public void Invert()
-        {
-            var temp = Left;
-            Left = Right;
-            Right = temp;
-
-            Left?.Invert();
-            Right?.Invert();
-        }
-
-        /// <summary>
-        /// 克隆
-        /// </summary>
-        public BinaryTree<T> Clone()
-        {
-            var clone = new BinaryTree<T>(Value);
-            if (Left != null)
-            {
-                clone.Left = Left.Clone();
-                clone.Left.Parent = clone;
-            }
-            if (Right != null)
-            {
-                clone.Right = Right.Clone();
-                clone.Right.Parent = clone;
-            }
-            return clone;
-        }
-
-        /// <summary>
-        /// 获取指定深度的所有节点
-        /// </summary>
-        public List<BinaryTree<T>> GetNodesAtDepth(int depth)
-        {
-            var result = new List<BinaryTree<T>>();
-            GetNodesAtDepth(this, depth, 0, result);
             return result;
         }
 
-        private static void GetNodesAtDepth(BinaryTree<T> node, int targetDepth, int currentDepth, List<BinaryTree<T>> result)
+        private static void FindAll<T>(T node, Func<T, bool> predicate, List<T> result) where T : ITreeNode<T>
         {
-            if (node == null)
-                return;
-
-            if (currentDepth == targetDepth)
-            {
+            if (predicate(node))
                 result.Add(node);
-                return;
-            }
 
-            GetNodesAtDepth(node.Left, targetDepth, currentDepth + 1, result);
-            GetNodesAtDepth(node.Right, targetDepth, currentDepth + 1, result);
-        }
-    }
-
-    /// <summary>
-    /// 二叉搜索树工具类
-    /// </summary>
-    public static class BinarySearchTreeUtil
-    {
-        /// <summary>
-        /// 创建二叉搜索树
-        /// </summary>
-        public static BinarySearchTree<T> Create<T>() where T : IComparable<T>
-        {
-            return new BinarySearchTree<T>();
-        }
-
-        /// <summary>
-        /// 从集合创建二叉搜索树
-        /// </summary>
-        public static BinarySearchTree<T> FromEnumerable<T>(IEnumerable<T> items) where T : IComparable<T>
-        {
-            var bst = new BinarySearchTree<T>();
-            foreach (var item in items)
+            if (node.Children != null)
             {
-                bst.Add(item);
+                foreach (var child in node.Children)
+                {
+                    FindAll(child, predicate, result);
+                }
             }
-            return bst;
         }
-    }
-
-    /// <summary>
-    /// 二叉搜索树
-    /// </summary>
-    public class BinarySearchTree<T> where T : IComparable<T>
-    {
-        private BSTNode _root;
-        private int _count;
 
         /// <summary>
-        /// 节点数量
+        /// 查找节点路径
         /// </summary>
-        public int Count => _count;
-
-        /// <summary>
-        /// 是否为空
-        /// </summary>
-        public bool IsEmpty => _count == 0;
-
-        /// <summary>
-        /// 最小值
-        /// </summary>
-        public T Min
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="predicate">查找条件</param>
+        /// <returns>从根到目标的路径</returns>
+        public static List<T> FindPath<T>(IEnumerable<T> roots, Func<T, bool> predicate) where T : ITreeNode<T>
         {
-            get
+            foreach (var root in roots)
             {
-                if (_root == null)
-                    throw new InvalidOperationException("Tree is empty");
-                return FindMin(_root).Value;
+                var path = new List<T>();
+                if (FindPath(root, predicate, path))
+                    return path;
             }
+
+            return new List<T>();
         }
 
-        /// <summary>
-        /// 最大值
-        /// </summary>
-        public T Max
+        private static bool FindPath<T>(T node, Func<T, bool> predicate, List<T> path) where T : ITreeNode<T>
         {
-            get
+            path.Add(node);
+
+            if (predicate(node))
+                return true;
+
+            if (node.Children != null)
             {
-                if (_root == null)
-                    throw new InvalidOperationException("Tree is empty");
-                return FindMax(_root).Value;
+                foreach (var child in node.Children)
+                {
+                    if (FindPath(child, predicate, path))
+                        return true;
+                }
             }
+
+            path.RemoveAt(path.Count - 1);
+            return false;
         }
 
-        private class BSTNode
-        {
-            public T Value { get; set; }
-            public BSTNode Left { get; set; }
-            public BSTNode Right { get; set; }
+        #endregion
 
-            public BSTNode(T value)
+        #region 树属性
+
+        /// <summary>
+        /// 获取树的深度
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <returns>最大深度</returns>
+        public static int GetDepth<T>(IEnumerable<T> roots) where T : ITreeNode<T>
+        {
+            return roots.Max(root => GetDepth(root));
+        }
+
+        /// <summary>
+        /// 获取树的深度
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="node">节点</param>
+        /// <returns>深度</returns>
+        public static int GetDepth<T>(T node) where T : ITreeNode<T>
+        {
+            if (node.Children == null || node.Children.Count == 0)
+                return 1;
+
+            return 1 + node.Children.Max(child => GetDepth(child));
+        }
+
+        /// <summary>
+        /// 获取节点数量
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <returns>节点总数</returns>
+        public static int GetNodeCount<T>(IEnumerable<T> roots) where T : ITreeNode<T>
+        {
+            return Flatten(roots).Count;
+        }
+
+        /// <summary>
+        /// 获取叶子节点数量
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <returns>叶子节点数量</returns>
+        public static int GetLeafCount<T>(IEnumerable<T> roots) where T : ITreeNode<T>
+        {
+            return Flatten(roots).Count(node => node.Children == null || node.Children.Count == 0);
+        }
+
+        /// <summary>
+        /// 获取所有叶子节点
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <returns>叶子节点列表</returns>
+        public static List<T> GetLeaves<T>(IEnumerable<T> roots) where T : ITreeNode<T>
+        {
+            return Flatten(roots).Where(node => node.Children == null || node.Children.Count == 0).ToList();
+        }
+
+        #endregion
+
+        #region 树操作
+
+        /// <summary>
+        /// 过滤树节点
+        /// </summary>
+        /// <typeparam name="T">节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="predicate">过滤条件</param>
+        /// <returns>过滤后的树</returns>
+        public static List<T> Filter<T>(IEnumerable<T> roots, Func<T, bool> predicate) where T : ITreeNode<T>, new()
+        {
+            var result = new List<T>();
+
+            foreach (var root in roots)
             {
-                Value = value;
+                var filtered = FilterNode(root, predicate);
+                if (filtered != null)
+                    result.Add(filtered);
             }
+
+            return result;
         }
 
-        /// <summary>
-        /// 添加元素
-        /// </summary>
-        public void Add(T value)
+        private static T? FilterNode<T>(T node, Func<T, bool> predicate) where T : ITreeNode<T>, new()
         {
-            _root = Add(_root, value);
-        }
+            var filteredChildren = new List<T>();
 
-        private BSTNode Add(BSTNode node, T value)
-        {
-            if (node == null)
+            if (node.Children != null)
             {
-                _count++;
-                return new BSTNode(value);
+                foreach (var child in node.Children)
+                {
+                    var filtered = FilterNode(child, predicate);
+                    if (filtered != null)
+                        filteredChildren.Add(filtered);
+                }
             }
 
-            int cmp = value.CompareTo(node.Value);
-            if (cmp < 0)
-                node.Left = Add(node.Left, value);
-            else if (cmp > 0)
-                node.Right = Add(node.Right, value);
-
-            return node;
-        }
-
-        /// <summary>
-        /// 是否包含元素
-        /// </summary>
-        public bool Contains(T value)
-        {
-            return Find(_root, value) != null;
-        }
-
-        private BSTNode Find(BSTNode node, T value)
-        {
-            if (node == null)
-                return null;
-
-            int cmp = value.CompareTo(node.Value);
-            if (cmp < 0)
-                return Find(node.Left, value);
-            if (cmp > 0)
-                return Find(node.Right, value);
-            return node;
-        }
-
-        /// <summary>
-        /// 移除元素
-        /// </summary>
-        public bool Remove(T value)
-        {
-            int oldCount = _count;
-            _root = Remove(_root, value);
-            return _count < oldCount;
-        }
-
-        private BSTNode Remove(BSTNode node, T value)
-        {
-            if (node == null)
-                return null;
-
-            int cmp = value.CompareTo(node.Value);
-            if (cmp < 0)
+            if (predicate(node) || filteredChildren.Count > 0)
             {
-                node.Left = Remove(node.Left, value);
-            }
-            else if (cmp > 0)
-            {
-                node.Right = Remove(node.Right, value);
-            }
-            else
-            {
-                _count--;
-                if (node.Left == null)
-                    return node.Right;
-                if (node.Right == null)
-                    return node.Left;
-
-                // 两个子节点都存在，用后继节点替换
-                var successor = FindMin(node.Right);
-                node.Value = successor.Value;
-                node.Right = Remove(node.Right, successor.Value);
-                _count++; // 因为上面递归会再次减
-            }
-
-            return node;
-        }
-
-        private BSTNode FindMin(BSTNode node)
-        {
-            while (node.Left != null)
-                node = node.Left;
-            return node;
-        }
-
-        private BSTNode FindMax(BSTNode node)
-        {
-            while (node.Right != null)
-                node = node.Right;
-            return node;
-        }
-
-        /// <summary>
-        /// 中序遍历
-        /// </summary>
-        public IEnumerable<T> InOrderTraversal()
-        {
-            return InOrderTraversal(_root);
-        }
-
-        private IEnumerable<T> InOrderTraversal(BSTNode node)
-        {
-            if (node == null)
-                yield break;
-
-            foreach (var value in InOrderTraversal(node.Left))
-                yield return value;
-
-            yield return node.Value;
-
-            foreach (var value in InOrderTraversal(node.Right))
-                yield return value;
-        }
-
-        /// <summary>
-        /// 清空
-        /// </summary>
-        public void Clear()
-        {
-            _root = null;
-            _count = 0;
-        }
-
-        /// <summary>
-        /// 查找小于指定值的最大元素
-        /// </summary>
-        public T? Floor(T value)
-        {
-            var node = Floor(_root, value);
-            return node == null ? default : node.Value;
-        }
-
-        private BSTNode Floor(BSTNode node, T value)
-        {
-            if (node == null)
-                return null;
-
-            int cmp = value.CompareTo(node.Value);
-            if (cmp == 0)
+                node.Children = filteredChildren;
                 return node;
-            if (cmp < 0)
-                return Floor(node.Left, value);
-
-            var rightFloor = Floor(node.Right, value);
-            return rightFloor ?? node;
-        }
-
-        /// <summary>
-        /// 查找大于指定值的最小元素
-        /// </summary>
-        public T? Ceiling(T value)
-        {
-            var node = Ceiling(_root, value);
-            return node == null ? default : node.Value;
-        }
-
-        private BSTNode Ceiling(BSTNode node, T value)
-        {
-            if (node == null)
-                return null;
-
-            int cmp = value.CompareTo(node.Value);
-            if (cmp == 0)
-                return node;
-            if (cmp > 0)
-                return Ceiling(node.Right, value);
-
-            var leftCeiling = Ceiling(node.Left, value);
-            return leftCeiling ?? node;
-        }
-
-        /// <summary>
-        /// 获取排名（小于指定值的元素数量）
-        /// </summary>
-        public int Rank(T value)
-        {
-            return Rank(_root, value);
-        }
-
-        private int Rank(BSTNode node, T value)
-        {
-            if (node == null)
-                return 0;
-
-            int cmp = value.CompareTo(node.Value);
-            if (cmp < 0)
-                return Rank(node.Left, value);
-            if (cmp > 0)
-                return 1 + CountNodes(node.Left) + Rank(node.Right, value);
-            return CountNodes(node.Left);
-        }
-
-        private int CountNodes(BSTNode node)
-        {
-            if (node == null)
-                return 0;
-            return 1 + CountNodes(node.Left) + CountNodes(node.Right);
-        }
-    }
-
-    /// <summary>
-    /// 线段树工具类
-    /// </summary>
-    public static class SegmentTreeUtil
-    {
-        /// <summary>
-        /// 创建线段树（求和）
-        /// </summary>
-        public static SegmentTree Create(int[] values)
-        {
-            return new SegmentTree(values, (a, b) => a + b, 0);
-        }
-
-        /// <summary>
-        /// 创建线段树（自定义操作）
-        /// </summary>
-        public static SegmentTree Create(int[] values, Func<int, int, int> operation, int identity)
-        {
-            return new SegmentTree(values, operation, identity);
-        }
-    }
-
-    /// <summary>
-    /// 线段树（区间查询/更新）
-    /// </summary>
-    public class SegmentTree
-    {
-        private readonly int[] _tree;
-        private readonly int[] _lazy;
-        private readonly int _n;
-        private readonly Func<int, int, int> _operation;
-        private readonly int _identity;
-
-        /// <summary>
-        /// 元素数量
-        /// </summary>
-        public int Count => _n;
-
-        /// <summary>
-        /// 创建线段树
-        /// </summary>
-        public SegmentTree(int[] values, Func<int, int, int> operation, int identity)
-        {
-            if (values == null || values.Length == 0)
-                throw new ArgumentException("Values cannot be null or empty");
-
-            _n = values.Length;
-            _operation = operation;
-            _identity = identity;
-            _tree = new int[4 * _n];
-            _lazy = new int[4 * _n];
-
-            Build(values, 1, 0, _n - 1);
-        }
-
-        private void Build(int[] values, int node, int start, int end)
-        {
-            if (start == end)
-            {
-                _tree[node] = values[start];
-            }
-            else
-            {
-                int mid = (start + end) / 2;
-                Build(values, 2 * node, start, mid);
-                Build(values, 2 * node + 1, mid + 1, end);
-                _tree[node] = _operation(_tree[2 * node], _tree[2 * node + 1]);
-            }
-        }
-
-        /// <summary>
-        /// 区间查询
-        /// </summary>
-        public int Query(int left, int right)
-        {
-            if (left < 0 || right >= _n || left > right)
-                throw new ArgumentOutOfRangeException();
-            return Query(1, 0, _n - 1, left, right);
-        }
-
-        private int Query(int node, int start, int end, int left, int right)
-        {
-            if (right < start || left > end)
-                return _identity;
-
-            if (left <= start && end <= right)
-                return _tree[node];
-
-            int mid = (start + end) / 2;
-            int leftResult = Query(2 * node, start, mid, left, right);
-            int rightResult = Query(2 * node + 1, mid + 1, end, left, right);
-            return _operation(leftResult, rightResult);
-        }
-
-        /// <summary>
-        /// 单点更新
-        /// </summary>
-        public void Update(int index, int value)
-        {
-            if (index < 0 || index >= _n)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            Update(1, 0, _n - 1, index, value);
-        }
-
-        private void Update(int node, int start, int end, int index, int value)
-        {
-            if (start == end)
-            {
-                _tree[node] = value;
-            }
-            else
-            {
-                int mid = (start + end) / 2;
-                if (index <= mid)
-                    Update(2 * node, start, mid, index, value);
-                else
-                    Update(2 * node + 1, mid + 1, end, index, value);
-                _tree[node] = _operation(_tree[2 * node], _tree[2 * node + 1]);
-            }
-        }
-
-        /// <summary>
-        /// 获取单个值
-        /// </summary>
-        public int Get(int index)
-        {
-            return Query(index, index);
-        }
-    }
-
-    /// <summary>
-    /// AVL树工具类
-    /// </summary>
-    public static class AVLTreeUtil
-    {
-        /// <summary>
-        /// 创建AVL树
-        /// </summary>
-        public static AVLTree<T> Create<T>() where T : IComparable<T>
-        {
-            return new AVLTree<T>();
-        }
-    }
-
-    /// <summary>
-    /// AVL树（自平衡二叉搜索树）
-    /// </summary>
-    public class AVLTree<T> where T : IComparable<T>
-    {
-        private AVLNode _root;
-        private int _count;
-
-        private class AVLNode
-        {
-            public T Value { get; set; }
-            public AVLNode Left { get; set; }
-            public AVLNode Right { get; set; }
-            public int Height { get; set; }
-
-            public AVLNode(T value)
-            {
-                Value = value;
-                Height = 1;
             }
 
-            public int BalanceFactor => GetHeight(Left) - GetHeight(Right);
-
-            private static int GetHeight(AVLNode node) => node?.Height ?? 0;
+            return default;
         }
 
         /// <summary>
-        /// 节点数量
+        /// 映射树节点
         /// </summary>
-        public int Count => _count;
-
-        /// <summary>
-        /// 是否为空
-        /// </summary>
-        public bool IsEmpty => _count == 0;
-
-        /// <summary>
-        /// 添加元素
-        /// </summary>
-        public void Add(T value)
+        /// <typeparam name="TSource">源节点类型</typeparam>
+        /// <typeparam name="TResult">结果节点类型</typeparam>
+        /// <param name="roots">根节点列表</param>
+        /// <param name="selector">映射函数</param>
+        /// <returns>映射后的树</returns>
+        public static List<TResult> Map<TSource, TResult>(IEnumerable<TSource> roots, Func<TSource, TResult> selector)
+            where TSource : ITreeNode<TSource>
+            where TResult : ITreeNode<TResult>, new()
         {
-            _root = Add(_root, value);
-        }
+            var result = new List<TResult>();
 
-        private AVLNode Add(AVLNode node, T value)
-        {
-            if (node == null)
+            foreach (var root in roots)
             {
-                _count++;
-                return new AVLNode(value);
+                result.Add(MapNode(root, selector));
             }
 
-            int cmp = value.CompareTo(node.Value);
-            if (cmp < 0)
-                node.Left = Add(node.Left, value);
-            else if (cmp > 0)
-                node.Right = Add(node.Right, value);
-            else
-                return node; // 重复值不添加
-
-            UpdateHeight(node);
-            return Balance(node);
+            return result;
         }
 
-        /// <summary>
-        /// 是否包含元素
-        /// </summary>
-        public bool Contains(T value)
+        private static TResult MapNode<TSource, TResult>(TSource node, Func<TSource, TResult> selector)
+            where TSource : ITreeNode<TSource>
+            where TResult : ITreeNode<TResult>, new()
         {
-            return Contains(_root, value);
-        }
+            var result = selector(node);
+            result.Children = new List<TResult>();
 
-        private bool Contains(AVLNode node, T value)
-        {
-            if (node == null)
-                return false;
-
-            int cmp = value.CompareTo(node.Value);
-            if (cmp < 0)
-                return Contains(node.Left, value);
-            if (cmp > 0)
-                return Contains(node.Right, value);
-            return true;
-        }
-
-        /// <summary>
-        /// 移除元素
-        /// </summary>
-        public bool Remove(T value)
-        {
-            int oldCount = _count;
-            _root = Remove(_root, value);
-            return _count < oldCount;
-        }
-
-        private AVLNode Remove(AVLNode node, T value)
-        {
-            if (node == null)
-                return null;
-
-            int cmp = value.CompareTo(node.Value);
-            if (cmp < 0)
+            if (node.Children != null)
             {
-                node.Left = Remove(node.Left, value);
-            }
-            else if (cmp > 0)
-            {
-                node.Right = Remove(node.Right, value);
-            }
-            else
-            {
-                _count--;
-                if (node.Left == null)
-                    return node.Right;
-                if (node.Right == null)
-                    return node.Left;
-
-                var successor = FindMin(node.Right);
-                node.Value = successor.Value;
-                node.Right = Remove(node.Right, successor.Value);
-                _count++;
+                foreach (var child in node.Children)
+                {
+                    result.Children.Add(MapNode(child, selector));
+                }
             }
 
-            UpdateHeight(node);
-            return Balance(node);
+            return result;
         }
 
-        private AVLNode FindMin(AVLNode node)
-        {
-            while (node.Left != null)
-                node = node.Left;
-            return node;
-        }
-
-        private void UpdateHeight(AVLNode node)
-        {
-            int leftHeight = node.Left?.Height ?? 0;
-            int rightHeight = node.Right?.Height ?? 0;
-            node.Height = 1 + Math.Max(leftHeight, rightHeight);
-        }
-
-        private AVLNode Balance(AVLNode node)
-        {
-            int balance = node.BalanceFactor;
-
-            // 左重
-            if (balance > 1)
-            {
-                if (node.Left.BalanceFactor < 0)
-                    node.Left = RotateLeft(node.Left);
-                return RotateRight(node);
-            }
-
-            // 右重
-            if (balance < -1)
-            {
-                if (node.Right.BalanceFactor > 0)
-                    node.Right = RotateRight(node.Right);
-                return RotateLeft(node);
-            }
-
-            return node;
-        }
-
-        private AVLNode RotateRight(AVLNode y)
-        {
-            var x = y.Left;
-            y.Left = x.Right;
-            x.Right = y;
-
-            UpdateHeight(y);
-            UpdateHeight(x);
-
-            return x;
-        }
-
-        private AVLNode RotateLeft(AVLNode x)
-        {
-            var y = x.Right;
-            x.Right = y.Left;
-            y.Left = x;
-
-            UpdateHeight(x);
-            UpdateHeight(y);
-
-            return y;
-        }
-
-        /// <summary>
-        /// 中序遍历
-        /// </summary>
-        public IEnumerable<T> InOrderTraversal()
-        {
-            return InOrderTraversal(_root);
-        }
-
-        private IEnumerable<T> InOrderTraversal(AVLNode node)
-        {
-            if (node == null)
-                yield break;
-
-            foreach (var value in InOrderTraversal(node.Left))
-                yield return value;
-
-            yield return node.Value;
-
-            foreach (var value in InOrderTraversal(node.Right))
-                yield return value;
-        }
-
-        /// <summary>
-        /// 清空
-        /// </summary>
-        public void Clear()
-        {
-            _root = null;
-            _count = 0;
-        }
+        #endregion
     }
 }
