@@ -17,7 +17,8 @@ namespace EasyTool.Extension
         {
             if (obj == null)
                 return default;
-            return ObjectMapperManager.DefaultInstance.GetMapper<TSource, TDestination>().Map(obj);
+            var mapper = ObjectMapperManager.DefaultInstance.GetMapper<TSource, TDestination>();
+            return mapper != null ? mapper.Map(obj) : default;
         }
 
         /// <summary>

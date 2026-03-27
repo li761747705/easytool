@@ -1,15 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
 
 namespace EasyTool.Standardization
 {
-
-#if NET6_0_OR_GREATER
     /*
      *标准化与前端下拉选项数据结构，减少前后端对接工作
      */
@@ -20,17 +17,33 @@ namespace EasyTool.Standardization
     /// <summary>
     /// 包含Value和Text的选择对象，用于前端下拉选项
     /// </summary>
-    public record Option<T>(T Value, string Text);
+    public class Option<T>
+    {
+        public T Value { get; set; }
+        public string Text { get; set; }
+
+        public Option(T value, string text)
+        {
+            Value = value;
+            Text = text;
+        }
+    }
 
     /// <summary>
     /// 包含Value和Text的选择对象，用于前端下拉选项
     /// </summary>
-    public record Option(string Value, string Text) : Option<string>(Value, Text);
+    public class Option : Option<string>
+    {
+        public Option(string value, string text) : base(value, text) { }
+    }
 
     /// <summary>
     /// 包含Value和Text的选择对象，用于前端下拉选项
     /// </summary>
-    public record OptionInt(int? Value, string Text) : Option<int?>(Value, Text);
+    public class OptionInt : Option<int?>
+    {
+        public OptionInt(int? value, string text) : base(value, text) { }
+    }
 
     /// <summary>
     /// 选项接口，用于描述选项的类
@@ -56,7 +69,7 @@ namespace EasyTool.Standardization
         /// <summary>
         /// 获得选项列表
         /// </summary>
-        public static List<Option> GetOptions<T>() where T : IOption, new()
+        static List<Option> GetOptions<T>() where T : IOption, new()
         {
             return new T().ToOptions();
         }
@@ -78,5 +91,4 @@ namespace EasyTool.Standardization
                 )).ToList();
         }
     }
-#endif
 }

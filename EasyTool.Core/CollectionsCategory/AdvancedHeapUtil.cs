@@ -42,9 +42,9 @@ namespace EasyTool.CollectionsCategory
         private class Node
         {
             public T Value { get; set; }
-            public Node Child { get; set; }
-            public Node Sibling { get; set; }
-            public Node Parent { get; set; }
+            public Node? Child { get; set; }
+            public Node? Sibling { get; set; }
+            public Node? Parent { get; set; }
 
             public Node(T value)
             {
@@ -52,7 +52,7 @@ namespace EasyTool.CollectionsCategory
             }
         }
 
-        private Node _root;
+        private Node? _root;
         private int _count;
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace EasyTool.CollectionsCategory
             other._count = 0;
         }
 
-        private Node Merge(Node a, Node b)
+        private Node? Merge(Node? a, Node? b)
         {
             if (a == null)
                 return b;
@@ -158,7 +158,7 @@ namespace EasyTool.CollectionsCategory
             }
         }
 
-        private Node MergePairs(Node node)
+        private Node? MergePairs(Node? node)
         {
             if (node == null || node.Sibling == null)
                 return node;
@@ -214,8 +214,8 @@ namespace EasyTool.CollectionsCategory
         private class Node
         {
             public T Value { get; set; }
-            public Node Parent { get; set; }
-            public Node Child { get; set; }
+            public Node? Parent { get; set; }
+            public Node? Child { get; set; }
             public Node Left { get; set; }
             public Node Right { get; set; }
             public int Degree { get; set; }
@@ -229,7 +229,7 @@ namespace EasyTool.CollectionsCategory
             }
         }
 
-        private Node _min;
+        private Node? _min;
         private int _count;
         private readonly List<Node> _degreeList;
 
@@ -497,9 +497,9 @@ namespace EasyTool.CollectionsCategory
         {
             public T Value { get; set; }
             public int Degree { get; set; }
-            public Node Child { get; set; }
-            public Node Sibling { get; set; }
-            public Node Parent { get; set; }
+            public Node? Child { get; set; }
+            public Node? Sibling { get; set; }
+            public Node? Parent { get; set; }
 
             public Node(T value)
             {
@@ -507,7 +507,7 @@ namespace EasyTool.CollectionsCategory
             }
         }
 
-        private Node _head;
+        private Node? _head;
         private int _count;
 
         /// <summary>

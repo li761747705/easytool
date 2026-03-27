@@ -238,7 +238,7 @@ public static class NPOIUtil
             IWorkbook workbook = workbookType.Equals(ExcelWorkbookType.XLSX) ? new XSSFWorkbook() : new HSSFWorkbook();
             T t = dataSource.FirstOrDefault();
             filename ??= typeof(T).Name;
-            ISheet sheet = workbook.CreateSheet(filename);
+            ISheet sheet = workbook.CreateSheet(filename!);
             IRow headerRow = sheet.CreateRow(0);
             var props = typeof(T).GetProperties().Where(x => x.PropertyType.IsPublic);
             int count = props.Count(); //T类型公开属性的数量
@@ -255,12 +255,12 @@ public static class NPOIUtil
                     row.CreateCell(j).SetCellValue(props.ElementAt(j).GetValue(dataSource.ElementAt(i)).ToString());
                 }
             }
-            string filePath = $"{path}{filename}";
+            string filePath = $"{path}{filename!}";
             string extension = workbookType.Equals(ExcelWorkbookType.XLSX) ? ".xlsx" : ".xls";
             int num = 1;
             while (File.Exists(filePath + extension))
             {
-                filePath = $"{path}{filename}({num})";
+                filePath = $"{path}{filename!}({num})";
                 num++;
             }
             using var fs = new FileStream(filePath + extension, FileMode.Create, FileAccess.Write);
@@ -308,12 +308,12 @@ public static class NPOIUtil
                     row.CreateCell(j).SetCellValue(dataTable.Rows[i][j].ToString());
                 }
             }
-            string filePath = $"{path}{filename}";
+            string filePath = $"{path}{filename!}";
             string extension = workbookType.Equals(ExcelWorkbookType.XLSX) ? ".xlsx" : ".xls";
             int num = 1;
             while (File.Exists(filePath + extension))
             {
-                filePath = $"{path}{filename}({num})";
+                filePath = $"{path}{filename!}({num})";
                 num++;
             }
             using var fs = new FileStream(filePath + extension, FileMode.Create, FileAccess.Write);
