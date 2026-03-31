@@ -19,7 +19,7 @@ namespace EasyTool.Tests
             Thread.Sleep(10);
             var uuid2 = IdUtil.UUID(UUIDStyle.Sequence);
 
-            Assert.IsTrue(uuid2.ToString().CompareTo(uuid1.ToString()) > 0);
+            Assert.IsGreaterThan(uuid1.ToString(), uuid2.ToString());
         }
     }
 }

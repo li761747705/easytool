@@ -234,7 +234,7 @@ namespace EasyTool.ToolCategory
             for (int i = 0; i < taskArray.Length; i++)
             {
                 int index = i;
-                taskArray[i].ContinueWith(t =>
+                _ = taskArray[i].ContinueWith(t =>
                 {
                     results[index] = t;
                     if (Interlocked.Decrement(ref remaining) == 0)

@@ -60,8 +60,12 @@ namespace EasyTool.CacheCategory
     {
         private readonly RedisCacheOptions _options;
         private readonly string _keyPrefix;
+#pragma warning disable CS0169, CS0649 // 字段保留供扩展使用
         private object? _connectionMultiplexer;
+#pragma warning restore CS0169, CS0649
+#pragma warning disable CS0169 // 字段保留供扩展使用
         private object? _database;
+#pragma warning restore CS0169
         private bool _disposed;
 
         /// <summary>

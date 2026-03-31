@@ -18,7 +18,7 @@ namespace EasyTool.CodeCategory.Tests
             var sk = "12345678";
             var en = DesUtil.Encrypt(input, sk);
             var de = DesUtil.Decrypt(en, sk);
-            Assert.IsTrue(de == input);
+            Assert.AreEqual(input, de);
         }
     }
 }

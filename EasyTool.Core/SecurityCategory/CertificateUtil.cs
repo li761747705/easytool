@@ -211,7 +211,6 @@ namespace EasyTool.SecurityCategory
                     // netstandard2.1 不支持 PEM 导出
                     throw new PlatformNotSupportedException("PEM 格式导出需要 .NET 5.0 或更高版本");
 #endif
-                    break;
                 case CertificateFormat.Cer:
                     data = certificate.Export(X509ContentType.Cert);
                     break;

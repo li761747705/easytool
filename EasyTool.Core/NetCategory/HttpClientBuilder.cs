@@ -23,13 +23,17 @@ namespace EasyTool.NetCategory
         private Dictionary<string, string> _defaultRequestHeaders = new();
         private AuthenticationHeaderValue? _authorizationHeader;
         private string? _baseAddress;
+#pragma warning disable CS0169 // 字段保留供扩展使用
         private TimeSpan? _pipeliningPolicy;
+#pragma warning restore CS0169
         private bool _allowAutoRedirect = true;
         private int _maxAutomaticRedirections = 50;
         private DecompressionMethods _automaticDecompression = DecompressionMethods.None;
         private ICredentials? _credentials;
         private IWebProxy? _proxy;
+#pragma warning disable CS0414 // 字段保留供扩展使用
         private bool _useDefaultCredentials;
+#pragma warning restore CS0414
         private TimeSpan? _connectionTimeout;
         private int _maxConnectionsPerServer = int.MaxValue;
         private int _maxResponseHeadersLength = 64;

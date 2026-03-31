@@ -207,7 +207,9 @@ namespace EasyTool.IOCategory
         private string? _filePath;
         private string? _directoryPath;
         private bool _disposed;
+#pragma warning disable CS0414 // 字段保留供扩展使用
         private readonly bool _isDirectory;
+#pragma warning restore CS0414
 
         /// <summary>
         /// 创建临时文件作用域

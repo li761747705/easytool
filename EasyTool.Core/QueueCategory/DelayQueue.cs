@@ -118,8 +118,6 @@ namespace EasyTool.QueueCategory
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                DelayQueueItem<T>? item;
-
                 lock (_lock)
                 {
                     if (_sortedItems.Count > 0)

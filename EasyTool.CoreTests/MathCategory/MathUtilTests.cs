@@ -13,7 +13,7 @@ namespace EasyTool.Tests
         public void GcdTest()
         {
             var result = MathUtil.Gcd(5, 20);
-            Assert.IsTrue(result == 5);
+            Assert.AreEqual(5, result);
         }
     }
 }

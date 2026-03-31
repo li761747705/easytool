@@ -17,9 +17,9 @@ namespace EasyTool.Tests
         {
             var options = new LogLevel().ToOptions();
             Assert.IsNotNull(options);
-            Assert.IsTrue(options.Count == 4);
-            Assert.IsTrue(options[0].Value == "Debug");
-            Assert.IsTrue(options[0].Text == "调试");
+            Assert.HasCount(4, options);
+            Assert.AreEqual("Debug", options[0].Value);
+            Assert.AreEqual("调试", options[0].Text);
 
         }
 
@@ -28,9 +28,9 @@ namespace EasyTool.Tests
         {
             var options = IOption.GetOptions<LogLevel>();
             Assert.IsNotNull(options);
-            Assert.IsTrue(options.Count == 4);
-            Assert.IsTrue(options[0].Value == "Debug");
-            Assert.IsTrue(options[0].Text == "调试");
+            Assert.HasCount(4, options);
+            Assert.AreEqual("Debug", options[0].Value);
+            Assert.AreEqual("调试", options[0].Text);
         }
 
         public class LogLevel : IOption

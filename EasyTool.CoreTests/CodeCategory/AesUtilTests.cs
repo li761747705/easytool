@@ -18,7 +18,7 @@ namespace EasyTool.CodeCategory.Tests
             var sk = "1234567890123456";
             var en = AesUtil.Encrypt(input, sk);
             var de = AesUtil.Decrypt(en, sk);
-            Assert.IsTrue(de == input);
+            Assert.AreEqual(input, de);
         }
 
         [TestMethod()]
@@ -28,7 +28,7 @@ namespace EasyTool.CodeCategory.Tests
             var sk = "123456789012345678901234";
             var en = AesUtil.Encrypt(input, sk);
             var de = AesUtil.Decrypt(en, sk);
-            Assert.IsTrue(de == input);
+            Assert.AreEqual(input, de);
         }
 
         [TestMethod()]
@@ -38,7 +38,7 @@ namespace EasyTool.CodeCategory.Tests
             var sk = "12345678901234567890123456789012";
             var en = AesUtil.Encrypt(input, sk);
             var de = AesUtil.Decrypt(en, sk);
-            Assert.IsTrue(de == input);
+            Assert.AreEqual(input, de);
         }
     }
 }

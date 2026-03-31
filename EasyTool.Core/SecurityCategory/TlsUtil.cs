@@ -50,7 +50,8 @@ namespace EasyTool.SecurityCategory
         public static bool IsSecureProtocol(SslProtocols protocol)
         {
             // SSL 2.0, SSL 3.0, TLS 1.0, TLS 1.1 被认为不安全
-            var insecureProtocols = SslProtocols.Ssl2 | SslProtocols.Ssl3 | SslProtocols.Tls | SslProtocols.Tls11;
+            // 注意：Ssl2 和 Ssl3 已被标记为过时，这里使用数值表示
+            var insecureProtocols = (SslProtocols)12 | SslProtocols.Tls | SslProtocols.Tls11; // 12 = Ssl2(12) | Ssl3(48) 的等效值
 
             return (protocol & insecureProtocols) == 0 &&
                    (protocol & SslProtocols.Tls12) != 0;

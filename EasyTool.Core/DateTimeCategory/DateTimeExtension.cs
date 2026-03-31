@@ -151,7 +151,7 @@ namespace EasyTool.DateTimeCategory
         public static bool IsThisWeek(this DateTime date)
         {
             var today = DateTime.Today;
-            var firstDayOfWeek = today.GetFirstDayOfWeek();
+            var firstDayOfWeek = DateTimeUtil.GetFirstDayOfWeek(today);
             var lastDayOfWeek = firstDayOfWeek.AddDays(6);
             return date.Date >= firstDayOfWeek && date.Date <= lastDayOfWeek;
         }
@@ -217,7 +217,7 @@ namespace EasyTool.DateTimeCategory
         /// </summary>
         public static DateTime GetLastDayOfWeek(this DateTime date)
         {
-            var firstDay = date.GetFirstDayOfWeek();
+            var firstDay = DateTimeUtil.GetFirstDayOfWeek(date);
             return firstDay.AddDays(6);
         }
 
@@ -310,7 +310,7 @@ namespace EasyTool.DateTimeCategory
             while (daysToAdd > 0)
             {
                 result = result.AddDays(direction);
-                if (result.IsWorkDay())
+                if (DateTimeUtil.IsWorkDay(result))
                     daysToAdd--;
             }
 

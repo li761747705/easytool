@@ -61,8 +61,8 @@ namespace EasyTool.IdentifierCategory
                 _lastTimestamp = timestamp;
 
                 return ((timestamp & MaxTimestamp) << (NodeIdBits + SequenceBits))
-                       | ((long)_nodeId << SequenceBits)
-                       | _sequence;
+                       | ((long)(uint)_nodeId << SequenceBits)
+                       | (long)(uint)_sequence;
             }
         }
 
@@ -107,8 +107,8 @@ namespace EasyTool.IdentifierCategory
                 _lastTimestamp = timestamp;
 
                 return ((timestamp & MaxTimestamp) << (NodeIdBits + SequenceBits))
-                       | ((long)nodeId << SequenceBits)
-                       | _sequence;
+                       | ((long)(uint)nodeId << SequenceBits)
+                       | (long)(uint)_sequence;
             }
         }
 
