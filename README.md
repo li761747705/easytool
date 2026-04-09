@@ -130,20 +130,72 @@ EasyTool/
 | 身份证 | `IdCardUtil` | 18位身份证验证、解析 |
 | 手机号 | `PhoneNumberUtil` | 大陆/香港/台湾手机号 |
 | 银行卡 | `BankCardUtil` | 银行卡号验证、BIN识别 |
-| 统一社会信用代码 | `CreditCodeUtil` | 18位信用代码验证 |
-| 车牌号 | `LicensePlateUtil` | 新能源/普通车牌 |
+| 统一社会信用代码 | `SocialCreditCodeUtil` | 18位信用代码验证、机构类型解析 |
+| 车牌号 | `PlateNumberUtil` | 新能源/普通车牌验证、归属地查询 |
 | 护照 | `PassportUtil` | 中国护照验证 |
 | 驾驶证 | `DrivingLicenseUtil` | 驾驶证号验证 |
 | 港澳通行证 | `HkMacaoPassUtil` | 港澳通行证验证 |
 | 台湾身份证 | `TwIdCardUtil` | 台湾身份证验证 |
 | ... | ... | 更多... |
 
+### 🎉 中国特色数据生成
+
+```csharp
+// 中文姓名生成
+var name = ChineseNameUtil.Generate();  // "张明华"
+var maleName = ChineseNameUtil.Generate(Gender.Male);
+var names = ChineseNameUtil.GenerateBatch(10);
+
+// 中国大学信息
+var univ = UniversityUtil.GetByCode("10001");  // 北京大学
+var univs985 = UniversityUtil.Get985Universities();
+var univsByProvince = UniversityUtil.GetByProvince("江苏");
+
+// 手机号归属地
+var location = PhoneLocationUtil.GetLocation("13800138000");
+// location.Carrier = "中国移动", location.Province = "广东", location.City = "广州"
+
+// 公司名称生成
+var company = CompanyUtil.Generate();  // "华创科技有限公司"
+var techCompany = CompanyUtil.GenerateTechCompany();
+
+// 地址生成
+var address = AddressUtil.Generate();  // "广东省广州市天河区中山大道100号阳光花园5栋1单元101室"
+var addressInfo = AddressUtil.GenerateFullInfo();
+```
+
+### 📅 中国节假日工具
+
+```csharp
+// 判断工作日/节假日（含调休）
+ChineseHolidayUtil.IsWorkday(DateTime.Today);
+ChineseHolidayUtil.IsHoliday(DateTime.Today);
+
+// 获取节假日信息
+var holiday = ChineseHolidayUtil.GetHolidayInfo(date);
+var nextHoliday = ChineseHolidayUtil.GetNextHoliday();
+var daysToHoliday = ChineseHolidayUtil.GetDaysToNextHoliday();
+
+// 计算工作日
+var workdays = ChineseHolidayUtil.GetWorkdaysBetween(start, end);
+var futureDate = ChineseHolidayUtil.AddWorkdays(DateTime.Today, 10);
+
+// 传统节日
+var lunarHoliday = ChineseHolidayUtil.GetTraditionalHoliday(date);  // "春节", "中秋"等
+```
+
 ### 📝 文本处理
 
 ```csharp
 // 汉字转拼音
-PinyinUtil.GetPinyin("中国北京");           // "zhongguobeijing"
-PinyinUtil.GetFirstLetter("中国北京");       // "ZGBJ"
+ChinesePinyinUtil.ToPinyin("中国北京");           // "zhong guo bei jing"
+ChinesePinyinUtil.GetPinyinInitial("中国北京");   // "ZGBJ"
+ChinesePinyinUtil.ToPinyinWithTone("中国");       // "zhong1 guo2"
+
+// 中文数字转换
+ChineseNumberUtil.ToChinese(12345);       // "一万二千三百四十五"
+ChineseNumberUtil.ToMoney(1234.56);       // "壹仟贰佰叁拾肆元伍角陆分"
+ChineseNumberUtil.FromChinese("一万二");  // 12000
 
 // 敏感词过滤（DFA算法，高效）
 SensitiveWordUtil.Init(new[] { "敏感词", "违规" });
@@ -152,6 +204,33 @@ SensitiveWordUtil.Filter("这是一个敏感词", '*');  // 替换
 
 // 文本相似度
 var similarity = TextSimilarityUtil.Calculate("hello", "hallo", SimilarityAlgorithm.Levenshtein);
+```
+
+### 🌏 行政区划工具
+
+```csharp
+// 省市区三级联动
+var provinces = RegionUtil.GetProvinces();
+var cities = RegionUtil.GetCities("440000");  // 广东省的城市
+var districts = RegionUtil.GetDistricts("440100");  // 广州市的区
+
+// 行政区划查询
+var info = RegionUtil.GetByCode("440106");  // 天河区
+var path = RegionUtil.GetFullPath("440106");  // "广东-广州-天河"
+var hierarchy = RegionUtil.GetHierarchy("440106");  // ("广东", "广州", "天河")
+```
+
+### 🌤️ 二十四节气
+
+```csharp
+// 节气查询
+var term = SolarTermUtil.GetSolarTerm(DateTime.Today);
+var nextTerm = SolarTermUtil.GetNextSolarTerm();
+var prevTerm = SolarTermUtil.GetPrevSolarTerm();
+
+// 季节判断
+var season = SolarTermUtil.GetSeason(DateTime.Today);  // "春"/"夏"/"秋"/"冬"
+SolarTermUtil.IsSpring(DateTime.Today);
 ```
 
 ### 🔐 加密编码
@@ -241,9 +320,9 @@ var similarity = VectorSimilarity.Cosine(vector1, vector2);
 
 | 分类 | 文件数 | 说明 |
 |------|--------|------|
-| **BusinessCategory** | 5 | 业务验证（身份证、银行卡、手机号等） |
+| **BusinessCategory** | 20+ | 业务验证（身份证、银行卡、车牌、节假日等） |
 | **CodeCategory** | 25+ | 编码加密（Base系列、哈希、国密） |
-| **TextCategory** | 25+ | 文本处理（拼音、敏感词、相似度） |
+| **TextCategory** | 25+ | 文本处理（拼音、中文数字、敏感词、相似度） |
 | **CollectionsCategory** | 10+ | 集合操作 |
 | **DateTimeCategory** | 5 | 日期时间 |
 | **IdentifierCategory** | 3 | ID生成 |
