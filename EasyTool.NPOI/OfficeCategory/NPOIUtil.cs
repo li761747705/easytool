@@ -110,7 +110,7 @@ public static class NPOIUtil
     /// </summary>
     /// <typeparam name="T">目标泛型</typeparam>
     /// <param name="wookbook"></param>
-    /// <example> IWorkbook workbook;workbook.GetSheetAt(0).ToList<T>();</example>
+    /// <example> IWorkbook workbook;workbook.GetSheetAt(0).ToList&lt;T&gt;();</example>
     /// <returns></returns>
     public static List<T> ConvertToList<T>(this ISheet sheet) where T : new()
     {
@@ -224,7 +224,7 @@ public static class NPOIUtil
     /// 导出到Excel
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="dataSource">IEnumerable<T></param>
+    /// <param name="dataSource">IEnumerable&lt;T&gt;</param>
     /// <param name="path">文件夹路径</param>
     /// <param name="workbookType">工作簿类型</param>
     /// <param name="filename">文件名称</param>

@@ -54,10 +54,10 @@ namespace EasyTool.TextCategory.Tests
         }
 
         [Fact]
-        public void ResetDictionary_ResetsToDefaultSize()
+        public async Task ResetDictionary_ResetsToDefaultSize()
         {
             // 先加载扩展字典
-            SpellCheckerUtil.LoadExtendedDictionaryAsync().Wait();
+            await SpellCheckerUtil.LoadExtendedDictionaryAsync();
             var extendedSize = SpellCheckerUtil.GetDictionarySize();
 
             // 重置
@@ -68,9 +68,9 @@ namespace EasyTool.TextCategory.Tests
         }
 
         [Fact]
-        public void IsCorrect_AfterLoadingExtendedWord_ReturnsTrue()
+        public async Task IsCorrect_AfterLoadingExtendedWord_ReturnsTrue()
         {
-            SpellCheckerUtil.LoadExtendedDictionaryAsync().Wait();
+            await SpellCheckerUtil.LoadExtendedDictionaryAsync();
 
             // 扩展字典中的常用词
             Assert.True(SpellCheckerUtil.IsCorrect("able"));
