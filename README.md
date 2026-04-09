@@ -13,203 +13,254 @@
 
 ## 📚 简介
 
-Easytool 是一个功能丰富且易用的 .NET 工具库，旨在帮助开发者快速、便捷地完成各类开发任务。 这些封装的工具涵盖了字符串、数字、集合、编码、日期、文件、IO、加密、JSON、HTTP客户端等一系列操作， 可以满足各种不同的开发需求。
+EasyTool 是一个**轻量级、零依赖、填补空白、中文友好**的 .NET 工具库，专注于提供成熟框架没有的功能。
 
-> [More information](https://easy-dotnet.com/pages/easytool/)
+### 🎯 设计理念
+
+- ✅ **轻量级** - 核心包无外部依赖
+- ✅ **零依赖** - 不引入第三方包
+- ✅ **填补空白** - 只做成熟框架没有的功能
+- ✅ **中文友好** - 中国特色业务验证、拼音转换、敏感词过滤
+
+### ❌ 我们不做
+
+| 功能 | 成熟替代方案 |
+|------|-------------|
+| ORM/数据库 | EF Core, Dapper, SqlSugar |
+| 日志 | Serilog, NLog |
+| 缓存 | EasyCaching, Microsoft.Extensions.Caching |
+| HTTP客户端 | RestSharp, Flurl, Refit |
+| JSON | System.Text.Json, Newtonsoft.Json |
+| 验证 | FluentValidation |
+| 对象映射 | AutoMapper, Mapster |
+| 任务调度 | Quartz.NET, Hangfire |
+| 限流/熔断 | Polly |
+| 邮件 | MailKit, FluentEmail |
+| 消息队列 | MassTransit, CAP |
+| WebSocket | SignalR |
+| JWT | System.IdentityModel.Tokens.Jwt |
+| 二维码 | QRCoder, ZXing.Net |
 
 ## 🚀 快速开始
 
 ### 安装
 
+**核心包（推荐）**
 ~~~
 PM> Install-Package EasyTool.Core
 ~~~
-或者 .NET CLI 👇
-~~~
-dotnet add package EasyTool.Core
-~~~
 
-### 使用
-
-复制文件或者目录
-~~~csharp
-FileUtil.Copy(sourceDir, destinationDir, isOverwrite)
+**整合包（包含所有模块）**
 ~~~
-克隆对象
-~~~csharp
-var a = CloneUtil.Clone<Person>(person);
+PM> Install-Package EasyTool.All
 ~~~
 
-## 🛠️ 目录
+**按需安装模块**
+~~~
+PM> Install-Package EasyTool.AI       # AI模块
+PM> Install-Package EasyTool.Media    # 媒体处理
+PM> Install-Package EasyTool.System   # 系统工具
+~~~
 
-Easytool 封装了开发过程中一些常用的方法
+### 使用示例
+
+```csharp
+using EasyTool.TextCategory;
+using EasyTool.CodeCategory;
+using EasyTool.BusinessCategory;
+
+// 汉字转拼音
+var pinyin = PinyinUtil.GetPinyin("中国");  // "zhongguo"
+var firstLetter = PinyinUtil.GetFirstLetter("中国");  // "ZG"
+
+// 敏感词过滤
+SensitiveWordUtil.Init(new[] { "敏感词", "违规" });
+var hasSensitive = SensitiveWordUtil.Contains("这是一个敏感词");  // true
+var filtered = SensitiveWordUtil.Filter("这是一个敏感词", '*');  // "这是一个***"
+
+// 身份证验证
+var isValid = IdCardUtil.IsValid("110101199003077654");  // true
+var info = IdCardUtil.GetInfo("110101199003077654");
+// info.Province, info.City, info.Birthday, info.Gender...
+
+// 国密SM4加密
+var encrypted = Sm4Util.EncryptEcb("key123456789012", "明文");
+var decrypted = Sm4Util.DecryptEcb("key123456789012", encrypted);
+
+// ID生成
+var snowflakeId = IdUtil.SnowflakeId();  // 雪花ID
+var ulid = IdUtil.ULID();  // ULID
+var objectId = IdUtil.ObjectId();  // ObjectId
+```
+
+## 📁 项目结构
+
+```
+EasyTool/
+├── EasyTool.Core/           # 核心包（轻量级，无外部依赖）
+│   ├── BusinessCategory/    # 业务验证（身份证、银行卡、手机号等30+种）
+│   ├── CodeCategory/        # 编码加密（Base系列、哈希、国密SM2/SM3/SM4）
+│   ├── CollectionsCategory/ # 集合操作
+│   ├── DateTimeCategory/    # 日期时间
+│   ├── IdentifierCategory/  # ID生成（Snowflake/ULID/TSID/ObjectId）
+│   ├── IOCategory/          # 文件操作
+│   ├── MathCategory/        # 数学工具
+│   ├── NetCategory/         # 网络工具
+│   ├── ReflectCategory/     # 反射工具
+│   ├── SecurityCategory/    # 安全（XSS、SQL注入）
+│   ├── TextCategory/        # 文本处理（拼音、敏感词、相似度）
+│   └── ToolCategory/        # 通用工具
+├── EasyTool.AI/             # AI模块
+├── EasyTool.Media/          # 媒体处理
+├── EasyTool.System/         # 系统工具
+├── EasyTool.All/            # 整合包
+├── EasyTool.Image/          # 图像处理
+├── EasyTool.NPOI/           # Excel处理
+└── EasyTool.Web/            # Web相关
+```
+
+## ✨ 特色功能
+
+### 🇨🇳 中国特色业务验证
+
+支持 30+ 种中国特色号码验证：
+
+| 类型 | 工具类 | 示例 |
+|------|--------|------|
+| 身份证 | `IdCardUtil` | 18位身份证验证、解析 |
+| 手机号 | `PhoneNumberUtil` | 大陆/香港/台湾手机号 |
+| 银行卡 | `BankCardUtil` | 银行卡号验证、BIN识别 |
+| 统一社会信用代码 | `CreditCodeUtil` | 18位信用代码验证 |
+| 车牌号 | `LicensePlateUtil` | 新能源/普通车牌 |
+| 护照 | `PassportUtil` | 中国护照验证 |
+| 驾驶证 | `DrivingLicenseUtil` | 驾驶证号验证 |
+| 港澳通行证 | `HkMacaoPassUtil` | 港澳通行证验证 |
+| 台湾身份证 | `TwIdCardUtil` | 台湾身份证验证 |
+| ... | ... | 更多... |
+
+### 📝 文本处理
+
+```csharp
+// 汉字转拼音
+PinyinUtil.GetPinyin("中国北京");           // "zhongguobeijing"
+PinyinUtil.GetFirstLetter("中国北京");       // "ZGBJ"
+
+// 敏感词过滤（DFA算法，高效）
+SensitiveWordUtil.Init(new[] { "敏感词", "违规" });
+SensitiveWordUtil.Contains("这是一个敏感词");  // 检测
+SensitiveWordUtil.Filter("这是一个敏感词", '*');  // 替换
+
+// 文本相似度
+var similarity = TextSimilarityUtil.Calculate("hello", "hallo", SimilarityAlgorithm.Levenshtein);
+```
+
+### 🔐 加密编码
+
+**Base编码系列**（成熟框架没有）
+```csharp
+Base32Util.Encode(data);
+Base45Util.Encode(data);   // ISO/IEC 18004
+Base58Util.Encode(data);   // 比特币地址
+Base85Util.Encode(data);   // Ascii85
+Base91Util.Encode(data);
+Base92Util.Encode(data);
+```
+
+**哈希算法**
+```csharp
+HashUtil.MD5(text);
+HashUtil.SHA256(text);
+MurmurHashUtil.Hash32(data);  // 高性能非加密哈希
+XxHashUtil.Hash32(data);      // 极速哈希
+CityHashUtil.Hash64(data);
+```
+
+**国密算法**
+```csharp
+// SM2 非对称加密
+Sm2Util.Encrypt(publicKey, data);
+Sm2Util.Decrypt(privateKey, encrypted);
+
+// SM3 哈希
+Sm3Util.Hash(data);
+
+// SM4 对称加密
+Sm4Util.EncryptEcb(key, data);
+Sm4Util.EncryptCbc(key, iv, data);
+```
+
+### 🆔 ID生成器
+
+```csharp
+// 雪花ID（分布式唯一ID）
+var snowflakeId = IdUtil.SnowflakeId();
+
+// ULID（字典序唯一ID）
+var ulid = IdUtil.ULID();
+
+// TSID（时间排序ID）
+var tsid = IdUtil.TSID();
+
+// ObjectId（MongoDB风格）
+var objectId = IdUtil.ObjectId();
+
+// 有序UUID
+var orderedUuid = IdUtil.UUID(UUIDStyle.Sequential);
+```
+
+### 🌐 网络工具
+
+```csharp
+// IP地址处理
+IpUtil.IsIpv4("192.168.1.1");
+IpUtil.IsIpv6("2001:db8::1");
+IpUtil.GetLocalIp();
+
+// HTTP重试机制
+var result = await HttpUtil.WithExponentialBackoffAsync(
+    async () => await httpClient.GetStringAsync(url),
+    maxRetries: 3
+);
+```
+
+### 🤖 AI模块
+
+```csharp
+// OpenAI客户端
+var client = new OpenAIClient("api-key");
+var response = await client.ChatSimpleAsync("你好！");
+
+// Token计数
+var tokens = TokenizerUtil.CountTokens("Hello, world!", "gpt-4");
+
+// 向量相似度
+var similarity = VectorSimilarity.Cosine(vector1, vector2);
+```
+
+## 📊 文件统计
+
+| 分类 | 文件数 | 说明 |
+|------|--------|------|
+| **BusinessCategory** | 5 | 业务验证（身份证、银行卡、手机号等） |
+| **CodeCategory** | 25+ | 编码加密（Base系列、哈希、国密） |
+| **TextCategory** | 25+ | 文本处理（拼音、敏感词、相似度） |
+| **CollectionsCategory** | 10+ | 集合操作 |
+| **DateTimeCategory** | 5 | 日期时间 |
+| **IdentifierCategory** | 3 | ID生成 |
+| **IOCategory** | 10+ | 文件操作 |
+| **SecurityCategory** | 5 | 安全工具 |
+| **ToolCategory** | 10+ | 通用工具 |
+
+## 🔗 相关链接
+
+- [在线文档](https://easy-dotnet.com/pages/easytool/)
+- [NuGet包](https://www.nuget.org/packages/EasyTool.Core)
+- [GitHub仓库](https://github.com/li761747705/easytool)
+
+## 📄 License
+
+[MIT License](LICENSE)
 
 ---
 
-## 📁 项目结构（最新更新：2025-02-13）
-
-EasyTool.Core 采用**模块化分类结构**，所有工具按功能领域清晰划分到 15 个分类目录中：
-
-### 📂 分类概览
-
-| 分类 | 文件数 | 功能描述 |
-|------|--------|----------|
-| **BusinessCategory** | 1 | 业务数据处理（社会信用代码） |
-| **CodeCategory** | 5 | 加密/编码工具（AES/DES/编码/哈希/十六进制） |
-| **CollectionsCategory** | 7 | 集合扩展操作（数组/字典/链表/列表/队列/栈） |
-| **ColorCategory** | 1 | 颜色处理扩展 |
-| **ConvertCategory** | 1 | 数据类型转换工具 |
-| **DateTimeCategory** | 4 | 日期时间处理（扩展/工具/日历/计时器） |
-| **IdentifierCategory** | 1 | 标识符生成工具（UUID/ObjectId/Snowflake） |
-| **IOCategory** | 7 | 文件/流/压缩操作（文件系统/文件类型/流/监控/ZIP） |
-| **MathCategory** | 4 | 数学工具（计算/预测/随机数） |
-| **NetCategory** | 3 | 网络工具（HTTP/IP/URL） |
-| **ReflectCategory** | 3 | 反射/类型/属性扩展 |
-| **Standardization** | 3 | 标准化类型（Option/QueryPage/Result） |
-| **SystemCategory** | 2 | 系统环境工具（环境变量/系统信息） |
-| **TextCategory** | 9 | 文本处理工具（正则/字符串/分割/XML/表情/脱敏） |
-| **ToolCategory** | 8 | 通用扩展方法（委托/枚举/异常/GUID/对象/映射/任务/分页） |
-
-### 📋 各分类详细说明
-
-#### **BusinessCategory** - 业务数据处理
-```
-CreditCodeUtil.cs - 中国社会信用代码的验证和处理工具
-```
-
-#### **CodeCategory** - 加密/编码工具
-```
-AesUtil.cs - AES 加密/解密（支持 ECB/CBC 模式）
-DesUtil.cs - DES 加密/解密（支持 ECB 模式）
-EncodingUtil.cs - 编码转换工具
-HashUtil.cs - 17 种哈希算法（加法/旋转/Bernstein/FNV/DJB/BKDR 等）
-HexUtil.cs - 十六进制转换工具
-```
-
-#### **CollectionsCategory** - 集合扩展操作
-```
-ArrayExtension.cs - 数组操作扩展
-DictionaryExtension.cs - 字典操作扩展
-IEnumerableExtensions.cs - IEnumerable 集合遍历扩展
-LinkedListUtil.cs - 链表操作工具
-ListExtension.cs - 列表操作扩展
-QueueUtil.cs - 队列操作工具
-StackUtil.cs - 栈操作工具
-```
-
-#### **ColorCategory** - 颜色处理
-```
-ColorExtension.cs - 颜色扩展（RGB/HSV/HEX 转换）
-```
-
-#### **ConvertCategory** - 数据类型转换
-```
-ConvertExtension.cs - 通用数据类型转换（ToByte/ToShort/ToInt/ToLong/ToFloat/ToDouble/ToDecimal）
-```
-
-#### **DateTimeCategory** - 日期时间处理
-```
-DateTimeExtension.cs - DateTime 类型扩展方法
-DateTimeUtil.cs - 日期时间工具类
-LunarCalendarUtil.cs - 农历工具
-TimerUtil.cs - 计时器工具
-```
-
-#### **IdentifierCategory** - 标识符生成
-```
-IdUtil.cs - ID 生成工具（有序 UUID/ObjectId/Snowflake ID）
-```
-
-#### **IOCategory** - 文件/流/压缩
-```
-FileSystemExtension.cs - 文件系统操作扩展
-FileTypeExtension.cs - 文件类型判断
-FileUtil.cs - 文件操作工具
-StreamExtension.cs - 流操作扩展
-Tailer.cs - 文件尾部追踪工具
-WatchMonitor.cs - 文件监控工具
-ZipUtil.cs - ZIP 压缩工具
-```
-
-#### **MathCategory** - 数学工具
-```
-MathUtil.cs - 数学计算工具
-NumberExtension.cs - 数字类型扩展（偶数/质数/二进制/十六进制）
-PredictUtil.cs - 预测算法工具
-RandomUtil.cs - 随机数生成工具
-```
-
-#### **NetCategory** - 网络工具
-```
-HttpClientExtension.cs - HttpClient 扩展
-IpUtil.cs - IP 地址处理工具
-URLUtil.cs - URL 处理工具
-```
-
-#### **ReflectCategory** - 反射/类型/属性扩展
-```
-PropertyInfoExtension.cs - PropertyInfo 扩展（值获取/设置/特性检查）
-ReflectUtil.cs - 反射工具类
-TypeExtension.cs - Type 类型扩展（类型判断/友好名称/默认值）
-```
-
-#### **Standardization** - 标准化类型
-```
-Option.cs - 选项对象（用于前端下拉）
-QueryPage.cs - 分页查询对象
-Result.cs - 统一结果对象
-```
-
-#### **SystemCategory** - 系统环境工具
-```
-EnvUtil.cs - 环境变量工具
-SystemUtil.cs - 系统信息工具
-```
-
-#### **TextCategory** - 文本处理工具（9个文件）
-```
-RegexUtil.cs - 正则表达式工具
-StringBuilderExtension.cs - StringBuilder 扩展
-StringComparisonExtension.cs - 字符串比较扩展
-StringExtension.cs - 字符串验证扩展（邮箱/手机/URL/身份证等）
-StrSplitter.cs - 字符串分割工具
-StrUtil.cs - 字符串处理工具（命名转换/空格处理）
-XmlUtil.cs - XML 处理工具
-EmojiUtil.cs - 表情符号处理工具
-DesensitizedUtil.cs - 数据脱敏工具（手机号/身份证/银行卡等）
-```
-
-#### **ToolCategory** - 通用扩展方法（8个文件）
-```
-DelegateExtension.cs - 委托扩展（安全调用）
-EnumExtension.cs - 枚举扩展（获取描述）
-ExceptionExtension.cs - 异常扩展（获取完整异常信息）
-GuidExtension.cs - Guid 扩展（空值判断）
-ObjectExtension.cs - 对象扩展（深拷贝/JSON序列化）
-SimpleMapExtension.cs - 简单对象映射扩展
-TaskExtension.cs - Task 异步扩展（Fire-and-Forget）
-PageUtil.cs - 分页工具（支持多种数据源和排序方式）
-```
-
----
-
-### 📈 优化历程
-
-本次更新主要完成了以下结构优化工作：
-
-1. ✅ **ReflectCategory 扩展** - PropertyInfoExtension、TypeExtension 移入
-2. ✅ **TextCategory 扩展** - StringComparisonExtension、StringExtension、EmojiUtil、DesensitizedUtil、StringBuilderExtension 移入
-3. ✅ **CollectionsCategory 扩展** - IEnumerableExtensions 合并
-4. ✅ **IdentifierCategory 新建** - ID 生成工具独立分类
-5. ✅ **BusinessCategory 新建** - 业务数据处理独立分类
-6. ✅ **ColorCategory 精简** - 颜色处理单独分类
-7. ✅ **ToolCategory 优化** - SimpleMapExtension、PageUtil 移入
-8. ✅ **空壳文件清理** - 删除仅含 Obsolete 方法的文件
-
-**最终状态**：**15 个分类，55 个源文件**，结构清晰、功能明确、无重复代码。
-
----
-
-> 项目采用模块化设计，每个分类职责单一，便于查找和维护。所有工具类都使用静态方法，无需实例化即可使用。
-
-## 代码共享
+> EasyTool - 让开发更简单 ✨

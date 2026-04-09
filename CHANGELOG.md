@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-04-09
+
+### 🔄 Changed
+
+- **Test Project Consolidation**
+  - Merged `EasyTool.CoreTests` into `EasyTool.UnitTests`
+  - Converted MSTest format to xUnit format
+  - Removed duplicate test project
+
+### 🐛 Fixed
+
+- Fixed XML comment format errors in `NPOIUtil.cs` (escaped `<T>` to `&lt;T&gt;`)
+- Fixed async test warnings in `SpellCheckerUtilExtendedTests.cs` (changed `.Wait()` to `await`)
+
+### 📚 Documentation
+
+- Updated project structure documentation
+- Clarified project positioning: lightweight, zero-dependency, filling gaps, Chinese-friendly
+
+---
+
 ## [1.1.0] - 2026-04-07
 
 ### 🎉 Major Changes
