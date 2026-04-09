@@ -7,6 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.1] - 2026-04-09
 
+### ✨ Added
+
+#### Chinese-Specific Business Utilities
+
+- **ChineseNameUtil** - Chinese name generator
+  - Random generation with common surnames (100+) and compound surnames (16)
+  - Gender-specific name characters
+  - Batch generation support
+
+- **UniversityUtil** - Chinese university information
+  - 985/211/Double FirstClass flags
+  - Search by code, name, province, city
+  - University type and level classification
+
+- **PhoneLocationUtil** - Phone number location lookup
+  - Carrier identification (Mobile/Unicom/Telecom)
+  - Province and city lookup by phone number
+  - Area code and zip code information
+
+- **CompanyUtil** - Company name generator
+  - Industry-specific name generation
+  - Company type variations
+  - Full company info generation with address
+
+- **AddressUtil** - Chinese address generator
+  - Province/City/District hierarchy support
+  - Realistic road and community names
+  - Building and commercial area names
+
+#### Chinese Text Utilities
+
+- **ChineseNumberUtil** - Chinese number conversion
+  - Number to Chinese (简体/繁体)
+  - Chinese to number
+  - Money amount to Chinese uppercase (金额大写)
+
+- **RegionUtil** - Administrative region utilities
+  - Province/City/District three-level hierarchy
+  - Code lookup and name search
+  - Full path generation
+
+- **ChineseHolidayUtil** - Chinese holiday utilities
+  - Legal holiday and workday determination
+  - Adjusted workday (调休) support
+  - Traditional holiday detection
+  - Workday calculation between dates
+
+- **ChinesePinyinUtil** - Chinese pinyin conversion
+  - Hanzi to pinyin conversion
+  - Pinyin initial extraction
+  - Tone number support
+
+- **PlateNumberUtil** - Vehicle plate number utilities
+  - Plate number validation
+  - Location lookup (province/city)
+  - New energy plate detection
+
+- **SolarTermUtil** - 24 solar terms utilities
+  - Solar term query for specific date
+  - Next/previous solar term
+  - Season determination
+
+- **SocialCreditCodeUtil** - Unified social credit code utilities
+  - Credit code validation
+  - Institution type parsing
+  - Department and region extraction
+
 ### 🔄 Changed
 
 - **Test Project Consolidation**
