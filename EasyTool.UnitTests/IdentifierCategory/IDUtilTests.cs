@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using EasyTool.IdentifierCategory;
 using System;
 using System.Collections.Generic;
@@ -9,17 +9,17 @@ using System.Diagnostics;
 
 namespace EasyTool.Tests
 {
-    [TestClass]
+    
     public class IdUtilTests
     {
-        [TestMethod]
+        [Fact]
         public void NextSequenceUUID_AreGreaterThan()
         {
             var uuid1 = IdUtil.UUID(UUIDStyle.Sequence);
             Thread.Sleep(10);
             var uuid2 = IdUtil.UUID(UUIDStyle.Sequence);
 
-            Assert.IsGreaterThan(uuid1.ToString(), uuid2.ToString());
+            Assert.True(string.Compare(uuid1.ToString(), uuid2.ToString(), StringComparison.Ordinal) < 0);
         }
     }
 }

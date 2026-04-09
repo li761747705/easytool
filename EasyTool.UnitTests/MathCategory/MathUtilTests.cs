@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using EasyTool.MathCategory;
 using System;
 using System.Collections.Generic;
@@ -6,14 +6,14 @@ using System.Text;
 
 namespace EasyTool.Tests
 {
-    [TestClass()]
+    
     public class MathUtilTests
     {
-        [TestMethod()]
+        [Fact]
         public void GcdTest()
         {
             var result = MathUtil.Gcd(5, 20);
-            Assert.AreEqual(5, result);
+            Assert.Equal(5, result);
         }
     }
 }

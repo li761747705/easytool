@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using EasyTool.ToolCategory;
 
 using System;
@@ -11,10 +11,10 @@ using System.Collections;
 
 namespace EasyTool.Tests
 {
-    [TestClass()]
+    
     public class SimpleMapExtensionsTests
     {
-        [TestMethod()]
+        [Fact]
         public void SimpleMapTest()
         {
             ClassA classA = new ClassA()
@@ -30,7 +30,7 @@ namespace EasyTool.Tests
            
 
         }
-        [TestMethod()]
+        [Fact]
         public void ListSimpleMapTest()
         {
             ClassA classA = new ClassA()

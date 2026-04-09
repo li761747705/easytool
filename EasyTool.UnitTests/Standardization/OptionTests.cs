@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using EasyTool.Standardization;
 using System;
 using System.Collections.Generic;
@@ -9,28 +9,28 @@ using System.ComponentModel;
 
 namespace EasyTool.Tests
 {
-    [TestClass()]
+    
     public class OptionTests
     {
-        [TestMethod()]
+        [Fact]
         public void ToOptionsTest()
         {
             var options = new LogLevel().ToOptions();
-            Assert.IsNotNull(options);
-            Assert.HasCount(4, options);
-            Assert.AreEqual("Debug", options[0].Value);
-            Assert.AreEqual("调试", options[0].Text);
+            Assert.NotNull(options);
+            Assert.Equal(4, options.Count);
+            Assert.Equal("Debug", options[0].Value);
+            Assert.Equal("调试", options[0].Text);
 
         }
 
-        [TestMethod()]
+        [Fact]
         public void GetOptionsTest()
         {
             var options = IOption.GetOptions<LogLevel>();
-            Assert.IsNotNull(options);
-            Assert.HasCount(4, options);
-            Assert.AreEqual("Debug", options[0].Value);
-            Assert.AreEqual("调试", options[0].Text);
+            Assert.NotNull(options);
+            Assert.Equal(4, options.Count);
+            Assert.Equal("Debug", options[0].Value);
+            Assert.Equal("调试", options[0].Text);
         }
 
         public class LogLevel : IOption

@@ -1,12 +1,12 @@
 ﻿using EasyTool.ToolCategory;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace EasyTool.Tests
 {
-    [TestClass()]
+    
     public class CloneExtensionTests
     {
-        [TestMethod()]
+        [Fact]
         public void DeepCloneTest()
         {
             var obj1 = new First()
@@ -26,8 +26,8 @@ namespace EasyTool.Tests
             };
             var obj2 = obj1.DeepClone();
 
-            Assert.AreEqual(obj1.MyProperty1, obj2.MyProperty1);
-            Assert.AreEqual(obj1.Second1.MyProperty1, obj2.Second1.MyProperty1);
+            Assert.Equal(obj1.MyProperty1, obj2.MyProperty1);
+            Assert.Equal(obj1.Second1.MyProperty1, obj2.Second1.MyProperty1);
         }
 
         [Serializable]
