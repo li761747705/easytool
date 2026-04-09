@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<Nullable>annotations</Nullable>
+		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Core", ""))</RootNamespace>
+
+		<PackageId>Joce.EasyTool.AI</PackageId>
+		<Authors>一个大西瓜,TimChen</Authors>
+		<Version>1.1.0</Version>
+		<Description>
+			EasyTool AI 扩展 - 向量相似度、Prompt模板、Token计数、文本摘要等AI辅助工具
+		</Description>
+		<PackageTags>Tool AI OpenAI Vector Prompt NLP</PackageTags>
+		<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
+		<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageIcon>logo.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\logo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<!-- 可选 OpenAI SDK 依赖，用户按需引入 -->
+	<ItemGroup>
+		<PackageReference Include="System.Text.Json" Version="9.0.0" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
+	</ItemGroup>
+
+</Project>

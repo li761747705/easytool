@@ -1,0 +1,37 @@
+<Project>
+  <PropertyGroup>
+    <!-- 版本信息 -->
+    <Version>1.1.0</Version>
+    <Company>EasyTool</Company>
+    <Authors>EasyTool Team</Authors>
+    <Product>EasyTool</Product>
+    <Description>EasyTool - .NET工具库，对标Java Hutool</Description>
+    <Copyright>Copyright © 2024-2026 EasyTool Team</Copyright>
+
+    <!-- 项目URL -->
+    <PackageProjectUrl>https://github.com/dotnet-easy/easytool</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotnet-easy/easytool.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo.png</PackageIcon>
+
+    <!-- 构建配置 -->
+    <LangVersion>latest</LangVersion>
+    <Nullable>annotations</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- 包发布配置 -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\logo.png" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+</Project>

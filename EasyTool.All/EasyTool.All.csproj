@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<Nullable>annotations</Nullable>
+		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Core", ""))</RootNamespace>
+
+		<PackageId>Joce.EasyTool.All</PackageId>
+		<Authors>一个大西瓜,TimChen</Authors>
+		<Version>2026.0108.1</Version>
+		<Description>
+			EasyTool 全功能整合包 - .NET 版的 Hutool，一站式小工具库。包含核心工具、媒体处理、AI辅助、系统操作等所有模块。
+		</Description>
+		<PackageTags>Tool Hutool Utility All-in-One</PackageTags>
+		<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
+		<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageIcon>logo.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\logo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<!-- 引用所有模块 -->
+	<ItemGroup>
+		<ProjectReference Include="..\EasyTool.Core\EasyTool.Core.csproj" />
+		<ProjectReference Include="..\EasyTool.Media\EasyTool.Media.csproj" />
+		<ProjectReference Include="..\EasyTool.AI\EasyTool.AI.csproj" />
+		<ProjectReference Include="..\EasyTool.System\EasyTool.System.csproj" />
+		<ProjectReference Include="..\EasyTool.NPOI\EasyTool.NPOI.csproj" />
+		<ProjectReference Include="..\EasyTool.EmitMapper\EasyTool.EmitMapper.csproj" />
+	</ItemGroup>
+
+</Project>

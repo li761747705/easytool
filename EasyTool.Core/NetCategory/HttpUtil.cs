@@ -377,5 +377,271 @@ namespace EasyTool.NetCategory
         }
 
         #endregion
+
+        #region 重试机制
+
+        /// <summary>
+        /// 带重试的HTTP请求
+        /// </summary>
+        /// <param name="requestFactory">请求工厂（每次重试创建新请求）</param>
+        /// <param name="maxRetries">最大重试次数</param>
+        /// <param name="retryDelay">重试延迟</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>HTTP响应</returns>
+        public static async Task<HttpResponseMessage> WithRetryAsync(
+            Func<HttpRequestMessage> requestFactory,
+            int maxRetries = 3,
+            TimeSpan? retryDelay = null,
+            CancellationToken cancellationToken = default)
+        {
+            var delay = retryDelay ?? TimeSpan.FromSeconds(1);
+            Exception? lastException = null;
+
+            for (int i = 0; i <= maxRetries; i++)
+            {
+                try
+                {
+                    using var request = requestFactory();
+                    var response = await _sharedClient.SendAsync(request, cancellationToken);
+
+                    if (response.IsSuccessStatusCode || i == maxRetries)
+                    {
+                        return response;
+                    }
+
+                    // 服务器错误时重试
+                    if ((int)response.StatusCode >= 500)
+                    {
+                        await Task.Delay(delay * (i + 1), cancellationToken);
+                        continue;
+                    }
+
+                    return response;
+                }
+                catch (HttpRequestException ex)
+                {
+                    lastException = ex;
+                    if (i < maxRetries)
+                    {
+                        await Task.Delay(delay * (i + 1), cancellationToken);
+                    }
+                }
+                catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+                {
+                    lastException = ex;
+                    if (i < maxRetries)
+                    {
+                        await Task.Delay(delay * (i + 1), cancellationToken);
+                    }
+                }
+            }
+
+            throw lastException ?? new HttpRequestException("请求失败");
+        }
+
+        /// <summary>
+        /// 带指数退避的重试
+        /// </summary>
+        /// <param name="requestFactory">请求工厂</param>
+        /// <param name="maxRetries">最大重试次数</param>
+        /// <param name="baseDelay">基础延迟</param>
+        /// <param name="maxDelay">最大延迟</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>HTTP响应</returns>
+        public static async Task<HttpResponseMessage> WithExponentialBackoffAsync(
+            Func<HttpRequestMessage> requestFactory,
+            int maxRetries = 5,
+            TimeSpan? baseDelay = null,
+            TimeSpan? maxDelay = null,
+            CancellationToken cancellationToken = default)
+        {
+            var baseDelayTime = baseDelay ?? TimeSpan.FromSeconds(1);
+            var maxDelayTime = maxDelay ?? TimeSpan.FromMinutes(1);
+            var random = new Random();
+            Exception? lastException = null;
+
+            for (int i = 0; i <= maxRetries; i++)
+            {
+                try
+                {
+                    using var request = requestFactory();
+                    var response = await _sharedClient.SendAsync(request, cancellationToken);
+
+                    if (response.IsSuccessStatusCode || i == maxRetries)
+                    {
+                        return response;
+                    }
+
+                    if ((int)response.StatusCode >= 500)
+                    {
+                        var delay = CalculateExponentialDelay(i, baseDelayTime, maxDelayTime, random);
+                        await Task.Delay(delay, cancellationToken);
+                        continue;
+                    }
+
+                    return response;
+                }
+                catch (HttpRequestException ex)
+                {
+                    lastException = ex;
+                    if (i < maxRetries)
+                    {
+                        var delay = CalculateExponentialDelay(i, baseDelayTime, maxDelayTime, random);
+                        await Task.Delay(delay, cancellationToken);
+                    }
+                }
+                catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+                {
+                    lastException = ex;
+                    if (i < maxRetries)
+                    {
+                        var delay = CalculateExponentialDelay(i, baseDelayTime, maxDelayTime, random);
+                        await Task.Delay(delay, cancellationToken);
+                    }
+                }
+            }
+
+            throw lastException ?? new HttpRequestException("请求失败");
+        }
+
+        private static TimeSpan CalculateExponentialDelay(int retryCount, TimeSpan baseDelay, TimeSpan maxDelay, Random random)
+        {
+            // 指数退避 + 抖动
+            var exponentialDelay = TimeSpan.FromTicks(baseDelay.Ticks * (long)Math.Pow(2, retryCount));
+            var jitter = TimeSpan.FromMilliseconds(random.Next(0, 1000));
+            var totalDelay = exponentialDelay + jitter;
+
+            return totalDelay > maxDelay ? maxDelay : totalDelay;
+        }
+
+        /// <summary>
+        /// 创建带重试策略的HttpClient包装器
+        /// </summary>
+        /// <param name="client">HttpClient实例</param>
+        /// <param name="maxRetries">最大重试次数</param>
+        /// <param name="retryDelay">重试延迟</param>
+        /// <returns>重试客户端包装器</returns>
+        public static RetryHttpClientWrapper CreateRetryWrapper(HttpClient client, int maxRetries = 3, TimeSpan? retryDelay = null)
+        {
+            return new RetryHttpClientWrapper(client, maxRetries, retryDelay);
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// 重试HttpClient包装器
+    /// </summary>
+    public class RetryHttpClientWrapper
+    {
+        private readonly HttpClient _client;
+        private readonly int _maxRetries;
+        private readonly TimeSpan _retryDelay;
+
+        /// <summary>
+        /// 创建重试包装器
+        /// </summary>
+        public RetryHttpClientWrapper(HttpClient client, int maxRetries = 3, TimeSpan? retryDelay = null)
+        {
+            _client = client;
+            _maxRetries = maxRetries;
+            _retryDelay = retryDelay ?? TimeSpan.FromSeconds(1);
+        }
+
+        /// <summary>
+        /// 发送带重试的请求
+        /// </summary>
+        public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
+        {
+            Exception? lastException = null;
+
+            for (int i = 0; i <= _maxRetries; i++)
+            {
+                try
+                {
+                    // 克隆请求（因为HttpRequestMessage只能发送一次）
+                    var clonedRequest = await CloneRequestAsync(request);
+                    var response = await _client.SendAsync(clonedRequest, cancellationToken);
+
+                    if (response.IsSuccessStatusCode || i == _maxRetries)
+                    {
+                        return response;
+                    }
+
+                    if ((int)response.StatusCode >= 500)
+                    {
+                        await Task.Delay(_retryDelay * (i + 1), cancellationToken);
+                        continue;
+                    }
+
+                    return response;
+                }
+                catch (HttpRequestException ex)
+                {
+                    lastException = ex;
+                    if (i < _maxRetries)
+                    {
+                        await Task.Delay(_retryDelay * (i + 1), cancellationToken);
+                    }
+                }
+                catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+                {
+                    lastException = ex;
+                    if (i < _maxRetries)
+                    {
+                        await Task.Delay(_retryDelay * (i + 1), cancellationToken);
+                    }
+                }
+            }
+
+            throw lastException ?? new HttpRequestException("请求失败");
+        }
+
+        private static async Task<HttpRequestMessage> CloneRequestAsync(HttpRequestMessage request)
+        {
+            var clone = new HttpRequestMessage(request.Method, request.RequestUri);
+
+            if (request.Content != null)
+            {
+                var content = await request.Content.ReadAsByteArrayAsync();
+                clone.Content = new ByteArrayContent(content);
+
+                foreach (var header in request.Content.Headers)
+                {
+                    clone.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                }
+            }
+
+            foreach (var header in request.Headers)
+            {
+                clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+
+            return clone;
+        }
+
+        /// <summary>
+        /// GET请求
+        /// </summary>
+        public async Task<string> GetStringAsync(string url, CancellationToken cancellationToken = default)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            using var response = await SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// POST请求
+        /// </summary>
+        public async Task<string> PostJsonAsync<T>(string url, T data, CancellationToken cancellationToken = default)
+        {
+            var json = JsonSerializer.Serialize(data);
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var response = await SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
     }
 }

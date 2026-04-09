@@ -124,6 +124,16 @@ namespace EasyTool.QueueCategory
         /// 死信队列是否启用
         /// </summary>
         public bool EnableDeadLetterQueue { get; set; } = true;
+
+        /// <summary>
+        /// 是否启用持久化
+        /// </summary>
+        public bool EnablePersistence { get; set; } = false;
+
+        /// <summary>
+        /// 持久化文件路径
+        /// </summary>
+        public string? PersistenceFilePath { get; set; }
     }
 
     /// <summary>
@@ -425,12 +435,96 @@ namespace EasyTool.QueueCategory
         {
             if (!_disposed)
             {
+                // 自动保存持久化
+                if (_options.EnablePersistence)
+                {
+                    SaveToPersistenceAsync().GetAwaiter().GetResult();
+                }
                 _cts.Cancel();
                 _signal.Dispose();
                 _cts.Dispose();
                 _disposed = true;
             }
         }
+
+        #region 持久化
+
+        /// <summary>
+        /// 保存消息到持久化文件
+        /// </summary>
+        public async Task SaveToPersistenceAsync()
+        {
+            if (!_options.EnablePersistence || string.IsNullOrEmpty(_options.PersistenceFilePath))
+                return;
+
+            var allMessages = new List<Message<T>>();
+
+            // 收集所有队列中的消息
+            while (_normalQueue.TryDequeue(out var msg)) allMessages.Add(msg);
+            while (_priorityQueue.TryDequeue(out var pMsg, out _)) allMessages.Add(pMsg);
+            while (_delayedQueue.TryDequeue(out var dMsg)) allMessages.Add(dMsg);
+
+            try
+            {
+                var json = System.Text.Json.JsonSerializer.Serialize(allMessages);
+                var directory = System.IO.Path.GetDirectoryName(_options.PersistenceFilePath);
+                if (!string.IsNullOrEmpty(directory) && !System.IO.Directory.Exists(directory))
+                {
+                    System.IO.Directory.CreateDirectory(directory);
+                }
+                await System.IO.File.WriteAllTextAsync(_options.PersistenceFilePath, json);
+            }
+            catch
+            {
+                // 忽略持久化错误
+            }
+        }
+
+        /// <summary>
+        /// 从持久化文件加载消息
+        /// </summary>
+        public async Task LoadFromPersistenceAsync()
+        {
+            if (!_options.EnablePersistence || string.IsNullOrEmpty(_options.PersistenceFilePath))
+                return;
+
+            if (!System.IO.File.Exists(_options.PersistenceFilePath))
+                return;
+
+            try
+            {
+                var json = await System.IO.File.ReadAllTextAsync(_options.PersistenceFilePath);
+                var messages = System.Text.Json.JsonSerializer.Deserialize<List<Message<T>>>(json);
+
+                if (messages != null)
+                {
+                    foreach (var message in messages)
+                    {
+                        if (message.IsExpired) continue;
+
+                        if (message.DelayTo != null && message.DelayTo > DateTime.UtcNow)
+                        {
+                            _delayedQueue.Enqueue(message);
+                        }
+                        else if (message.Priority > 0)
+                        {
+                            _priorityQueue.Enqueue(message, -message.Priority);
+                        }
+                        else
+                        {
+                            _normalQueue.Enqueue(message);
+                        }
+                        _signal.Release();
+                    }
+                }
+            }
+            catch
+            {
+                // 忽略加载错误
+            }
+        }
+
+        #endregion
     }
 
     /// <summary>

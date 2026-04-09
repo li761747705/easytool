@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 
 namespace EasyTool.ReflectCategory
 {
@@ -9,6 +12,189 @@ namespace EasyTool.ReflectCategory
     /// </summary>
     public static class EnumUtil
     {
+        #region Description 属性相关
+
+        /// <summary>
+        /// 获取枚举值的 Description 属性描述
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <param name="value">枚举值</param>
+        /// <returns>Description 描述，如果没有则返回枚举名称</returns>
+        public static string GetDescription<T>(T value) where T : struct, Enum
+        {
+            var field = typeof(T).GetField(value.ToString());
+            if (field == null) return value.ToString();
+
+            var attr = field.GetCustomAttribute<DescriptionAttribute>();
+            return attr?.Description ?? value.ToString();
+        }
+
+        /// <summary>
+        /// 获取所有枚举值的描述字典
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <returns>枚举值与描述的字典</returns>
+        public static Dictionary<T, string> GetAllDescriptions<T>() where T : struct, Enum
+        {
+            var result = new Dictionary<T, string>();
+            foreach (var value in GetValues<T>())
+            {
+                result[value] = GetDescription(value);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 根据描述查找枚举值
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <param name="description">描述文本</param>
+        /// <param name="ignoreCase">是否忽略大小写</param>
+        /// <returns>匹配的枚举值，未找到则返回 null</returns>
+        public static T? FromDescription<T>(string description, bool ignoreCase = true) where T : struct, Enum
+        {
+            if (string.IsNullOrEmpty(description)) return null;
+
+            foreach (var value in GetValues<T>())
+            {
+                var desc = GetDescription(value);
+                if (ignoreCase)
+                {
+                    if (string.Equals(desc, description, StringComparison.OrdinalIgnoreCase))
+                        return value;
+                }
+                else
+                {
+                    if (desc == description)
+                        return value;
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region Display 属性相关
+
+        /// <summary>
+        /// 获取枚举值的 Display 属性名称
+        /// 优先返回 Display(Name=)，如果没有则返回 Description，都没有则返回枚举名称
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <param name="value">枚举值</param>
+        /// <returns>显示名称</returns>
+        public static string GetDisplayName<T>(T value) where T : struct, Enum
+        {
+            var field = typeof(T).GetField(value.ToString());
+            if (field == null) return value.ToString();
+
+            // 优先使用 Display 属性
+            var displayAttr = field.GetCustomAttribute<DisplayAttribute>();
+            if (displayAttr != null && !string.IsNullOrEmpty(displayAttr.Name))
+            {
+                return displayAttr.Name;
+            }
+
+            // 其次使用 Description 属性
+            var descAttr = field.GetCustomAttribute<DescriptionAttribute>();
+            if (descAttr != null)
+            {
+                return descAttr.Description;
+            }
+
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// 获取所有枚举值的显示名称字典
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <returns>枚举值与显示名称的字典</returns>
+        public static Dictionary<T, string> GetAllDisplayNames<T>() where T : struct, Enum
+        {
+            var result = new Dictionary<T, string>();
+            foreach (var value in GetValues<T>())
+            {
+                result[value] = GetDisplayName(value);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 根据显示名称查找枚举值
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <param name="displayName">显示名称</param>
+        /// <param name="ignoreCase">是否忽略大小写</param>
+        /// <returns>匹配的枚举值，未找到则返回 null</returns>
+        public static T? FromDisplayName<T>(string displayName, bool ignoreCase = true) where T : struct, Enum
+        {
+            if (string.IsNullOrEmpty(displayName)) return null;
+
+            foreach (var value in GetValues<T>())
+            {
+                var name = GetDisplayName(value);
+                if (ignoreCase)
+                {
+                    if (string.Equals(name, displayName, StringComparison.OrdinalIgnoreCase))
+                        return value;
+                }
+                else
+                {
+                    if (name == displayName)
+                        return value;
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region 带描述的枚举项
+
+        /// <summary>
+        /// 获取带描述的枚举项列表
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <returns>带描述的枚举项列表</returns>
+        public static IEnumerable<EnumItemWithDescription<T>> GetItemsWithDescription<T>() where T : struct, Enum
+        {
+            foreach (var value in GetValues<T>())
+            {
+                yield return new EnumItemWithDescription<T>
+                {
+                    Name = value.ToString(),
+                    Value = value,
+                    IntValue = Convert.ToInt32(value),
+                    Description = GetDescription(value)
+                };
+            }
+        }
+
+        /// <summary>
+        /// 获取完整的枚举项信息（包含 Description 和 Display）
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <returns>完整信息的枚举项列表</returns>
+        public static IEnumerable<EnumItemFull<T>> GetItemsFull<T>() where T : struct, Enum
+        {
+            foreach (var value in GetValues<T>())
+            {
+                yield return new EnumItemFull<T>
+                {
+                    Name = value.ToString(),
+                    Value = value,
+                    IntValue = Convert.ToInt32(value),
+                    Description = GetDescription(value),
+                    DisplayName = GetDisplayName(value)
+                };
+            }
+        }
+
+        #endregion
+
+        #region 基础方法
+
         /// <summary>
         /// 获取枚举所有值
         /// </summary>
@@ -182,6 +368,8 @@ namespace EasyTool.ReflectCategory
             }
             return (T)Enum.ToObject(typeof(T), result);
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -207,6 +395,73 @@ namespace EasyTool.ReflectCategory
         public override string ToString()
         {
             return $"{Name} ({IntValue})";
+        }
+    }
+
+    /// <summary>
+    /// 带描述的枚举项信息
+    /// </summary>
+    public class EnumItemWithDescription<T> where T : struct, Enum
+    {
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 枚举值
+        /// </summary>
+        public T Value { get; set; }
+
+        /// <summary>
+        /// 整数值
+        /// </summary>
+        public int IntValue { get; set; }
+
+        /// <summary>
+        /// Description 属性描述
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
+
+        public override string ToString()
+        {
+            return $"{Name} ({IntValue}): {Description}";
+        }
+    }
+
+    /// <summary>
+    /// 完整的枚举项信息（包含 Description 和 Display）
+    /// </summary>
+    public class EnumItemFull<T> where T : struct, Enum
+    {
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 枚举值
+        /// </summary>
+        public T Value { get; set; }
+
+        /// <summary>
+        /// 整数值
+        /// </summary>
+        public int IntValue { get; set; }
+
+        /// <summary>
+        /// Description 属性描述
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Display 属性显示名称
+        /// </summary>
+        public string DisplayName { get; set; } = string.Empty;
+
+        public override string ToString()
+        {
+            return $"{Name} ({IntValue}): {DisplayName}";
         }
     }
 }
