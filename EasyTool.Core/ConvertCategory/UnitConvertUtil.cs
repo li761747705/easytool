@@ -107,7 +107,7 @@ namespace EasyTool.ConvertCategory
                 TemperatureUnit.Celsius => value,
                 TemperatureUnit.Fahrenheit => (value - 32) * 5 / 9,
                 TemperatureUnit.Kelvin => value - 273.15,
-                _ => throw new ArgumentException("Invalid temperature unit")
+                _ => throw new ArgumentException("无效的温度单位")
             };
 
             // 再从摄氏度转换为目标单位
@@ -116,7 +116,7 @@ namespace EasyTool.ConvertCategory
                 TemperatureUnit.Celsius => celsius,
                 TemperatureUnit.Fahrenheit => celsius * 9 / 5 + 32,
                 TemperatureUnit.Kelvin => celsius + 273.15,
-                _ => throw new ArgumentException("Invalid temperature unit")
+                _ => throw new ArgumentException("无效的温度单位")
             };
         }
 
@@ -327,7 +327,7 @@ namespace EasyTool.ConvertCategory
                 AngleUnit.Radian => value * 180 / Math.PI,
                 AngleUnit.Gradian => value * 0.9,
                 AngleUnit.Turn => value * 360,
-                _ => throw new ArgumentException("Invalid angle unit")
+                _ => throw new ArgumentException("无效的角度单位")
             };
 
             // 再从度转换为目标单位
@@ -337,7 +337,7 @@ namespace EasyTool.ConvertCategory
                 AngleUnit.Radian => degrees * Math.PI / 180,
                 AngleUnit.Gradian => degrees / 0.9,
                 AngleUnit.Turn => degrees / 360,
-                _ => throw new ArgumentException("Invalid angle unit")
+                _ => throw new ArgumentException("无效的角度单位")
             };
         }
 

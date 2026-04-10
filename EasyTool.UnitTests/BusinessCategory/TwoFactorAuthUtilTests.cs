@@ -124,5 +124,66 @@ namespace EasyTool.UnitTests.BusinessCategory
             Assert.True(TwoFactorAuthUtil.VerifyTotp(secret, code1));
             Assert.True(TwoFactorAuthUtil.VerifyTotp(secret, code2));
         }
+
+        #region 边界测试
+
+        [Fact]
+        public void GenerateSecret_DefaultLength_ReturnsValidBase32()
+        {
+            var secret = TwoFactorAuthUtil.GenerateSecret();
+            Assert.True(secret.Length >= 16);
+            Assert.Matches("^[A-Z2-7]+=*$", secret);
+        }
+
+        [Fact]
+        public void GenerateTotp_InvalidSecret_ThrowsException()
+        {
+            // 无效的Base32密钥会触发解码异常
+            Assert.Throws<FormatException>(() => TwoFactorAuthUtil.GenerateTotp("INVALID!SECRET"));
+        }
+
+        [Fact]
+        public void VerifyTotp_WrongSecret_ReturnsFalse()
+        {
+            var secret1 = TwoFactorAuthUtil.GenerateSecret();
+            var secret2 = TwoFactorAuthUtil.GenerateSecret();
+            var code = TwoFactorAuthUtil.GenerateTotp(secret1);
+
+            Assert.False(TwoFactorAuthUtil.VerifyTotp(secret2, code));
+        }
+
+        [Fact]
+        public void GetRemainingSeconds_ReturnsValidRange()
+        {
+            var remaining = TwoFactorAuthUtil.GetRemainingSeconds();
+            Assert.InRange(remaining, 1, 30);
+        }
+
+        [Fact]
+        public void GetOtpAuthUri_ContainsAllRequiredParts()
+        {
+            var secret = TwoFactorAuthUtil.GenerateSecret();
+            var uri = TwoFactorAuthUtil.GetOtpAuthUri("TestApp", "user@test.com", secret);
+
+            Assert.StartsWith("otpauth://totp/", uri);
+            Assert.Contains("issuer=TestApp", uri);
+            Assert.Contains("secret=", uri);
+        }
+
+        [Fact]
+        public void VerifyTotp_AllZerosCode_ReturnsFalse()
+        {
+            var secret = TwoFactorAuthUtil.GenerateSecret();
+            Assert.False(TwoFactorAuthUtil.VerifyTotp(secret, "000000"));
+        }
+
+        [Fact]
+        public void VerifyTotp_AllNinesCode_ReturnsFalse()
+        {
+            var secret = TwoFactorAuthUtil.GenerateSecret();
+            Assert.False(TwoFactorAuthUtil.VerifyTotp(secret, "999999"));
+        }
+
+        #endregion
     }
 }

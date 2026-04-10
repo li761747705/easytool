@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -10,6 +12,30 @@ namespace EasyTool.TextCategory
     /// </summary>
     public static class StrExtension
     {
+        #region 编译缓存的正则表达式
+
+        private static readonly Regex EmailRegex = new(
+            @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+            RegexOptions.Compiled);
+
+        private static readonly Regex PhoneRegex = new(
+            @"^1[3-9]\d{9}$",
+            RegexOptions.Compiled);
+
+        private static readonly Regex UrlRegex = new(
+            @"^(https?|ftp)://[^\s/$.?#].[^\s]*$",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private static readonly Regex IPv4Regex = new(
+            @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+            RegexOptions.Compiled);
+
+        private static readonly Regex IdCardRegex = new(
+            @"^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$",
+            RegexOptions.Compiled);
+
+        #endregion
+
         #region 文本可为空判断
         #endregion
 
@@ -20,11 +46,7 @@ namespace EasyTool.TextCategory
         /// </summary>
         public static bool IsEmail(this string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-
-            const string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-            return Regex.IsMatch(value, pattern);
+            return !string.IsNullOrWhiteSpace(value) && EmailRegex.IsMatch(value);
         }
 
         /// <summary>
@@ -32,12 +54,7 @@ namespace EasyTool.TextCategory
         /// </summary>
         public static bool IsPhoneNumber(this string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-
-            // 中国大陆手机号：1开头，11位数字
-            const string pattern = @"^1[3-9]\d{9}$";
-            return Regex.IsMatch(value, pattern);
+            return !string.IsNullOrWhiteSpace(value) && PhoneRegex.IsMatch(value);
         }
 
         /// <summary>
@@ -45,11 +62,7 @@ namespace EasyTool.TextCategory
         /// </summary>
         public static bool IsUrl(this string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-
-            const string pattern = @"^(https?|ftp)://[^\s/$.?#].[^\s]*$";
-            return Regex.IsMatch(value, pattern, RegexOptions.IgnoreCase);
+            return !string.IsNullOrWhiteSpace(value) && UrlRegex.IsMatch(value);
         }
 
         /// <summary>
@@ -57,11 +70,7 @@ namespace EasyTool.TextCategory
         /// </summary>
         public static bool IsIPv4(this string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-
-            const string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-            return Regex.IsMatch(value, pattern);
+            return !string.IsNullOrWhiteSpace(value) && IPv4Regex.IsMatch(value);
         }
 
         /// <summary>
@@ -69,12 +78,7 @@ namespace EasyTool.TextCategory
         /// </summary>
         public static bool IsIdCard(this string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-
-            // 18位身份证号码
-            const string pattern = @"^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$";
-            return Regex.IsMatch(value, pattern);
+            return !string.IsNullOrWhiteSpace(value) && IdCardRegex.IsMatch(value);
         }
 
         #endregion
@@ -285,5 +289,246 @@ namespace EasyTool.TextCategory
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// 集合扩展方法
+    /// </summary>
+    public static class CollectionExtensions
+    {
+        /// <summary>
+        /// 遍历集合执行操作（支持链式调用）
+        /// </summary>
+        public static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        {
+            foreach (var item in source)
+            {
+                action(item);
+            }
+            return source;
+        }
+
+        /// <summary>
+        /// 判断集合是否为空或 null
+        /// </summary>
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T>? source)
+        {
+            return source == null || !source.Any();
+        }
+
+        /// <summary>
+        /// 判断集合是否不为空
+        /// </summary>
+        public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? source)
+        {
+            return source != null && source.Any();
+        }
+
+        /// <summary>
+        /// 将集合连接为字符串
+        /// </summary>
+        public static string JoinAsString<T>(this IEnumerable<T> source, string separator = ",")
+        {
+            return string.Join(separator, source);
+        }
+
+        /// <summary>
+        /// 根据属性去重
+        /// </summary>
+        public static IEnumerable<T> DistinctBy<T, TKey>(this IEnumerable<T> source, Func<T, TKey> keySelector)
+        {
+            return source.GroupBy(keySelector).Select(g => g.First());
+        }
+
+        /// <summary>
+        /// 批量处理
+        /// </summary>
+        public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> source, int batchSize)
+        {
+            var batch = new List<T>(batchSize);
+            foreach (var item in source)
+            {
+                batch.Add(item);
+                if (batch.Count == batchSize)
+                {
+                    yield return batch;
+                    batch = new List<T>(batchSize);
+                }
+            }
+            if (batch.Count > 0)
+            {
+                yield return batch;
+            }
+        }
+
+        /// <summary>
+        /// 随机选择元素
+        /// </summary>
+        public static T RandomElement<T>(this IEnumerable<T> source)
+        {
+            var list = source as IList<T> ?? source.ToList();
+            if (list.Count == 0)
+            {
+                throw new ArgumentException("集合不能为空");
+            }
+            return list[MathCategory.RandomUtil.RandomInt(0, list.Count)];
+        }
+
+        /// <summary>
+        /// 打乱顺序
+        /// </summary>
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
+        {
+            var random = new Random();
+            return source.OrderBy(_ => random.Next());
+        }
+    }
+
+    /// <summary>
+    /// 日期时间扩展方法
+    /// </summary>
+    public static class DateTimeExtensions
+    {
+        /// <summary>
+        /// 格式化为标准日期字符串
+        /// </summary>
+        public static string ToDateString(this DateTime date, string format = "yyyy-MM-dd")
+        {
+            return date.ToString(format);
+        }
+
+        /// <summary>
+        /// 格式化为标准日期时间字符串
+        /// </summary>
+        public static string ToDateTimeString(this DateTime date, string format = "yyyy-MM-dd HH:mm:ss")
+        {
+            return date.ToString(format);
+        }
+
+        /// <summary>
+        /// 判断是否为今天
+        /// </summary>
+        public static bool IsToday(this DateTime date)
+        {
+            return date.Date == DateTime.Today;
+        }
+
+        /// <summary>
+        /// 判断是否为工作日（周一到周五）
+        /// </summary>
+        public static bool IsWeekday(this DateTime date)
+        {
+            return date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday;
+        }
+
+        /// <summary>
+        /// 获取年龄
+        /// </summary>
+        public static int GetAge(this DateTime birthDate)
+        {
+            var today = DateTime.Today;
+            var age = today.Year - birthDate.Year;
+            if (birthDate.Date > today.AddYears(-age))
+            {
+                age--;
+            }
+            return age;
+        }
+
+        /// <summary>
+        /// 获取季度
+        /// </summary>
+        public static int GetQuarter(this DateTime date)
+        {
+            return (date.Month - 1) / 3 + 1;
+        }
+
+        /// <summary>
+        /// 转换为时间戳（秒）
+        /// </summary>
+        public static long ToTimestamp(this DateTime date)
+        {
+            return new DateTimeOffset(date).ToUnixTimeSeconds();
+        }
+
+        /// <summary>
+        /// 转换为时间戳（毫秒）
+        /// </summary>
+        public static long ToTimestampMs(this DateTime date)
+        {
+            return new DateTimeOffset(date).ToUnixTimeMilliseconds();
+        }
+    }
+
+    /// <summary>
+    /// 数字扩展方法
+    /// </summary>
+    public static class NumberExtensions
+    {
+        /// <summary>
+        /// 判断是否在范围内
+        /// </summary>
+        public static bool InRange(this int value, int min, int max)
+        {
+            return value >= min && value <= max;
+        }
+
+        /// <summary>
+        /// 判断是否在范围内
+        /// </summary>
+        public static bool InRange(this double value, double min, double max)
+        {
+            return value >= min && value <= max;
+        }
+
+        /// <summary>
+        /// 限制在范围内
+        /// </summary>
+        public static int Clamp(this int value, int min, int max)
+        {
+            return Math.Max(min, Math.Min(max, value));
+        }
+
+        /// <summary>
+        /// 限制在范围内
+        /// </summary>
+        public static double Clamp(this double value, double min, double max)
+        {
+            return Math.Max(min, Math.Min(max, value));
+        }
+
+        /// <summary>
+        /// 转换为中文数字
+        /// </summary>
+        public static string ToChinese(this int number)
+        {
+            return ChineseNumberUtil.ToChinese(number);
+        }
+
+        /// <summary>
+        /// 转换为金额大写
+        /// </summary>
+        public static string ToMoneyChinese(this decimal amount)
+        {
+            return ChineseNumberUtil.ToMoney(amount);
+        }
+
+        /// <summary>
+        /// 转换为文件大小字符串
+        /// </summary>
+        public static string ToFileSize(this long bytes)
+        {
+            string[] units = { "B", "KB", "MB", "GB", "TB" };
+            int unitIndex = 0;
+            double size = bytes;
+
+            while (size >= 1024 && unitIndex < units.Length - 1)
+            {
+                size /= 1024;
+                unitIndex++;
+            }
+
+            return $"{size:F2} {units[unitIndex]}";
+        }
     }
 }

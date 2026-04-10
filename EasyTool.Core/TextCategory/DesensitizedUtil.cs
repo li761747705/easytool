@@ -10,11 +10,11 @@ namespace EasyTool.TextCategory
     /// </summary>
     public static class DesensitizedUtil
     {
-        private static readonly Regex IdcardRegex = new Regex(@"^\d{15}(\d{2}[0-9xX])?$");
-        private static readonly Regex MobileRegex = new Regex(@"^(13\d|14[5-9]|15[^4\D]|16\d|17[0-8]|18\d|19[0-3,5-9])\d{8}$");
-        private static readonly Regex TelRegex = new Regex(@"^(\d{3,4}-?)?\d{7,8}$");
-        private static readonly Regex EmailRegex = new Regex(@"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$");
-        private static readonly Regex BankcardRegex = new Regex(@"^\d{12,19}$");
+        private static readonly Regex IdcardRegex = new Regex(@"^\d{15}(\d{2}[0-9xX])?$", RegexOptions.Compiled);
+        private static readonly Regex MobileRegex = new Regex(@"^(13\d|14[5-9]|15[^4\D]|16\d|17[0-8]|18\d|19[0-3,5-9])\d{8}$", RegexOptions.Compiled);
+        private static readonly Regex TelRegex = new Regex(@"^(\d{3,4}-?)?\d{7,8}$", RegexOptions.Compiled);
+        private static readonly Regex EmailRegex = new Regex(@"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", RegexOptions.Compiled);
+        private static readonly Regex BankcardRegex = new Regex(@"^\d{12,19}$", RegexOptions.Compiled);
         private static readonly string[] AreaCodes = new string[] {
         "11", "12", "13", "14", "15", "21", "22", "23", "31", "32",
         "33", "34", "35", "36", "37", "41", "42", "43", "44", "45",

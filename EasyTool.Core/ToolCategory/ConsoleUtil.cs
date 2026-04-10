@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EasyTool
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// 控制台工具类

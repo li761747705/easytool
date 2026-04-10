@@ -262,7 +262,7 @@ namespace EasyTool.CodeCategory
                 return string.Empty;
 
             if (data.Length % 4 != 0)
-                throw new ArgumentException("Data length must be a multiple of 4 for Z85 encoding", nameof(data));
+                throw new ArgumentException("Z85 编码的数据长度必须是 4 的倍数", nameof(data));
 
             var result = new StringBuilder(data.Length * 5 / 4);
 
@@ -296,7 +296,7 @@ namespace EasyTool.CodeCategory
                 return Array.Empty<byte>();
 
             if (value.Length % 5 != 0)
-                throw new ArgumentException("String length must be a multiple of 5 for Z85 decoding", nameof(value));
+                throw new ArgumentException("Z85 解码的字符串长度必须是 5 的倍数", nameof(value));
 
             var result = new byte[value.Length * 4 / 5];
             int resultIndex = 0;

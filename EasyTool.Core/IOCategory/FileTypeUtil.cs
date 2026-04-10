@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace EasyTool
+namespace EasyTool.IOCategory
 {
     /// <summary>
     /// 文件类型工具类

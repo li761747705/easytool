@@ -580,7 +580,7 @@ namespace EasyTool.ConvertCategory
                 case 0xC7: // ext 8
                 case 0xC8: // ext 16
                 case 0xC9: // ext 32
-                    throw new NotSupportedException("Extension types are not supported");
+                    throw new NotSupportedException("不支持的扩展类型");
 
                 case 0xCA: // float 32
                     return ReadFloat(stream);
@@ -634,7 +634,7 @@ namespace EasyTool.ConvertCategory
                     return DeserializeMap(stream, (int)ReadBigEndianUInt32(stream));
 
                 default:
-                    throw new NotSupportedException($"Unknown format: 0x{header:X2}");
+                    throw new NotSupportedException($"未知格式: 0x{header:X2}");
             }
         }
 

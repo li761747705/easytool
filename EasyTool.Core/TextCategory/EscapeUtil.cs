@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Web;
 
-namespace EasyTool
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// 转义工具类
@@ -152,9 +152,9 @@ namespace EasyTool
             return xml
                 .Replace("&lt;", "<")
                 .Replace("&gt;", ">")
-                .Replace("&amp;", "&")
                 .Replace("&quot;", "\"")
-                .Replace("&apos;", "'");
+                .Replace("&apos;", "'")
+                .Replace("&amp;", "&");
         }
 
         #endregion

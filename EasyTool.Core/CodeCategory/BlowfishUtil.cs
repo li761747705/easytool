@@ -25,7 +25,7 @@ namespace EasyTool.CodeCategory
             if (plainText == null)
                 throw new ArgumentNullException(nameof(plainText));
             if (key == null || key.Length < 4 || key.Length > 56)
-                throw new ArgumentException("Key must be 4-56 bytes", nameof(key));
+                throw new ArgumentException("密钥必须是 4-56 字节", nameof(key));
 
             var ctx = InitializeContext(key);
 
@@ -54,9 +54,9 @@ namespace EasyTool.CodeCategory
             if (cipherText == null)
                 throw new ArgumentNullException(nameof(cipherText));
             if (key == null || key.Length < 4 || key.Length > 56)
-                throw new ArgumentException("Key must be 4-56 bytes", nameof(key));
+                throw new ArgumentException("密钥必须是 4-56 字节", nameof(key));
             if (cipherText.Length % BlockSize != 0)
-                throw new ArgumentException("Cipher text length must be multiple of block size", nameof(cipherText));
+                throw new ArgumentException("密文长度必须是块大小的倍数", nameof(cipherText));
 
             var ctx = InitializeContext(key);
             byte[] result = new byte[cipherText.Length];
@@ -103,7 +103,7 @@ namespace EasyTool.CodeCategory
         public static byte[] GenerateKey(int length = 16)
         {
             if (length < 4 || length > 56)
-                throw new ArgumentException("Key length must be between 4 and 56 bytes", nameof(length));
+                throw new ArgumentException("密钥长度必须在 4 到 56 字节之间", nameof(length));
 
             byte[] key = new byte[length];
             using var rng = RandomNumberGenerator.Create();

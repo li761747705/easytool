@@ -168,7 +168,21 @@ namespace EasyTool.BusinessCategory
 
         private static byte[] Base32Decode(string input)
         {
-            input = input.ToUpper().TrimEnd('=');
+            if (string.IsNullOrEmpty(input))
+                throw new ArgumentException("Base32 输入不能为空", nameof(input));
+
+            input = input.ToUpperInvariant().TrimEnd('=');
+
+            // 验证所有字符均为合法 Base32 字符
+            foreach (var c in input)
+            {
+                if (Base32Chars.IndexOf(c) < 0)
+                    throw new FormatException($"无效的 Base32 字符: '{c}'");
+            }
+
+            if (input.Length == 0)
+                return Array.Empty<byte>();
+
             var output = new byte[input.Length * 5 / 8];
             var buffer = new int[8];
 
@@ -177,15 +191,13 @@ namespace EasyTool.BusinessCategory
                 for (int k = 0; k < 8 && i < input.Length; k++, i++)
                 {
                     buffer[k] = Base32Chars.IndexOf(input[i]);
-                    if (buffer[k] < 0 && i < input.Length)
-                        buffer[k] = 0;
                 }
 
-                output[j++] = (byte)((buffer[0] << 3) | (buffer[1] >> 2));
-                output[j++] = (byte)((buffer[1] << 6) | (buffer[2] << 1) | (buffer[3] >> 4));
-                output[j++] = (byte)((buffer[3] << 4) | (buffer[4] >> 1));
-                output[j++] = (byte)((buffer[4] << 7) | (buffer[5] << 2) | (buffer[6] >> 3));
-                output[j++] = (byte)((buffer[6] << 5) | buffer[7]);
+                if (j < output.Length) output[j++] = (byte)((buffer[0] << 3) | (buffer[1] >> 2));
+                if (j < output.Length) output[j++] = (byte)((buffer[1] << 6) | (buffer[2] << 1) | (buffer[3] >> 4));
+                if (j < output.Length) output[j++] = (byte)((buffer[3] << 4) | (buffer[4] >> 1));
+                if (j < output.Length) output[j++] = (byte)((buffer[4] << 7) | (buffer[5] << 2) | (buffer[6] >> 3));
+                if (j < output.Length) output[j++] = (byte)((buffer[6] << 5) | buffer[7]);
             }
 
             return output;

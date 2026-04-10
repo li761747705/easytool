@@ -21,7 +21,7 @@ namespace EasyTool.CodeCategory
         /// <param name="padding"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string Encrypt(string str, string sk, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
+        public static string Encrypt(string str, string sk, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
         {
             if (string.IsNullOrWhiteSpace(str)) return string.Empty;
             if (!IsLegalSize(sk)) throw new ArgumentException("不合规的秘钥，请确认秘钥为8位的字符");
@@ -32,7 +32,7 @@ namespace EasyTool.CodeCategory
             des.Mode = cipher;
             des.Padding = padding;
             des.Key = keyBytes;
-            des.IV = keyBytes;
+            des.GenerateIV();
 
             ICryptoTransform cTransform = des.CreateEncryptor();
             var resultArray = cTransform.TransformFinalBlock(toEncrypt, 0, toEncrypt.Length);
@@ -48,7 +48,7 @@ namespace EasyTool.CodeCategory
         /// <param name="padding"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string Decrypt(string str, string sk, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
+        public static string Decrypt(string str, string sk, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
         {
             if (string.IsNullOrWhiteSpace(str)) return string.Empty;
             if (!IsLegalSize(sk)) throw new ArgumentException("不合规的秘钥，请确认秘钥为8位的字符");
@@ -59,7 +59,7 @@ namespace EasyTool.CodeCategory
             des.Mode = cipher;
             des.Padding = padding;
             des.Key = keyBytes;
-            des.IV = keyBytes;
+            des.GenerateIV();
             ICryptoTransform cTransform = des.CreateDecryptor();
             var resultArray = cTransform.TransformFinalBlock(toDecrypt, 0, toDecrypt.Length);
             return encoding.GetString(resultArray);
@@ -73,12 +73,12 @@ namespace EasyTool.CodeCategory
         /// <param name="str">待加密字符串</param>
         /// <param name="sk">秘钥</param>
         /// <param name="iv">向量Iv</param>
-        /// <param name="cipher">默认ECB</param>
+        /// <param name="cipher">默认CBC</param>
         /// <param name="padding">默认PKCS7</param>
         /// <param name="encoding">默认UTF8</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static string Encrypt(string str, string sk,string iv, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
+        public static string Encrypt(string str, string sk,string iv, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
         {
             if (string.IsNullOrWhiteSpace(str)) return string.Empty;
             if (!IsLegalSize(sk)) throw new ArgumentException("不合规的秘钥，请确认秘钥为8位的字符");
@@ -109,7 +109,7 @@ namespace EasyTool.CodeCategory
         /// <param name="encoding">默认UTF8</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static string Decrypt(string str, string sk, string iv, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
+        public static string Decrypt(string str, string sk, string iv, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
         {
             if (string.IsNullOrWhiteSpace(str)) return string.Empty;
             if (!IsLegalSize(sk)) throw new ArgumentException("不合规的秘钥，请确认秘钥为8位的字符");
@@ -146,7 +146,7 @@ namespace EasyTool.CodeCategory
         /// <param name="padding">默认PKCS7</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static byte[] Encrypt(byte[] data, byte[] keyBytes, byte[]? ivBytes = null, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7)
+        public static byte[] Encrypt(byte[] data, byte[] keyBytes, byte[]? ivBytes = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
         {
             if (data == null || data.Length == 0)
                 return Array.Empty<byte>();
@@ -178,7 +178,7 @@ namespace EasyTool.CodeCategory
         /// <param name="padding">默认PKCS7</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static byte[] Decrypt(byte[] data, byte[] keyBytes, byte[]? ivBytes = null, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7)
+        public static byte[] Decrypt(byte[] data, byte[] keyBytes, byte[]? ivBytes = null, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7)
         {
             if (data == null || data.Length == 0)
                 return Array.Empty<byte>();

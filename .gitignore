@@ -402,3 +402,37 @@ FodyWeavers.xsd
 .omc/
 .claude/
 .spec-workflow/
+
+#########################################
+# Additional ignores
+#########################################
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Merge conflict backups
+*.orig
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+
+# Dotnet tools manifest (if using local tools)
+# .dotnet-tools.json
+
+# User secrets
+secrets.json
+appsettings.Development.json
+appsettings.Local.json

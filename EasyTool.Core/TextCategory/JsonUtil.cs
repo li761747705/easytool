@@ -4,37 +4,27 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EasyTool
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// JSON工具类，基于System.Text.Json封装
     /// </summary>
     public static class JsonUtil
     {
-        private static JsonSerializerOptions _defaultOptions;
+        private static readonly Lazy<JsonSerializerOptions> _defaultOptions = new(() => new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+            WriteIndented = false,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString
+        });
 
         /// <summary>
-        /// 默认的JSON序列化选项
+        /// 默认的JSON序列化选项（线程安全懒加载）
         /// </summary>
-        public static JsonSerializerOptions DefaultOptions
-        {
-            get
-            {
-                if (_defaultOptions == null)
-                {
-                    _defaultOptions = new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        PropertyNameCaseInsensitive = true,
-                        WriteIndented = false,
-                        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                        NumberHandling = JsonNumberHandling.AllowReadingFromString
-                    };
-                }
-                return _defaultOptions;
-            }
-        }
+        public static JsonSerializerOptions DefaultOptions => _defaultOptions.Value;
 
         #region 序列化
 

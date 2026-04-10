@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EasyTool
+namespace EasyTool.TextCategory
 {
     /// <summary>
     /// 文本清洗器
@@ -266,10 +266,10 @@ namespace EasyTool
             if (string.IsNullOrEmpty(text))
                 return string.Empty;
 
-            return text.Replace("&apos;", "'")
-                       .Replace("&quot;", "\"")
+            return text.Replace("&lt;", "<")
                        .Replace("&gt;", ">")
-                       .Replace("&lt;", "<")
+                       .Replace("&quot;", "\"")
+                       .Replace("&apos;", "'")
                        .Replace("&amp;", "&");
         }
 

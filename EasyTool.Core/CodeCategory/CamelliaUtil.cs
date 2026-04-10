@@ -63,7 +63,7 @@ namespace EasyTool.CodeCategory
             if (plainText == null)
                 throw new ArgumentNullException(nameof(plainText));
             if (key == null || (key.Length != 16 && key.Length != 24 && key.Length != 32))
-                throw new ArgumentException("Key must be 16, 24, or 32 bytes", nameof(key));
+                throw new ArgumentException("密钥必须是 16、24 或 32 字节", nameof(key));
 
             int paddedLength = ((plainText.Length + BlockSize - 1) / BlockSize) * BlockSize;
             byte[] padded = new byte[paddedLength];
@@ -91,9 +91,9 @@ namespace EasyTool.CodeCategory
             if (cipherText == null)
                 throw new ArgumentNullException(nameof(cipherText));
             if (key == null || (key.Length != 16 && key.Length != 24 && key.Length != 32))
-                throw new ArgumentException("Key must be 16, 24, or 32 bytes", nameof(key));
+                throw new ArgumentException("密钥必须是 16、24 或 32 字节", nameof(key));
             if (cipherText.Length % BlockSize != 0)
-                throw new ArgumentException("Cipher text length must be multiple of block size", nameof(cipherText));
+                throw new ArgumentException("密文长度必须是块大小的倍数", nameof(cipherText));
 
             byte[] result = new byte[cipherText.Length];
             var keys = GenerateSubkeys(key);
@@ -138,7 +138,7 @@ namespace EasyTool.CodeCategory
         public static byte[] GenerateKey(int length = 32)
         {
             if (length != 16 && length != 24 && length != 32)
-                throw new ArgumentException("Key length must be 16, 24, or 32 bytes", nameof(length));
+                throw new ArgumentException("密钥长度必须是 16、24 或 32 字节", nameof(length));
 
             byte[] key = new byte[length];
             using var rng = RandomNumberGenerator.Create();

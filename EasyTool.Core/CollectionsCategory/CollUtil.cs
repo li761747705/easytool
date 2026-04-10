@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace EasyTool
+namespace EasyTool.CollectionsCategory
 {
     /// <summary>
     /// 集合操作工具类
@@ -454,7 +454,14 @@ namespace EasyTool
                 return new List<T>();
 
             var random = new Random();
-            return list.OrderBy(x => random.Next()).Take(count).ToList();
+            int max = Math.Min(count, list.Count);
+            // Fisher-Yates 部分洗牌，O(n) 复杂度
+            for (int i = 0; i < max; i++)
+            {
+                int j = random.Next(i, list.Count);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+            return list.Take(max).ToList();
         }
 
         #endregion

@@ -55,7 +55,7 @@ namespace EasyTool.ColorCategory
                 return Color.FromArgb(a, r, g, b);
             }
 
-            throw new ArgumentException("Invalid hex color format", nameof(hex));
+            throw new ArgumentException("无效的十六进制颜色格式", nameof(hex));
         }
 
         /// <summary>

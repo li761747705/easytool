@@ -123,5 +123,75 @@ namespace EasyTool.UnitTests.BusinessCategory
 
             Assert.True(strength >= PasswordGenerator.PasswordStrength.Strong);
         }
+
+        #region 边界测试
+
+        [Fact]
+        public void Generate_MinLength_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => PasswordGenerator.Generate(length: 3));
+        }
+
+        [Fact]
+        public void Generate_NoCharacterTypes_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => PasswordGenerator.Generate(
+                includeLowerCase: false,
+                includeUpperCase: false,
+                includeDigits: false,
+                includeSpecialChars: false));
+        }
+
+        [Fact]
+        public void GeneratePin_ValidLength_ReturnsCorrectFormat()
+        {
+            var pin = PasswordGenerator.GeneratePin(4);
+            Assert.Equal(4, pin.Length);
+            Assert.Matches("^[0-9]{4}$", pin);
+        }
+
+        [Fact]
+        public void GeneratePassphrase_ValidWordCount_ReturnsCorrectFormat()
+        {
+            var passphrase = PasswordGenerator.GeneratePassphrase(5, "-");
+            var words = passphrase.Split('-');
+            Assert.Equal(5, words.Length);
+        }
+
+        [Fact]
+        public void GenerateBatch_ReturnsUniquePasswords()
+        {
+            var passwords = PasswordGenerator.GenerateBatch(100, 12);
+            var uniqueCount = passwords.Distinct().Count();
+            Assert.Equal(100, uniqueCount);
+        }
+
+        [Fact]
+        public void Generate_WithExcludeAmbiguous_DoesNotContainAmbiguousChars()
+        {
+            var ambiguous = "l1IO0";
+            for (int i = 0; i < 10; i++)
+            {
+                var password = PasswordGenerator.Generate(length: 50, excludeAmbiguous: true);
+                foreach (var c in ambiguous)
+                {
+                    Assert.DoesNotContain(c, password);
+                }
+            }
+        }
+
+        [Fact]
+        public void CheckStrength_EmptyString_ReturnsWeak()
+        {
+            Assert.Equal(PasswordGenerator.PasswordStrength.Weak, PasswordGenerator.CheckStrength(""));
+        }
+
+        [Fact]
+        public void CheckStrength_Null_ReturnsWeak()
+        {
+            Assert.Equal(PasswordGenerator.PasswordStrength.Weak, PasswordGenerator.CheckStrength(null!));
+        }
+
+        #endregion
     }
 }

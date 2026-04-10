@@ -82,7 +82,7 @@ namespace EasyTool.CollectionsCategory
         public CircularBuffer(int capacity)
         {
             if (capacity <= 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), "Capacity must be greater than 0");
+                throw new ArgumentOutOfRangeException(nameof(capacity), "容量必须大于 0");
 
             _buffer = new T[capacity];
             _head = 0;

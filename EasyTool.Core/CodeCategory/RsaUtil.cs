@@ -2,7 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.CodeCategory
 {
     /// <summary>
     /// RSA 非对称加密工具类

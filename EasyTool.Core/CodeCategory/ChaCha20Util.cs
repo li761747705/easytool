@@ -41,9 +41,9 @@ namespace EasyTool.CodeCategory
             if (plainText == null)
                 throw new ArgumentNullException(nameof(plainText));
             if (key == null || key.Length != 32)
-                throw new ArgumentException("Key must be 32 bytes", nameof(key));
+                throw new ArgumentException("密钥必须是 32 字节", nameof(key));
             if (nonce == null || nonce.Length != 12)
-                throw new ArgumentException("Nonce must be 12 bytes", nameof(nonce));
+                throw new ArgumentException("Nonce 必须是 12 字节", nameof(nonce));
 
             byte[] cipherText = new byte[length];
             ProcessChaCha20(plainText, offset, length, cipherText, 0, key, nonce, initialCounter);
@@ -121,7 +121,7 @@ namespace EasyTool.CodeCategory
 
             byte[] data = Convert.FromBase64String(cipherText);
             if (data.Length < 12)
-                throw new ArgumentException("Invalid cipher text");
+                throw new ArgumentException("无效的密文");
 
             // 提取 nonce
             byte[] nonce = new byte[12];
@@ -174,9 +174,9 @@ namespace EasyTool.CodeCategory
             if (plainText == null)
                 throw new ArgumentNullException(nameof(plainText));
             if (key == null || key.Length != 32)
-                throw new ArgumentException("Key must be 32 bytes", nameof(key));
+                throw new ArgumentException("密钥必须是 32 字节", nameof(key));
             if (nonce == null || nonce.Length != 12)
-                throw new ArgumentException("Nonce must be 12 bytes", nameof(nonce));
+                throw new ArgumentException("Nonce 必须是 12 字节", nameof(nonce));
 
             // 加密数据
             byte[] cipherText = new byte[plainText.Length + 16];
@@ -204,9 +204,9 @@ namespace EasyTool.CodeCategory
             if (cipherText == null || cipherText.Length < 16)
                 throw new ArgumentException("Cipher text must be at least 16 bytes", nameof(cipherText));
             if (key == null || key.Length != 32)
-                throw new ArgumentException("Key must be 32 bytes", nameof(key));
+                throw new ArgumentException("密钥必须是 32 字节", nameof(key));
             if (nonce == null || nonce.Length != 12)
-                throw new ArgumentException("Nonce must be 12 bytes", nameof(nonce));
+                throw new ArgumentException("Nonce 必须是 12 字节", nameof(nonce));
 
             int cipherLength = cipherText.Length - 16;
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,35 +12,62 @@ namespace EasyTool.TextCategory
     public static class KeywordExtractor
     {
         /// <summary>
-        /// 中文停用词
+        /// 中文停用词（使用 ConcurrentDictionary 保证线程安全）
         /// </summary>
-        private static readonly HashSet<string> ChineseStopWords = new()
+        private static readonly ConcurrentDictionary<string, byte> ChineseStopWords = new()
         {
-            "的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一", "一个",
-            "上", "也", "很", "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好",
-            "自己", "这", "那", "什么", "他", "她", "它", "们", "这个", "那个", "哪个",
-            "怎么", "为什么", "因为", "所以", "但是", "然后", "如果", "可以", "可能",
-            "已经", "还是", "只是", "就是", "这样", "那样", "怎样", "这么", "那么",
-            "更", "最", "比", "而", "且", "或", "与", "及", "等", "等等", "之", "于",
-            "以", "为", "让", "把", "被", "从", "向", "对", "给", "跟", "像", "关于",
-            "通过", "按照", "根据", "由于", "为了", "既然", "无论", "不管", "即使",
-            "虽然", "即使", "哪怕", "只要", "除非", "假如", "倘若", "若是", "要是"
+            ["的"] = 0, ["了"] = 0, ["在"] = 0, ["是"] = 0, ["我"] = 0, ["有"] = 0, ["和"] = 0,
+            ["就"] = 0, ["不"] = 0, ["人"] = 0, ["都"] = 0, ["一"] = 0, ["一个"] = 0,
+            ["上"] = 0, ["也"] = 0, ["很"] = 0, ["到"] = 0, ["说"] = 0, ["要"] = 0,
+            ["去"] = 0, ["你"] = 0, ["会"] = 0, ["着"] = 0, ["没有"] = 0, ["看"] = 0, ["好"] = 0,
+            ["自己"] = 0, ["这"] = 0, ["那"] = 0, ["什么"] = 0, ["他"] = 0, ["她"] = 0,
+            ["它"] = 0, ["们"] = 0, ["这个"] = 0, ["那个"] = 0, ["哪个"] = 0,
+            ["怎么"] = 0, ["为什么"] = 0, ["因为"] = 0, ["所以"] = 0, ["但是"] = 0,
+            ["然后"] = 0, ["如果"] = 0, ["可以"] = 0, ["可能"] = 0,
+            ["已经"] = 0, ["还是"] = 0, ["只是"] = 0, ["就是"] = 0, ["这样"] = 0,
+            ["那样"] = 0, ["怎样"] = 0, ["这么"] = 0, ["那么"] = 0,
+            ["更"] = 0, ["最"] = 0, ["比"] = 0, ["而"] = 0, ["且"] = 0, ["或"] = 0,
+            ["与"] = 0, ["及"] = 0, ["等"] = 0, ["等等"] = 0, ["之"] = 0, ["于"] = 0,
+            ["以"] = 0, ["为"] = 0, ["让"] = 0, ["把"] = 0, ["被"] = 0, ["从"] = 0,
+            ["向"] = 0, ["对"] = 0, ["给"] = 0, ["跟"] = 0, ["像"] = 0, ["关于"] = 0,
+            ["通过"] = 0, ["按照"] = 0, ["根据"] = 0, ["由于"] = 0, ["为了"] = 0,
+            ["既然"] = 0, ["无论"] = 0, ["不管"] = 0, ["即使"] = 0,
+            ["虽然"] = 0, ["哪怕"] = 0, ["只要"] = 0, ["除非"] = 0, ["假如"] = 0,
+            ["倘若"] = 0, ["若是"] = 0, ["要是"] = 0
         };
 
         /// <summary>
-        /// 英文停用词
+        /// 英文停用词（使用 ConcurrentDictionary 保证线程安全）
         /// </summary>
-        private static readonly HashSet<string> EnglishStopWords = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly ConcurrentDictionary<string, byte> EnglishStopWords = new(StringComparer.OrdinalIgnoreCase)
         {
-            "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with",
-            "by", "from", "as", "is", "was", "are", "were", "been", "be", "have", "has", "had",
-            "do", "does", "did", "will", "would", "could", "should", "may", "might", "must",
-            "shall", "can", "need", "dare", "ought", "used", "it", "its", "this", "that",
-            "these", "those", "i", "you", "he", "she", "we", "they", "what", "which", "who",
-            "whom", "whose", "where", "when", "why", "how", "all", "each", "every", "both",
-            "few", "more", "most", "other", "some", "such", "no", "not", "only", "same", "so",
-            "than", "too", "very", "just", "also", "now", "here", "there", "then", "once"
+            ["a"] = 0, ["an"] = 0, ["the"] = 0, ["and"] = 0, ["or"] = 0, ["but"] = 0,
+            ["in"] = 0, ["on"] = 0, ["at"] = 0, ["to"] = 0, ["for"] = 0, ["of"] = 0,
+            ["with"] = 0, ["by"] = 0, ["from"] = 0, ["as"] = 0, ["is"] = 0, ["was"] = 0,
+            ["are"] = 0, ["were"] = 0, ["been"] = 0, ["be"] = 0, ["have"] = 0, ["has"] = 0,
+            ["had"] = 0, ["do"] = 0, ["does"] = 0, ["did"] = 0, ["will"] = 0, ["would"] = 0,
+            ["could"] = 0, ["should"] = 0, ["may"] = 0, ["might"] = 0, ["must"] = 0,
+            ["shall"] = 0, ["can"] = 0, ["need"] = 0, ["dare"] = 0, ["ought"] = 0,
+            ["used"] = 0, ["it"] = 0, ["its"] = 0, ["this"] = 0, ["that"] = 0,
+            ["these"] = 0, ["those"] = 0, ["i"] = 0, ["you"] = 0, ["he"] = 0, ["she"] = 0,
+            ["we"] = 0, ["they"] = 0, ["what"] = 0, ["which"] = 0, ["who"] = 0,
+            ["whom"] = 0, ["whose"] = 0, ["where"] = 0, ["when"] = 0, ["why"] = 0,
+            ["how"] = 0, ["all"] = 0, ["each"] = 0, ["every"] = 0, ["both"] = 0,
+            ["few"] = 0, ["more"] = 0, ["most"] = 0, ["other"] = 0, ["some"] = 0,
+            ["such"] = 0, ["no"] = 0, ["not"] = 0, ["only"] = 0, ["same"] = 0, ["so"] = 0,
+            ["than"] = 0, ["too"] = 0, ["very"] = 0, ["just"] = 0, ["also"] = 0,
+            ["now"] = 0, ["here"] = 0, ["there"] = 0, ["then"] = 0, ["once"] = 0
         };
+
+        /// <summary>
+        /// 编译后的正则表达式（性能优化）
+        /// </summary>
+        private static readonly Regex ChinesePhraseRegex = new Regex(@"[\u4e00-\u9fa5]{2,}", RegexOptions.Compiled);
+        private static readonly Regex EnglishWordRegex = new Regex(@"\b[a-zA-Z]{2,}\b", RegexOptions.Compiled);
+        private static readonly Regex ChineseWordRegex = new Regex(@"[\u4e00-\u9fa5]+", RegexOptions.Compiled);
+        private static readonly Regex NumberPatternRegex = new Regex(@"\b\d+(\.\d+)?\b", RegexOptions.Compiled);
+        private static readonly Regex CleanTextRegex = new Regex(@"[\s\p{P}]+", RegexOptions.Compiled);
+        private static readonly Regex ChineseCharRegex = new Regex(@"[\u4e00-\u9fa5]", RegexOptions.Compiled);
 
         /// <summary>
         /// 使用TF-IDF算法提取关键词
@@ -121,7 +149,7 @@ namespace EasyTool.TextCategory
         public static List<KeywordResult> ExtractNgrams(string text, int n = 2, int topN = 10)
         {
             var ngrams = new Dictionary<string, int>();
-            var cleanText = Regex.Replace(text, @"[\s\p{P}]+", " ").Trim();
+            var cleanText = CleanTextRegex.Replace(text, " ").Trim();
 
             for (int i = 0; i <= cleanText.Length - n; i++)
             {
@@ -149,9 +177,8 @@ namespace EasyTool.TextCategory
         public static List<KeywordResult> ExtractChinesePhrases(string text, int topN = 10)
         {
             var phrases = new Dictionary<string, int>();
-            var chinesePattern = new Regex(@"[\u4e00-\u9fa5]{2,}");
 
-            foreach (Match match in chinesePattern.Matches(text))
+            foreach (Match match in ChinesePhraseRegex.Matches(text))
             {
                 var phrase = match.Value;
                 if (!phrases.ContainsKey(phrase))
@@ -180,9 +207,8 @@ namespace EasyTool.TextCategory
         public static List<KeywordResult> ExtractEnglishPhrases(string text, int topN = 10)
         {
             var phrases = new Dictionary<string, int>();
-            var wordPattern = new Regex(@"\b[a-zA-Z]{2,}\b");
 
-            foreach (Match match in wordPattern.Matches(text))
+            foreach (Match match in EnglishWordRegex.Matches(text))
             {
                 var word = match.Value.ToLower();
                 if (!IsStopWord(word))
@@ -213,8 +239,7 @@ namespace EasyTool.TextCategory
             var words = new List<string>();
 
             // 提取中文词
-            var chinesePattern = new Regex(@"[\u4e00-\u9fa5]+");
-            foreach (Match match in chinesePattern.Matches(text))
+            foreach (Match match in ChineseWordRegex.Matches(text))
             {
                 var word = match.Value;
                 // 中文简单分词：提取双字词
@@ -229,15 +254,13 @@ namespace EasyTool.TextCategory
             }
 
             // 提取英文词
-            var englishPattern = new Regex(@"\b[a-zA-Z]{2,}\b");
-            foreach (Match match in englishPattern.Matches(text))
+            foreach (Match match in EnglishWordRegex.Matches(text))
             {
                 words.Add(match.Value.ToLower());
             }
 
             // 提取数字
-            var numberPattern = new Regex(@"\b\d+(\.\d+)?\b");
-            foreach (Match match in numberPattern.Matches(text))
+            foreach (Match match in NumberPatternRegex.Matches(text))
             {
                 words.Add(match.Value);
             }
@@ -250,23 +273,23 @@ namespace EasyTool.TextCategory
         /// </summary>
         private static bool IsStopWord(string word)
         {
-            return ChineseStopWords.Contains(word) || EnglishStopWords.Contains(word);
+            return ChineseStopWords.ContainsKey(word) || EnglishStopWords.ContainsKey(word);
         }
 
         /// <summary>
-        /// 添加自定义停用词
+        /// 添加自定义停用词（线程安全）
         /// </summary>
         public static void AddStopWords(IEnumerable<string> words)
         {
             foreach (var word in words)
             {
-                if (Regex.IsMatch(word, @"[\u4e00-\u9fa5]"))
+                if (ChineseCharRegex.IsMatch(word))
                 {
-                    ChineseStopWords.Add(word);
+                    ChineseStopWords.TryAdd(word, 0);
                 }
                 else
                 {
-                    EnglishStopWords.Add(word.ToLower());
+                    EnglishStopWords.TryAdd(word.ToLower(), 0);
                 }
             }
         }

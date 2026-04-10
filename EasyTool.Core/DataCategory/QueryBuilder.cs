@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.DataCategory
 {
     /// <summary>
     /// SQL 查询构建器

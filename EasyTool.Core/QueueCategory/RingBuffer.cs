@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace EasyTool
+namespace EasyTool.QueueCategory
 {
     /// <summary>
     /// 环形缓冲区
@@ -235,8 +235,20 @@ namespace EasyTool
         /// <returns>是否读取成功</returns>
         public bool TryRead(out T? item)
         {
-            item = Read();
-            return _count >= 0 || !Equals(item, default(T));
+            lock (_lock)
+            {
+                if (_count == 0)
+                {
+                    item = default;
+                    return false;
+                }
+
+                item = _buffer[_head];
+                _buffer[_head] = default!;
+                _head = (_head + 1) % Capacity;
+                _count--;
+                return true;
+            }
         }
 
         /// <summary>

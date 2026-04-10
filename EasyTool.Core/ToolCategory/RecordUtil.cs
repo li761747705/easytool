@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace EasyTool
+namespace EasyTool.ToolCategory
 {
     /// <summary>
     /// Record 记录类型工具类

@@ -49,7 +49,7 @@ namespace EasyTool.CodeCategory
             int iterations, int parallelism, int hashLength)
         {
             if (string.IsNullOrEmpty(password))
-                throw new ArgumentException("Password cannot be null or empty", nameof(password));
+                throw new ArgumentException("密码不能为空", nameof(password));
 
             ValidateParameters(memorySize, iterations, parallelism, hashLength);
 
@@ -115,10 +115,10 @@ namespace EasyTool.CodeCategory
             int parallelism = DefaultParallelism, int hashLength = DefaultHashLength)
         {
             if (password == null || password.Length == 0)
-                throw new ArgumentException("Password cannot be null or empty", nameof(password));
+                throw new ArgumentException("密码不能为空", nameof(password));
 
             if (salt == null || salt.Length < 8)
-                throw new ArgumentException("Salt must be at least 8 bytes", nameof(salt));
+                throw new ArgumentException("盐值必须至少为 8 字节", nameof(salt));
 
             ValidateParameters(memorySize, iterations, parallelism, hashLength);
 
@@ -169,16 +169,16 @@ namespace EasyTool.CodeCategory
         private static void ValidateParameters(int memorySize, int iterations, int parallelism, int hashLength)
         {
             if (memorySize < 8)
-                throw new ArgumentException("Memory size must be at least 8 KB", nameof(memorySize));
+                throw new ArgumentException("内存大小必须至少为 8 KB", nameof(memorySize));
 
             if (iterations < 1)
-                throw new ArgumentException("Iterations must be at least 1", nameof(iterations));
+                throw new ArgumentException("迭代次数必须至少为 1", nameof(iterations));
 
             if (parallelism < 1)
-                throw new ArgumentException("Parallelism must be at least 1", nameof(parallelism));
+                throw new ArgumentException("并行度必须至少为 1", nameof(parallelism));
 
             if (hashLength < 4)
-                throw new ArgumentException("Hash length must be at least 4 bytes", nameof(hashLength));
+                throw new ArgumentException("哈希长度必须至少为 4 字节", nameof(hashLength));
         }
 
         private static (Argon2Type type, int memory, int iterations, int parallelism, byte[] salt, byte[] hash) ParseHash(string hash)

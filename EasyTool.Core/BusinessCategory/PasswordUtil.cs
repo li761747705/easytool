@@ -393,13 +393,14 @@ namespace EasyTool.BusinessCategory
                 charSet = lowercase + digits;
             }
 
-            string password = "";
+            var charArray = charSet.ToCharArray();
+            var password = new char[length];
             for (int i = 0; i < length; i++)
             {
-                password += MathCategory.RandomUtil.GetRandomElement(charSet.ToCharArray());
+                password[i] = MathCategory.RandomUtil.GetRandomElement(charArray);
             }
 
-            return password;
+            return new string(password);
         }
 
         /// <summary>

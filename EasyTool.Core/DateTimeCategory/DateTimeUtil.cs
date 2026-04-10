@@ -211,12 +211,11 @@ namespace EasyTool.DateTimeCategory
         /// <returns>指定日期所在月份的所有日期。</returns>
         public static List<DateTime> GetMonthDays(DateTime date)
         {
-            DateTime firstDay = new DateTime(date.Year, date.Month, 1);
-            DateTime lastDay = firstDay.AddMonths(1).AddDays(-1);
-            List<DateTime> days = new List<DateTime>();
-            for (DateTime i = firstDay; i <= lastDay; i = i.AddDays(1))
+            int daysInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+            List<DateTime> days = new List<DateTime>(daysInMonth);
+            for (int day = 1; day <= daysInMonth; day++)
             {
-                days.Add(i);
+                days.Add(new DateTime(date.Year, date.Month, day));
             }
             return days;
         }

@@ -140,4 +140,215 @@ namespace EasyTool.ToolCategory
             return new ObjectPool<T>(factory, maxSize, reset);
         }
     }
+
+    /// <summary>
+    /// StringBuilder 对象池
+    /// </summary>
+    public static class StringBuilderPool
+    {
+        private static readonly ObjectPool<System.Text.StringBuilder> _pool = new(
+            () => new System.Text.StringBuilder(1024),
+            maxSize: 50,
+            reset: sb => sb.Clear());
+
+        /// <summary>
+        /// 获取 StringBuilder
+        /// </summary>
+        public static System.Text.StringBuilder Get() => _pool.Get();
+
+        /// <summary>
+        /// 归还 StringBuilder
+        /// </summary>
+        public static void Return(System.Text.StringBuilder sb) => _pool.Return(sb);
+
+        /// <summary>
+        /// 使用 StringBuilder 执行操作并返回结果字符串
+        /// </summary>
+        public static string Use(Action<System.Text.StringBuilder> action)
+        {
+            var sb = Get();
+            try
+            {
+                action(sb);
+                return sb.ToString();
+            }
+            finally
+            {
+                Return(sb);
+            }
+        }
+
+        /// <summary>
+        /// 使用 StringBuilder 执行操作
+        /// </summary>
+        public static TResult Use<TResult>(Func<System.Text.StringBuilder, TResult> action)
+        {
+            var sb = Get();
+            try
+            {
+                return action(sb);
+            }
+            finally
+            {
+                Return(sb);
+            }
+        }
+    }
+
+    /// <summary>
+    /// MemoryStream 对象池
+    /// </summary>
+    public static class MemoryStreamPool
+    {
+        private static readonly ObjectPool<System.IO.MemoryStream> _pool = new(
+            () => new System.IO.MemoryStream(8192),
+            maxSize: 20,
+            reset: ms =>
+            {
+                ms.SetLength(0);
+                ms.Position = 0;
+            });
+
+        /// <summary>
+        /// 获取 MemoryStream
+        /// </summary>
+        public static System.IO.MemoryStream Get() => _pool.Get();
+
+        /// <summary>
+        /// 归还 MemoryStream
+        /// </summary>
+        public static void Return(System.IO.MemoryStream ms) => _pool.Return(ms);
+
+        /// <summary>
+        /// 使用 MemoryStream 执行操作
+        /// </summary>
+        public static TResult Use<TResult>(Func<System.IO.MemoryStream, TResult> action)
+        {
+            var ms = Get();
+            try
+            {
+                return action(ms);
+            }
+            finally
+            {
+                Return(ms);
+            }
+        }
+
+        /// <summary>
+        /// 使用 MemoryStream 执行操作
+        /// </summary>
+        public static void Use(Action<System.IO.MemoryStream> action)
+        {
+            var ms = Get();
+            try
+            {
+                action(ms);
+            }
+            finally
+            {
+                Return(ms);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 字节数组池（使用 ArrayPool）
+    /// </summary>
+    public static class ByteArrayPool
+    {
+        /// <summary>
+        /// 租用字节数组
+        /// </summary>
+        /// <param name="minimumLength">最小长度</param>
+        /// <returns>字节数组</returns>
+        public static byte[] Rent(int minimumLength)
+        {
+            return System.Buffers.ArrayPool<byte>.Shared.Rent(minimumLength);
+        }
+
+        /// <summary>
+        /// 归还字节数组
+        /// </summary>
+        /// <param name="array">要归还的数组</param>
+        /// <param name="clearArray">是否清空数组</param>
+        public static void Return(byte[] array, bool clearArray = false)
+        {
+            System.Buffers.ArrayPool<byte>.Shared.Return(array, clearArray);
+        }
+
+        /// <summary>
+        /// 使用字节数组执行操作
+        /// </summary>
+        public static TResult Use<TResult>(int minimumLength, Func<byte[], TResult> action)
+        {
+            var array = Rent(minimumLength);
+            try
+            {
+                return action(array);
+            }
+            finally
+            {
+                Return(array);
+            }
+        }
+
+        /// <summary>
+        /// 使用字节数组执行操作
+        /// </summary>
+        public static void Use(int minimumLength, Action<byte[]> action)
+        {
+            var array = Rent(minimumLength);
+            try
+            {
+                action(array);
+            }
+            finally
+            {
+                Return(array);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 字符数组池（使用 ArrayPool）
+    /// </summary>
+    public static class CharArrayPool
+    {
+        /// <summary>
+        /// 租用字符数组
+        /// </summary>
+        /// <param name="minimumLength">最小长度</param>
+        /// <returns>字符数组</returns>
+        public static char[] Rent(int minimumLength)
+        {
+            return System.Buffers.ArrayPool<char>.Shared.Rent(minimumLength);
+        }
+
+        /// <summary>
+        /// 归还字符数组
+        /// </summary>
+        /// <param name="array">要归还的数组</param>
+        /// <param name="clearArray">是否清空数组</param>
+        public static void Return(char[] array, bool clearArray = false)
+        {
+            System.Buffers.ArrayPool<char>.Shared.Return(array, clearArray);
+        }
+
+        /// <summary>
+        /// 使用字符数组执行操作
+        /// </summary>
+        public static TResult Use<TResult>(int minimumLength, Func<char[], TResult> action)
+        {
+            var array = Rent(minimumLength);
+            try
+            {
+                return action(array);
+            }
+            finally
+            {
+                Return(array);
+            }
+        }
+    }
 }

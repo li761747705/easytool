@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace EasyTool.CodeCategory
 {
@@ -17,11 +16,11 @@ namespace EasyTool.CodeCategory
         /// </summary>
         /// <param name="str">需要加密的字符串</param>
         /// <param name="sk">加密密钥（16、24或32位）</param>
-        /// <param name="cipher">加密模式，默认ECB</param>
+        /// <param name="cipher">加密模式，默认CBC</param>
         /// <param name="padding">填充模式，默认PKCS7</param>
         /// <param name="encoding">编码格式，默认UTF-8</param>
         /// <returns>Base64编码的加密结果</returns>
-        public static string Encrypt(string str, string sk, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
+        public static string Encrypt(string str, string sk, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
         {
             if (string.IsNullOrEmpty(str)) return string.Empty;
             if (!IsLegalSize(sk)) throw new ArgumentException("不合规的秘钥，请确认秘钥为16 、24、 32位的字符");
@@ -42,11 +41,11 @@ namespace EasyTool.CodeCategory
         /// </summary>
         /// <param name="str">Base64编码的加密字符串</param>
         /// <param name="sk">解密密钥（16、24或32位）</param>
-        /// <param name="cipher">加密模式，默认ECB</param>
+        /// <param name="cipher">加密模式，默认CBC</param>
         /// <param name="padding">填充模式，默认PKCS7</param>
         /// <param name="encoding">编码格式，默认UTF-8</param>
         /// <returns>解密后的原始字符串</returns>
-        public static string Decrypt(string str, string sk, CipherMode cipher = CipherMode.ECB, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
+        public static string Decrypt(string str, string sk, CipherMode cipher = CipherMode.CBC, PaddingMode padding = PaddingMode.PKCS7, Encoding? encoding = null)
         {
             if (string.IsNullOrEmpty(str)) return string.Empty;
             if (!IsLegalSize(sk)) throw new ArgumentException("不合规的秘钥，请确认秘钥为16 、24、 32位的字符");
@@ -64,22 +63,9 @@ namespace EasyTool.CodeCategory
 
         private static bool IsLegalSize(string sk)
         {
-            var legalSizes = new KeySizes(128, 256, 64);
             if (string.IsNullOrEmpty(sk)) return false;
-            var size = sk.Length * 8;
-            if (size >= legalSizes.MinSize && size <= legalSizes.MaxSize)
-            {
-                // If the number is in range, check to see if it's a legal increment above MinSize
-                int delta = size - legalSizes.MinSize;
-
-                // While it would be unusual to see KeySizes { 10, 20, 5 } and { 11, 14, 1 }, it could happen.
-                // So don't return false just because this one doesn't match.
-                if (delta % legalSizes.SkipSize == 0)
-                {
-                    return true;
-                }
-            }
-            return false;
+            var byteCount = Encoding.UTF8.GetByteCount(sk);
+            return byteCount == 16 || byteCount == 24 || byteCount == 32;
         }
 
 
@@ -190,7 +176,7 @@ namespace EasyTool.CodeCategory
             if (data == null || data.Length == 0)
                 return Array.Empty<byte>();
             if (key == null || key.Length == 0)
-                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+                throw new ArgumentException("密钥不能为空", nameof(key));
             if (!KeyIsLegalSizeBytes(key))
                 throw new ArgumentException("不合规的秘钥，请确认秘钥为16、24、32位");
             if (iv != null && iv.Length != 16)
@@ -223,7 +209,7 @@ namespace EasyTool.CodeCategory
             if (data == null || data.Length == 0)
                 return Array.Empty<byte>();
             if (key == null || key.Length == 0)
-                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+                throw new ArgumentException("密钥不能为空", nameof(key));
             if (!KeyIsLegalSizeBytes(key))
                 throw new ArgumentException("不合规的秘钥，请确认秘钥为16、24、32位");
             if (iv != null && iv.Length != 16)
@@ -260,7 +246,7 @@ namespace EasyTool.CodeCategory
             if (outputStream == null)
                 throw new ArgumentNullException(nameof(outputStream));
             if (key == null || key.Length == 0)
-                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+                throw new ArgumentException("密钥不能为空", nameof(key));
             if (!KeyIsLegalSizeBytes(key))
                 throw new ArgumentException("不合规的秘钥，请确认秘钥为16、24、32位");
             if (iv != null && iv.Length != 16)
@@ -288,7 +274,7 @@ namespace EasyTool.CodeCategory
             if (inputStream == null)
                 throw new ArgumentNullException(nameof(inputStream));
             if (key == null || key.Length == 0)
-                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+                throw new ArgumentException("密钥不能为空", nameof(key));
             if (!KeyIsLegalSizeBytes(key))
                 throw new ArgumentException("不合规的秘钥，请确认秘钥为16、24、32位");
             if (iv != null && iv.Length != 16)

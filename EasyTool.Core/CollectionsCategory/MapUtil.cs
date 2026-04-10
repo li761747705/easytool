@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EasyTool
+namespace EasyTool.CollectionsCategory
 {
     /// <summary>
     /// Map 操作工具类

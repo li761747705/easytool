@@ -114,17 +114,45 @@ namespace EasyTool.DataCategory
         /// <summary>
         /// 随机整数
         /// </summary>
-        public static int RandomInt(int max) => RandomInt(0, max);
+        /// <param name="max">最大值（不包含）</param>
+        /// <returns>0 到 max-1 之间的随机整数</returns>
+        /// <exception cref="ArgumentException">当 max 小于等于 0 时抛出</exception>
+        public static int RandomInt(int max)
+        {
+            if (max <= 0)
+            {
+                throw new ArgumentException($"参数 max 必须大于 0，当前值: {max}", nameof(max));
+            }
+            return RandomInt(0, max);
+        }
 
         /// <summary>
         /// 随机整数（指定范围）
+        /// 使用拒绝采样法消除模偏差，避免 int.MinValue 溢出
         /// </summary>
+        /// <param name="min">最小值（包含）</param>
+        /// <param name="max">最大值（不包含）</param>
+        /// <returns>min 到 max-1 之间的随机整数</returns>
+        /// <exception cref="ArgumentException">当 min 大于或等于 max 时抛出</exception>
         public static int RandomInt(int min, int max)
         {
+            if (min >= max)
+            {
+                throw new ArgumentException($"参数 min 必须小于 max，当前: min={min}, max={max}");
+            }
+            var range = (uint)(max - min);
             var bytes = new byte[4];
-            _rng.GetBytes(bytes);
-            var value = BitConverter.ToInt32(bytes, 0);
-            return Math.Abs(value % (max - min)) + min;
+
+            // 拒绝采样：排除会导致模偏差的值
+            var maxValid = uint.MaxValue - (uint.MaxValue % range);
+            uint value;
+            do
+            {
+                _rng.GetBytes(bytes);
+                value = BitConverter.ToUInt32(bytes, 0);
+            } while (value >= maxValid);
+
+            return (int)(value % range) + min;
         }
 
         /// <summary>
@@ -154,9 +182,16 @@ namespace EasyTool.DataCategory
         /// <summary>
         /// 随机选择
         /// </summary>
+        /// <param name="items">元素集合</param>
+        /// <returns>随机选中的元素</returns>
+        /// <exception cref="ArgumentException">当集合为空时抛出</exception>
         public static T RandomChoice<T>(IEnumerable<T> items)
         {
             var list = items.ToList();
+            if (list.Count == 0)
+            {
+                throw new ArgumentException("集合必须包含至少一个元素", nameof(items));
+            }
             return list[RandomInt(list.Count)];
         }
 
@@ -168,8 +203,16 @@ namespace EasyTool.DataCategory
         /// <summary>
         /// 随机日期
         /// </summary>
+        /// <param name="pastYears">过去年数</param>
+        /// <param name="futureYears">未来年数</param>
+        /// <returns>随机日期</returns>
+        /// <exception cref="ArgumentException">当 pastYears 和 futureYears 都为 0 时抛出</exception>
         public static DateTime RandomDate(int pastYears = 10, int futureYears = 0)
         {
+            if (pastYears <= 0 && futureYears <= 0)
+            {
+                throw new ArgumentException("pastYears 和 futureYears 不能同时小于等于 0");
+            }
             var start = DateTime.Now.AddYears(-pastYears);
             var range = (pastYears + futureYears) * 365;
             return start.AddDays(RandomInt(range));
@@ -178,8 +221,16 @@ namespace EasyTool.DataCategory
         /// <summary>
         /// 随机金额
         /// </summary>
+        /// <param name="min">最小金额</param>
+        /// <param name="max">最大金额</param>
+        /// <returns>随机金额</returns>
+        /// <exception cref="ArgumentException">当 min 大于或等于 max 时抛出</exception>
         public static decimal RandomMoney(decimal min = 1, decimal max = 10000)
         {
+            if (min >= max)
+            {
+                throw new ArgumentException($"参数 min 必须小于 max，当前: min={min}, max={max}");
+            }
             var value = RandomInt((int)(min * 100), (int)(max * 100));
             return value / 100m;
         }

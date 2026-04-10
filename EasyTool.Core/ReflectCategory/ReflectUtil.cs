@@ -233,7 +233,9 @@ namespace EasyTool.ReflectCategory
         /// <returns>方法返回值</returns>
         public static object InvokeGenericMethod(object obj, string methodName, Type genericType, params object[] args)
         {
-            MethodInfo method = obj.GetType().GetMethod(methodName);
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            MethodInfo method = obj.GetType().GetMethod(methodName)
+                ?? throw new MissingMethodException($"在类型 '{obj.GetType().Name}' 上未找到方法 '{methodName}'");
             MethodInfo genericMethod = method.MakeGenericMethod(genericType);
             return genericMethod.Invoke(obj, args);
         }

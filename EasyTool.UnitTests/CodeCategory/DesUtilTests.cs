@@ -1,14 +1,10 @@
-﻿using Xunit;
+using Xunit;
 using EasyTool.CodeCategory;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EasyTool.CodeCategory.Tests
 {
-    
+
     public class DesUtilTests
     {
         [Fact]
@@ -16,9 +12,22 @@ namespace EasyTool.CodeCategory.Tests
         {
             var input = "abbfly";
             var sk = "12345678";
-            var en = DesUtil.Encrypt(input, sk);
-            var de = DesUtil.Decrypt(en, sk);
+            var iv = "12345678";
+            var en = DesUtil.Encrypt(input, sk, iv);
+            var de = DesUtil.Decrypt(en, sk, iv);
             Assert.Equal(input, de);
+        }
+
+        [Fact]
+        public void EncryptWithBytesTest()
+        {
+            var data = global::System.Text.Encoding.UTF8.GetBytes("hello world");
+            var key = new byte[8];
+            var iv = new byte[8];
+            for (int i = 0; i < 8; i++) { key[i] = (byte)(i + 1); iv[i] = (byte)(i + 1); }
+            var encrypted = DesUtil.Encrypt(data, key, iv);
+            var decrypted = DesUtil.Decrypt(encrypted, key, iv);
+            Assert.Equal(data, decrypted);
         }
     }
 }

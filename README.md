@@ -41,6 +41,74 @@ EasyTool 是一个**轻量级、零依赖、填补空白、中文友好**的 .NE
 | JWT | System.IdentityModel.Tokens.Jwt |
 | 二维码 | QRCoder, ZXing.Net |
 
+### 🔄 流式扩展方法
+
+```csharp
+// 集合扩展（支持链式调用）
+var result = list
+    .Where(x => x.IsActive)
+    .ForEach(x => x.Process())
+    .DistinctBy(x => x.Id)
+    .Batch(100)
+    .JoinAsString(",");
+
+// 判断集合状态
+list.IsNullOrEmpty();    // 是否为空
+list.IsNotNullOrEmpty(); // 是否不为空
+
+// 随机操作
+var element = list.RandomElement();
+var shuffled = list.Shuffle();
+
+// 日期时间扩展
+var dateStr = DateTime.Now.ToDateString();        // "2026-04-10"
+var dateTimeStr = DateTime.Now.ToDateTimeString(); // "2026-04-10 12:30:00"
+DateTime.Now.IsToday();        // 是否今天
+DateTime.Now.IsWeekday();      // 是否工作日
+birthDate.GetAge();            // 计算年龄
+DateTime.Now.GetQuarter();     // 获取季度（1-4）
+DateTime.Now.ToTimestamp();    // Unix时间戳（秒）
+DateTime.Now.ToTimestampMs();  // Unix时间戳（毫秒）
+
+// 数字扩展
+100.InRange(1, 200);           // 判断范围
+100.Clamp(50, 150);            // 限制范围
+12345.ToChinese();             // "一万二千三百四十五"
+1234.56.ToMoneyChinese();      // "壹仟贰佰叁拾肆元伍角陆分"
+1024.ToFileSize();             // "1.00 KB"
+```
+
+### 🗃️ 对象池（减少GC压力）
+
+```csharp
+// StringBuilder池
+var result = StringBuilderPool.Use(sb => {
+    sb.Append("Hello").Append(" World");
+    return sb.ToString();
+});
+
+// MemoryStream池
+var data = MemoryStreamPool.Use(ms => {
+    // 写入数据
+    ms.WriteByte(1);
+    return ms.ToArray();
+});
+
+// 字节数组池（基于ArrayPool）
+var buffer = ByteArrayPool.Rent(1024);
+try {
+    // 使用buffer
+} finally {
+    ByteArrayPool.Return(buffer);
+}
+
+// 或使用Use方法自动归还
+var result = ByteArrayPool.Use(1024, buffer => {
+    // 处理数据
+    return ProcessBuffer(buffer);
+});
+```
+
 ## 🚀 快速开始
 
 ### 安装
@@ -97,29 +165,126 @@ var objectId = IdUtil.ObjectId();  // ObjectId
 
 ```
 EasyTool/
-├── EasyTool.Core/           # 核心包（轻量级，无外部依赖）
-│   ├── BusinessCategory/    # 业务验证（身份证、银行卡、手机号等30+种）
-│   ├── CodeCategory/        # 编码加密（Base系列、哈希、国密SM2/SM3/SM4）
-│   ├── CollectionsCategory/ # 集合操作
-│   ├── DateTimeCategory/    # 日期时间
-│   ├── IdentifierCategory/  # ID生成（Snowflake/ULID/TSID/ObjectId）
-│   ├── IOCategory/          # 文件操作
-│   ├── MathCategory/        # 数学工具
-│   ├── NetCategory/         # 网络工具
-│   ├── ReflectCategory/     # 反射工具
-│   ├── SecurityCategory/    # 安全（XSS、SQL注入）
-│   ├── TextCategory/        # 文本处理（拼音、敏感词、相似度）
-│   └── ToolCategory/        # 通用工具
-├── EasyTool.AI/             # AI模块
-├── EasyTool.Media/          # 媒体处理
-├── EasyTool.System/         # 系统工具
-├── EasyTool.All/            # 整合包
-├── EasyTool.Image/          # 图像处理
-├── EasyTool.NPOI/           # Excel处理
-└── EasyTool.Web/            # Web相关
+├── 📁 Core                        # 核心包（轻量级，无外部依赖）
+│   ├── BusinessCategory/         # 业务验证（身份证、银行卡、手机号等30+种）
+│   │   ├── PasswordGenerator     # 密码生成器
+│   │   ├── TwoFactorAuthUtil     # TOTP双因素认证
+│   │   ├── WeatherUtil           # 天气查询
+│   │   └── ...
+│   ├── CodeCategory/             # 编码加密（Base系列、哈希、国密SM2/SM3/SM4）
+│   ├── CollectionsCategory/      # 集合操作
+│   ├── DataCategory/             # 数据工具
+│   │   └── FakerUtil             # 模拟数据生成器
+│   ├── DateTimeCategory/         # 日期时间
+│   ├── IdentifierCategory/       # ID生成（Snowflake/ULID/TSID/ObjectId）
+│   ├── IOCategory/               # 文件操作
+│   ├── MathCategory/             # 数学工具
+│   ├── NetCategory/              # 网络工具
+│   │   ├── HttpRetryUtil         # HTTP重试与熔断
+│   │   ├── ShortUrlUtil          # 短链接生成
+│   │   └── ...
+│   ├── ReflectCategory/          # 反射工具
+│   ├── SecurityCategory/         # 安全（XSS、SQL注入）
+│   ├── TextCategory/             # 文本处理（拼音、敏感词、相似度）
+│   └── ToolCategory/             # 通用工具
+├── 📁 Extensions                 # 扩展模块
+│   ├── EasyTool.AI/              # AI模块
+│   ├── EasyTool.EmitMapper/      # 对象映射
+│   ├── EasyTool.Image/           # 图像处理
+│   ├── EasyTool.Media/           # 媒体处理
+│   ├── EasyTool.NPOI/            # Excel处理
+│   ├── EasyTool.System/          # 系统工具
+│   └── EasyTool.Web/             # Web相关
+├── 📁 Integration                # 整合包
+│   └── EasyTool.All/             # 全功能包（发布这个就行）
+└── 📁 Tests                      # 测试项目
+    └── EasyTool.UnitTests/       # 单元测试（318个测试）
 ```
 
 ## ✨ 特色功能
+
+### 🔐 密码与安全
+
+```csharp
+// 密码生成器
+var password = PasswordGenerator.Generate();                    // 12位随机密码
+var strong = PasswordGenerator.GenerateStrong();               // 16位强密码
+var pin = PasswordGenerator.GeneratePin(6);                    // 6位PIN码
+var passphrase = PasswordGenerator.GeneratePassphrase(4);      // 密码短语
+
+// 密码强度检测
+var strength = PasswordGenerator.CheckStrength("Password123!");  // Strong
+
+// TOTP双因素认证（兼容Google Authenticator）
+var secret = TwoFactorAuthUtil.GenerateSecret();
+var totp = TwoFactorAuthUtil.GenerateTotp(secret);
+var isValid = TwoFactorAuthUtil.VerifyTotp(secret, totp);
+var qrContent = TwoFactorAuthUtil.GetQrCodeContent("MyApp", "user@example.com", secret);
+```
+
+### 🌤️ 天气查询
+
+```csharp
+// 配置API密钥
+WeatherApiConfig.QWeatherApiKey = "your-api-key";
+
+// 查询天气
+var weather = await WeatherUtil.GetCurrentWeatherAsync("广州");
+var forecast = await WeatherUtil.GetForecastAsync("北京", 7);
+var airQuality = await WeatherUtil.GetAirQualityAsync("深圳");
+```
+
+### 🔗 短链接生成
+
+```csharp
+// 生成随机短码
+var code = ShortUrlUtil.GenerateCode(6);
+
+// 基于URL生成短码（同一URL生成相同短码）
+var code = ShortUrlUtil.GenerateCodeFromUrl("https://example.com/long-url");
+
+// Base62编码（适合ID转短码）
+var shortCode = ShortUrlUtil.EncodeBase62(123456789);
+var id = ShortUrlUtil.DecodeBase62(shortCode);
+
+// 第三方短链接服务
+var shortUrl = await ShortUrlUtil.ShortenWithIsGdAsync("https://example.com");
+```
+
+### 🌐 HTTP重试与熔断
+
+```csharp
+// 指数退避重试
+var response = await HttpRetryUtil.ExecuteWithRetryAsync(
+    httpClient, request,
+    new HttpRetryUtil.RetryOptions { MaxRetries = 3 });
+
+// 熔断器模式
+var circuitBreaker = new HttpRetryUtil.CircuitBreaker(failureThreshold: 5);
+await circuitBreaker.ExecuteAsync(async () => await httpClient.GetAsync(url));
+```
+
+### 🎲 模拟数据生成
+
+```csharp
+// 中文姓名
+var name = FakerUtil.ChineseName();           // "张明"
+var maleName = FakerUtil.ChineseName("male"); // 男性名字
+
+// 中国地址
+var address = FakerUtil.ChineseAddress();     // "广东省广州市天河区中山大道100号..."
+
+// 手机号
+var phone = FakerUtil.PhoneNumber();          // "13812345678"
+
+// 邮箱
+var email = FakerUtil.Email();                // "abc123@qq.com"
+
+// 随机数据
+var num = FakerUtil.RandomInt(1, 100);
+var money = FakerUtil.RandomMoney(1, 1000);
+var date = FakerUtil.RandomDate(5);           // 最近5年内随机日期
+```
 
 ### 🇨🇳 中国特色业务验证
 
@@ -320,15 +485,17 @@ var similarity = VectorSimilarity.Cosine(vector1, vector2);
 
 | 分类 | 文件数 | 说明 |
 |------|--------|------|
-| **BusinessCategory** | 20+ | 业务验证（身份证、银行卡、车牌、节假日等） |
-| **CodeCategory** | 25+ | 编码加密（Base系列、哈希、国密） |
-| **TextCategory** | 25+ | 文本处理（拼音、中文数字、敏感词、相似度） |
-| **CollectionsCategory** | 10+ | 集合操作 |
-| **DateTimeCategory** | 5 | 日期时间 |
-| **IdentifierCategory** | 3 | ID生成 |
-| **IOCategory** | 10+ | 文件操作 |
-| **SecurityCategory** | 5 | 安全工具 |
-| **ToolCategory** | 10+ | 通用工具 |
+| **BusinessCategory** | 35+ | 业务验证（身份证、银行卡、车牌、节假日等） |
+| **CodeCategory** | 70+ | 编码加密（Base系列、哈希、国密SM2/SM3/SM4） |
+| **TextCategory** | 30+ | 文本处理（拼音、中文数字、敏感词、相似度） |
+| **CollectionsCategory** | 45+ | 集合操作（BloomFilter、Trie、LRU、图、堆等） |
+| **DateTimeCategory** | 10+ | 日期时间（农历、节气、节假日） |
+| **IdentifierCategory** | 7+ | ID生成（Snowflake/ULID/TSID/ObjectId/NanoId） |
+| **IOCategory** | 30+ | 文件操作（压缩、监控、CSV、Excel） |
+| **MathCategory** | 18+ | 数学工具（统计、矩阵、几何、插值） |
+| **NetCategory** | 20+ | 网络工具（HTTP重试、短链接、DNS） |
+| **SecurityCategory** | 10+ | 安全工具（XSS、SQL注入、TLS、JWT） |
+| **ToolCategory** | 35+ | 通用工具（对象池、事件总线、熔断器） |
 
 ## 🔗 相关链接
 

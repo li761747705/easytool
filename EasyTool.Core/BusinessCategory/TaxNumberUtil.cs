@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace EasyTool.BusinessCategory
@@ -544,12 +545,12 @@ namespace EasyTool.BusinessCategory
         /// </summary>
         private static string GenerateRandomCode(int length)
         {
-            string result = "";
+            var sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {
-                result += BaseCode[MathCategory.RandomUtil.RandomInt(0, BaseCode.Length)];
+                sb.Append(BaseCode[MathCategory.RandomUtil.RandomInt(0, BaseCode.Length)]);
             }
-            return result;
+            return sb.ToString();
         }
 
         #endregion

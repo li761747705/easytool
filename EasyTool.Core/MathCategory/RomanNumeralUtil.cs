@@ -44,7 +44,7 @@ namespace EasyTool.MathCategory
         public static string ToRoman(int number)
         {
             if (number < 1 || number > 3999)
-                throw new ArgumentOutOfRangeException(nameof(number), "Number must be between 1 and 3999");
+                throw new ArgumentOutOfRangeException(nameof(number), "数字必须在 1 到 3999 之间");
 
             var result = new StringBuilder();
 
@@ -66,7 +66,7 @@ namespace EasyTool.MathCategory
         public static int FromRoman(string roman)
         {
             if (string.IsNullOrWhiteSpace(roman))
-                throw new ArgumentException("Roman numeral cannot be empty");
+                throw new ArgumentException("罗马数字不能为空");
 
             roman = roman.ToUpperInvariant().Trim();
             int result = 0;
@@ -75,7 +75,7 @@ namespace EasyTool.MathCategory
             for (int i = roman.Length - 1; i >= 0; i--)
             {
                 if (!RomanValues.TryGetValue(roman[i], out int value))
-                    throw new ArgumentException($"Invalid Roman numeral character: {roman[i]}");
+                    throw new ArgumentException($"无效的罗马数字字符: {roman[i]}");
 
                 if (value < prevValue)
                     result -= value;
@@ -87,7 +87,7 @@ namespace EasyTool.MathCategory
 
             // 验证结果是否有效
             if (ToRoman(result) != roman)
-                throw new ArgumentException($"Invalid Roman numeral: {roman}");
+                throw new ArgumentException($"无效的罗马数字: {roman}");
 
             return result;
         }

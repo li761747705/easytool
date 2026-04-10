@@ -2,7 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace EasyTool
+namespace EasyTool.CodeCategory
 {
     /// <summary>
     /// ECDSA 椭圆曲线签名算法工具类
