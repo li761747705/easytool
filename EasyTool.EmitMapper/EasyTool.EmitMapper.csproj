@@ -8,7 +8,7 @@
 
 		<PackageId>Joce.EasyTool.EmitMapper</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>2026.0108.1</Version>
+		<Version>1.2.0</Version>
 		<Description>
 			A open source C# tool to make .NET easy
 		</Description>
@@ -36,14 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="EmitMapper.Core" Version="1.0.2" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="LICENSE">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
+		<PackageReference Include="EmitMapper.Core" />
 	</ItemGroup>
 
 </Project>

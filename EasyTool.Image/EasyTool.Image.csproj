@@ -8,7 +8,7 @@
 
 		<PackageId>Joce.EasyTool.Image</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>2026.0108.1</Version>
+		<Version>1.2.0</Version>
 		<Description>
 			A open source C# tool to make .NET easy
 		</Description>
@@ -36,15 +36,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="SkiaSharp" Version="3.119.1" />
-	  <PackageReference Include="System.Drawing.Common" Version="10.0.1" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="LICENSE">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="System.Drawing.Common" />
 	</ItemGroup>
 
 </Project>

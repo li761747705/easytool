@@ -8,7 +8,7 @@
 
 		<PackageId>Joce.EasyTool.All</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>2026.0108.1</Version>
+		<Version>1.2.0</Version>
 		<Description>
 			EasyTool 全功能整合包 - .NET 版的 Hutool，一站式小工具库。包含核心工具、媒体处理、AI辅助、系统操作等所有模块。
 		</Description>

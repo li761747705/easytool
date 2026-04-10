@@ -8,7 +8,7 @@
 
 		<PackageId>Joce.EasyTool.Web</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>2026.0108.1</Version>
+		<Version>1.2.0</Version>
 		<Description>
 			A open source C# tool to make .NET easy
 		</Description>
