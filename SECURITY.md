@@ -17,7 +17,7 @@ We take security vulnerabilities seriously. If you discover a security vulnerabi
 
 Instead, please report them via:
 
-1. **GitHub Security Advisory** (Preferred): Use the [Security Advisories](https://github.com/dotnet-easy/easytool/security/advisories/new) feature to privately report the vulnerability.
+1. **GitHub Security Advisory** (Preferred): Use the [Security Advisories](https://github.com/li761747705/easytool/security/advisories/new) feature to privately report the vulnerability.
 2. **Email**: Send a description of the vulnerability to the maintainers.
 
 ### What to Include

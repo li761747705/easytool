@@ -7,13 +7,13 @@
 		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Core", ""))</RootNamespace>
 
 		<PackageId>Joce.EasyTool.AI</PackageId>
-		<Authors>一个大西瓜,TimChen</Authors>
+		<Authors>Joce</Authors>
 		<Description>
 			EasyTool AI 扩展 - 向量相似度、Prompt模板、Token计数、文本摘要等AI辅助工具
 		</Description>
 		<PackageTags>Tool AI OpenAI Vector Prompt NLP</PackageTags>
-		<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
-		<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/li761747705/easytool</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/li761747705/easytool</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageIcon>logo.png</PackageIcon>

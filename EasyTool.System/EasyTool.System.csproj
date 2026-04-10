@@ -7,13 +7,13 @@
 		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Core", ""))</RootNamespace>
 
 		<PackageId>Joce.EasyTool.System</PackageId>
-		<Authors>一个大西瓜,TimChen</Authors>
+		<Authors>Joce</Authors>
 		<Description>
 			EasyTool 系统扩展 - 系统信息、进程管理、剪贴板、键鼠模拟等系统操作工具
 		</Description>
 		<PackageTags>Tool System Process Clipboard Hardware</PackageTags>
-		<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
-		<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/li761747705/easytool</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/li761747705/easytool</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageIcon>logo.png</PackageIcon>

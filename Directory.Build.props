@@ -9,8 +9,8 @@
     <Copyright>Copyright © 2024-2026 EasyTool Team</Copyright>
 
     <!-- 项目URL -->
-    <PackageProjectUrl>https://github.com/dotnet-easy/easytool</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/dotnet-easy/easytool.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/li761747705/easytool</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/li761747705/easytool.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>

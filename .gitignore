@@ -402,6 +402,7 @@ FodyWeavers.xsd
 .omc/
 .claude/
 .spec-workflow/
+.serena/
 
 #########################################
 # Additional ignores

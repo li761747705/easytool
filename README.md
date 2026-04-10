@@ -4,11 +4,11 @@
 </div>
 <div align="center">
 
-[![pull_request](https://github.com/dotnet-easy/easytool/actions/workflows/pull_request.yml/badge.svg)](https://github.com/dotnet-easy/easytool/actions/workflows/pull_request.yml)
+[![pull_request](https://github.com/li761747705/easytool/actions/workflows/pull_request.yml/badge.svg)](https://github.com/li761747705/easytool/actions/workflows/pull_request.yml)
 [![](https://img.shields.io/nuget/v/EasyTool.Core.svg)](https://www.nuget.org/packages/EasyTool.Core)
 [![](https://img.shields.io/badge/.NET-netstandard2.1-blue)](https://learn.microsoft.com/dotnet/standard/net-standard)
-[![](https://img.shields.io/badge/测试-1069+-brightgreen)](https://github.com/dotnet-easy/easytool)
-[![](https://img.shields.io/badge/工具类-300+-orange)](https://github.com/dotnet-easy/easytool)
+[![](https://img.shields.io/badge/测试-1069+-brightgreen)](https://github.com/li761747705/easytool)
+[![](https://img.shields.io/badge/工具类-300+-orange)](https://github.com/li761747705/easytool)
 <p>
     <span>中文</span> | <a href="README.EN-US.md">English</a>
 </p>
@@ -885,9 +885,9 @@ EasyTool/
 
 ## 🔗 相关链接
 
-- [在线文档](https://easy-dotnet.com/pages/easytool/)
+- [在线文档](https://github.com/li761747705/easytool#readme)
 - [NuGet 包](https://www.nuget.org/packages/EasyTool.Core)
-- [GitHub 仓库](https://github.com/dotnet-easy/easytool)
+- [GitHub 仓库](https://github.com/li761747705/easytool)
 
 ## 🤝 贡献
 

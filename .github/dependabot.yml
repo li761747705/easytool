@@ -7,7 +7,7 @@ updates:
       day: "monday"
     open-pull-requests-limit: 10
     reviewers:
-      - "dotnet-easy/easytool"
+      - "li761747705/easytool"
     labels:
       - "dependencies"
       - "nuget"

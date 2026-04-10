@@ -7,13 +7,13 @@
 			<RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Web", ""))</RootNamespace>
 
 			<PackageId>Joce.EasyTool.Web</PackageId>
-			<Authors>一个大西瓜,TimChen</Authors>
+			<Authors>Joce</Authors>
 			<Description>
 				EasyTool Web扩展 - ASP.NET Core TypeScript代码生成工具，自动扫描API Controller生成TypeScript类型定义和HTTP客户端代码
 			</Description>
 			<PackageTags>Tool Web TypeScript ASP.NET Core API CodeGeneration</PackageTags>
-			<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
-			<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
+			<RepositoryUrl>https://github.com/li761747705/easytool</RepositoryUrl>
+			<PackageProjectUrl>https://github.com/li761747705/easytool</PackageProjectUrl>
 			<PackageReadmeFile>README.md</PackageReadmeFile>
 			<PackageLicenseFile>LICENSE</PackageLicenseFile>
 			<PackageIcon>logo.png</PackageIcon>

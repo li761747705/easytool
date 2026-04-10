@@ -4,11 +4,11 @@ An open-source .NET utility library inspired by Java Hutool, making development 
 </div>
 <div align="center">
 
-[![pull_request](https://github.com/dotnet-easy/easytool/actions/workflows/pull_request.yml/badge.svg)](https://github.com/dotnet-easy/easytool/actions/workflows/pull_request.yml)
+[![pull_request](https://github.com/li761747705/easytool/actions/workflows/pull_request.yml/badge.svg)](https://github.com/li761747705/easytool/actions/workflows/pull_request.yml)
 [![](https://img.shields.io/nuget/v/EasyTool.Core.svg)](https://www.nuget.org/packages/EasyTool.Core)
 [![](https://img.shields.io/badge/.NET-netstandard2.1-blue)](https://learn.microsoft.com/dotnet/standard/net-standard)
-[![](https://img.shields.io/badge/Tests-1069+-brightgreen)](https://github.com/dotnet-easy/easytool)
-[![](https://img.shields.io/badge/Utilities-300+-orange)](https://github.com/dotnet-easy/easytool)
+[![](https://img.shields.io/badge/Tests-1069+-brightgreen)](https://github.com/li761747705/easytool)
+[![](https://img.shields.io/badge/Utilities-300+-orange)](https://github.com/li761747705/easytool)
 <p>
     <a href="README.md">中文</a> | <span>English</span>
 </p>
@@ -556,9 +556,9 @@ EasyTool/
 
 ## 🔗 Links
 
-- [Documentation](https://easy-dotnet.com/pages/easytool/)
+- [Documentation](https://github.com/li761747705/easytool#readme)
 - [NuGet](https://www.nuget.org/packages/EasyTool.Core)
-- [GitHub](https://github.com/dotnet-easy/easytool)
+- [GitHub](https://github.com/li761747705/easytool)
 
 ## 🤝 Contributing
 

@@ -491,5 +491,5 @@ var localResponse = await ollamaClient.ChatSimpleAsync("Hello!");
 
 ---
 
-[1.1.0]: https://github.com/dotnet-easy/easytool/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/dotnet-easy/easytool/releases/tag/v1.0.0
+[1.1.0]: https://github.com/li761747705/easytool/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/li761747705/easytool/releases/tag/v1.0.0

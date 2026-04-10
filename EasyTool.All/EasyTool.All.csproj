@@ -7,13 +7,13 @@
 		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Core", ""))</RootNamespace>
 
 		<PackageId>Joce.EasyTool.All</PackageId>
-		<Authors>一个大西瓜,TimChen</Authors>
+		<Authors>Joce</Authors>
 		<Description>
 			EasyTool 全功能整合包 - .NET 版的 Hutool，一站式小工具库。包含核心工具、媒体处理、AI辅助、系统操作等所有模块。
 		</Description>
 		<PackageTags>Tool Hutool Utility All-in-One</PackageTags>
-		<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
-		<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/li761747705/easytool</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/li761747705/easytool</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageIcon>logo.png</PackageIcon>
