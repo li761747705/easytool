@@ -145,6 +145,11 @@ namespace EasyTool.System
         /// <returns>电源状态信息</returns>
         public static PowerStatus GetPowerStatus()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var status = new SYSTEM_POWER_STATUS();
             GetSystemPowerStatus(ref status);
 
@@ -259,6 +264,11 @@ namespace EasyTool.System
         /// <returns>是否成功</returns>
         public static bool Sleep(bool force = false)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             try
             {
                 return SetSuspendState(false, force, false);
@@ -276,6 +286,11 @@ namespace EasyTool.System
         /// <returns>是否成功</returns>
         public static bool Hibernate(bool force = false)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             try
             {
                 return SetSuspendState(true, force, false);

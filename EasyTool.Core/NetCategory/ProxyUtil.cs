@@ -272,7 +272,7 @@ namespace EasyTool.NetCategory
                 using var client = CreateHttpClient(proxyInfo);
                 client.Timeout = timeout ?? TimeSpan.FromSeconds(30);
 
-                var response = await client.GetAsync(testUrl);
+                var response = await client.GetAsync(testUrl).ConfigureAwait(false);
                 return response.IsSuccessStatusCode;
             }
             catch
@@ -291,7 +291,7 @@ namespace EasyTool.NetCategory
         public static async Task<bool> TestProxyAsync(string proxyString, string testUrl = "http://www.google.com", TimeSpan? timeout = null)
         {
             var proxyInfo = Parse(proxyString);
-            return await TestProxyAsync(proxyInfo, testUrl, timeout);
+            return await TestProxyAsync(proxyInfo, testUrl, timeout).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace EasyTool.NetCategory
                 client.Timeout = TimeSpan.FromSeconds(30);
 
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-                await client.GetAsync(testUrl);
+                await client.GetAsync(testUrl).ConfigureAwait(false);
                 stopwatch.Stop();
 
                 return stopwatch.ElapsedMilliseconds;
@@ -555,13 +555,13 @@ namespace EasyTool.NetCategory
         {
             var tasks = _proxies.Select(async proxy =>
             {
-                var responseTime = await ProxyUtil.GetResponseTimeAsync(proxy, testUrl);
+                var responseTime = await ProxyUtil.GetResponseTimeAsync(proxy, testUrl).ConfigureAwait(false);
                 var success = responseTime >= 0;
                 ReportResult(proxy.Address, success, responseTime);
                 return success;
             });
 
-            var results = await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
             return results.Count(r => r);
         }
     }

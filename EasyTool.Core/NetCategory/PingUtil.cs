@@ -202,9 +202,9 @@ namespace EasyTool.NetCategory
                 else
                 {
 #if NET5_0_OR_GREATER
-                    var addresses = await Dns.GetHostAddressesAsync(hostNameOrAddress, cancellationToken);
+                    var addresses = await Dns.GetHostAddressesAsync(hostNameOrAddress, cancellationToken).ConfigureAwait(false);
 #else
-                    var addresses = await Dns.GetHostAddressesAsync(hostNameOrAddress);
+                    var addresses = await Dns.GetHostAddressesAsync(hostNameOrAddress).ConfigureAwait(false);
 #endif
                     if (addresses.Length == 0)
                     {
@@ -225,7 +225,7 @@ namespace EasyTool.NetCategory
                 }
 
                 var options = new System.Net.NetworkInformation.PingOptions(128, true);
-                var reply = await ping.SendPingAsync(ipAddress, timeout, buffer, options);
+                var reply = await ping.SendPingAsync(ipAddress, timeout, buffer, options).ConfigureAwait(false);
 
                 result.Status = reply.Status;
                 result.Success = reply.Status == IPStatus.Success;
@@ -272,9 +272,9 @@ namespace EasyTool.NetCategory
                 else
                 {
 #if NET5_0_OR_GREATER
-                    var addresses = await Dns.GetHostAddressesAsync(hostNameOrAddress, cancellationToken);
+                    var addresses = await Dns.GetHostAddressesAsync(hostNameOrAddress, cancellationToken).ConfigureAwait(false);
 #else
-                    var addresses = await Dns.GetHostAddressesAsync(hostNameOrAddress);
+                    var addresses = await Dns.GetHostAddressesAsync(hostNameOrAddress).ConfigureAwait(false);
 #endif
                     if (addresses.Length == 0)
                     {
@@ -295,7 +295,7 @@ namespace EasyTool.NetCategory
                 }
 
                 var pingOptions = new System.Net.NetworkInformation.PingOptions(options.Ttl, options.DontFragment);
-                var reply = await ping.SendPingAsync(ipAddress, options.Timeout, buffer, pingOptions);
+                var reply = await ping.SendPingAsync(ipAddress, options.Timeout, buffer, pingOptions).ConfigureAwait(false);
 
                 result.Status = reply.Status;
                 result.Success = reply.Status == IPStatus.Success;
@@ -338,7 +338,7 @@ namespace EasyTool.NetCategory
                 if (cancellationToken.IsCancellationRequested)
                     break;
 
-                var result = await PingAsync(hostNameOrAddress, options, cancellationToken);
+                var result = await PingAsync(hostNameOrAddress, options, cancellationToken).ConfigureAwait(false);
                 stats.Results.Add(result);
                 stats.PacketsSent++;
 
@@ -356,7 +356,7 @@ namespace EasyTool.NetCategory
 
                 if (i < options.Count - 1)
                 {
-                    await Task.Delay(options.Interval, cancellationToken);
+                    await Task.Delay(options.Interval, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -379,7 +379,7 @@ namespace EasyTool.NetCategory
         public static async Task<Dictionary<string, PingResult>> PingMultipleAsync(IEnumerable<string> hosts, int timeout = 5000)
         {
             var tasks = hosts.Select(h => PingAsync(h, timeout));
-            var results = await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
 
             return hosts.Zip(results, (h, r) => new { Host = h, Result = r })
                        .ToDictionary(x => x.Host, x => x.Result);
@@ -393,7 +393,7 @@ namespace EasyTool.NetCategory
         /// <returns>是否可达</returns>
         public static async Task<bool> IsReachableAsync(string hostNameOrAddress, int timeout = 5000)
         {
-            var result = await PingAsync(hostNameOrAddress, timeout);
+            var result = await PingAsync(hostNameOrAddress, timeout).ConfigureAwait(false);
             return result.Success;
         }
 
@@ -423,7 +423,7 @@ namespace EasyTool.NetCategory
                 var connectTask = client.ConnectAsync(hostNameOrAddress, port);
                 var timeoutTask = Task.Delay(timeout);
 
-                var completedTask = await Task.WhenAny(connectTask, timeoutTask);
+                var completedTask = await Task.WhenAny(connectTask, timeoutTask).ConfigureAwait(false);
 
                 if (completedTask == connectTask && client.Connected)
                 {
@@ -459,7 +459,7 @@ namespace EasyTool.NetCategory
         public static async Task<double> TestLatencyAsync(string hostNameOrAddress, int count = 5)
         {
             var options = new PingOptions { Count = count };
-            var stats = await PingContinuousAsync(hostNameOrAddress, options);
+            var stats = await PingContinuousAsync(hostNameOrAddress, options).ConfigureAwait(false);
             return stats.AverageRoundtripTime;
         }
 

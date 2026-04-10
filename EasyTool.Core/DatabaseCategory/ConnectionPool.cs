@@ -179,7 +179,7 @@ namespace EasyTool.DatabaseCategory
         {
             for (int retry = 0; retry < _options.RetryCount; retry++)
             {
-                if (await _semaphore.WaitAsync(_options.ConnectionTimeout, cancellationToken))
+                if (await _semaphore.WaitAsync(_options.ConnectionTimeout, cancellationToken).ConfigureAwait(false))
                 {
                     try
                     {
@@ -218,7 +218,7 @@ namespace EasyTool.DatabaseCategory
 
                 if (retry < _options.RetryCount - 1)
                 {
-                    await Task.Delay(_options.RetryDelay, cancellationToken);
+                    await Task.Delay(_options.RetryDelay, cancellationToken).ConfigureAwait(false);
                 }
             }
 

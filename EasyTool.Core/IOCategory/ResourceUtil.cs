@@ -89,7 +89,7 @@ namespace EasyTool.IOCategory
                 throw new FileNotFoundException($"嵌入资源未找到: {resourceName}");
 
             using var reader = new StreamReader(stream, Encoding.UTF8);
-            return await reader.ReadToEndAsync();
+            return await reader.ReadToEndAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace EasyTool.IOCategory
                 throw new FileNotFoundException($"嵌入资源未找到: {resourceName}");
 
             using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
+            await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
             return memoryStream.ToArray();
         }
 
@@ -257,7 +257,7 @@ namespace EasyTool.IOCategory
             }
 
             using var fileStream = File.Create(outputPath);
-            await stream.CopyToAsync(fileStream);
+            await stream.CopyToAsync(fileStream).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace EasyTool.IOCategory
         /// <returns>反序列化的对象</returns>
         public static async Task<T?> ReadAsJsonAsync<T>(string resourceName, Assembly? assembly = null)
         {
-            var json = await ReadAsStringAsync(resourceName, assembly);
+            var json = await ReadAsStringAsync(resourceName, assembly).ConfigureAwait(false);
             return System.Text.Json.JsonSerializer.Deserialize<T>(json);
         }
 

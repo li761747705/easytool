@@ -75,7 +75,7 @@ namespace EasyTool.CodeCategory
 
             // 验证长度
             if (encoded.Length % 3 == 1)
-                throw new ArgumentException("Invalid Base45 string length", nameof(encoded));
+                throw new ArgumentException("无效的 Base45 字符串长度", nameof(encoded));
 
             var result = new System.Collections.Generic.List<byte>();
 
@@ -226,7 +226,7 @@ namespace EasyTool.CodeCategory
         private static int DecodeChar(char c)
         {
             if (c >= 128 || DecodeMap[c] < 0)
-                throw new ArgumentException($"Invalid Base45 character: {c}", "encoded");
+                throw new ArgumentException($"无效的 Base45 字符: {c}", "encoded");
 
             return DecodeMap[c];
         }

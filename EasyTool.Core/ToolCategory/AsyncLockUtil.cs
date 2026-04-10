@@ -77,7 +77,7 @@ namespace EasyTool.ToolCategory
         /// <returns>是否成功获取和释放器</returns>
         public async Task<(bool acquired, Releaser releaser)> TryLockAsync(TimeSpan timeout)
         {
-            if (await _semaphore.WaitAsync(timeout))
+            if (await _semaphore.WaitAsync(timeout).ConfigureAwait(false))
             {
                 return (true, new Releaser(this));
             }
@@ -119,10 +119,10 @@ namespace EasyTool.ToolCategory
         /// <returns>释放器</returns>
         public async Task<ReaderReleaser> ReaderLockAsync()
         {
-            await _readLock.WaitAsync();
+            await _readLock.WaitAsync().ConfigureAwait(false);
             if (Interlocked.Increment(ref _readersCount) == 1)
             {
-                await _writeLock.WaitAsync();
+                await _writeLock.WaitAsync().ConfigureAwait(false);
             }
             _readLock.Release();
 
@@ -135,7 +135,7 @@ namespace EasyTool.ToolCategory
         /// <returns>释放器</returns>
         public async Task<WriterReleaser> WriterLockAsync()
         {
-            await _writeLock.WaitAsync();
+            await _writeLock.WaitAsync().ConfigureAwait(false);
             return new WriterReleaser(this);
         }
 
@@ -144,14 +144,14 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public async Task<(bool acquired, ReaderReleaser releaser)> TryReaderLockAsync(TimeSpan timeout)
         {
-            if (!await _readLock.WaitAsync(timeout))
+            if (!await _readLock.WaitAsync(timeout).ConfigureAwait(false))
                 return (false, default);
 
             try
             {
                 if (Interlocked.Increment(ref _readersCount) == 1)
                 {
-                    if (!await _writeLock.WaitAsync(timeout))
+                    if (!await _writeLock.WaitAsync(timeout).ConfigureAwait(false))
                     {
                         Interlocked.Decrement(ref _readersCount);
                         return (false, default);
@@ -172,7 +172,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public async Task<(bool acquired, WriterReleaser releaser)> TryWriterLockAsync(TimeSpan timeout)
         {
-            if (await _writeLock.WaitAsync(timeout))
+            if (await _writeLock.WaitAsync(timeout).ConfigureAwait(false))
             {
                 return (true, new WriterReleaser(this));
             }
@@ -515,9 +515,9 @@ namespace EasyTool.ToolCategory
         public static async Task<T> WithLockAsync<T>(string name, Func<Task<T>> action)
         {
             var @lock = GetOrCreateLock(name);
-            using (await @lock.LockAsync())
+            using (await @lock.LockAsync().ConfigureAwait(false))
             {
-                return await action();
+                return await action().ConfigureAwait(false);
             }
         }
 
@@ -529,9 +529,9 @@ namespace EasyTool.ToolCategory
         public static async Task WithLockAsync(string name, Func<Task> action)
         {
             var @lock = GetOrCreateLock(name);
-            using (await @lock.LockAsync())
+            using (await @lock.LockAsync().ConfigureAwait(false))
             {
-                await action();
+                await action().ConfigureAwait(false);
             }
         }
 
@@ -551,9 +551,9 @@ namespace EasyTool.ToolCategory
         public static async Task<T> WithReaderLockAsync<T>(string name, Func<Task<T>> action)
         {
             var @lock = GetOrCreateReaderWriterLock(name);
-            using (await @lock.ReaderLockAsync())
+            using (await @lock.ReaderLockAsync().ConfigureAwait(false))
             {
-                return await action();
+                return await action().ConfigureAwait(false);
             }
         }
 
@@ -563,9 +563,9 @@ namespace EasyTool.ToolCategory
         public static async Task<T> WithWriterLockAsync<T>(string name, Func<Task<T>> action)
         {
             var @lock = GetOrCreateReaderWriterLock(name);
-            using (await @lock.WriterLockAsync())
+            using (await @lock.WriterLockAsync().ConfigureAwait(false))
             {
-                return await action();
+                return await action().ConfigureAwait(false);
             }
         }
 

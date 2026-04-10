@@ -120,7 +120,7 @@ namespace EasyTool.ValidationCategory
 
             foreach (var validator in _validators)
             {
-                var result = await validator.ValidateAsync(instance);
+                var result = await validator.ValidateAsync(instance).ConfigureAwait(false);
                 if (!result.IsValid)
                 {
                     allErrors.AddRange(result.Errors);
@@ -243,6 +243,12 @@ namespace EasyTool.ValidationCategory
         /// </summary>
         public string? FirstError => AllErrors.FirstOrDefault();
 
+        /// <summary>
+        /// 创建批量验证结果
+        /// </summary>
+        /// <param name="isValid">是否全部验证通过</param>
+        /// <param name="allErrors">所有错误消息</param>
+        /// <param name="propertyResults">按属性分组的验证结果</param>
         public BatchValidationResult(bool isValid, List<string> allErrors, Dictionary<string, ValidationResult> propertyResults)
         {
             IsValid = isValid;
@@ -332,9 +338,9 @@ namespace EasyTool.ValidationCategory
             var validator = Get<T>();
             if (validator == null)
             {
-                return await ModelValidator.ValidateAsync(instance);
+                return await ModelValidator.ValidateAsync(instance).ConfigureAwait(false);
             }
-            return await validator.ValidateAsync(instance);
+            return await validator.ValidateAsync(instance).ConfigureAwait(false);
         }
 
         /// <summary>

@@ -226,7 +226,7 @@ namespace EasyTool.QueueCategory
 
             if (waitForCompletion)
             {
-                await Task.WhenAll(_consumerTasks);
+                await Task.WhenAll(_consumerTasks).ConfigureAwait(false);
             }
         }
 
@@ -325,7 +325,7 @@ namespace EasyTool.QueueCategory
             {
                 try
                 {
-                    await _signal.WaitAsync(cancellationToken);
+                    await _signal.WaitAsync(cancellationToken).ConfigureAwait(false);
 
                     Message<T>? message = null;
 
@@ -348,7 +348,7 @@ namespace EasyTool.QueueCategory
                         continue;
 
                     // 处理消息
-                    var result = await _handler(message);
+                    var result = await _handler(message).ConfigureAwait(false);
 
                     switch (result.Action)
                     {
@@ -360,7 +360,7 @@ namespace EasyTool.QueueCategory
                             message.RetryCount++;
                             if (message.RetryCount < message.MaxRetryCount)
                             {
-                                await Task.Delay(_options.DefaultRetryDelay, cancellationToken);
+                                await Task.Delay(_options.DefaultRetryDelay, cancellationToken).ConfigureAwait(false);
                                 Publish(message.Body, MessageType.Normal);
                             }
                             else if (_options.EnableDeadLetterQueue)
@@ -394,7 +394,7 @@ namespace EasyTool.QueueCategory
             {
                 try
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
 
                     var now = DateTime.UtcNow;
                     var readyMessages = new List<Message<T>>();
@@ -472,7 +472,7 @@ namespace EasyTool.QueueCategory
                 {
                     System.IO.Directory.CreateDirectory(directory);
                 }
-                await System.IO.File.WriteAllTextAsync(_options.PersistenceFilePath, json);
+                await System.IO.File.WriteAllTextAsync(_options.PersistenceFilePath, json).ConfigureAwait(false);
             }
             catch
             {
@@ -493,7 +493,7 @@ namespace EasyTool.QueueCategory
 
             try
             {
-                var json = await System.IO.File.ReadAllTextAsync(_options.PersistenceFilePath);
+                var json = await System.IO.File.ReadAllTextAsync(_options.PersistenceFilePath).ConfigureAwait(false);
                 var messages = System.Text.Json.JsonSerializer.Deserialize<List<Message<T>>>(json);
 
                 if (messages != null)

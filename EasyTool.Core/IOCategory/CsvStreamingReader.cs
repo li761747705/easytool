@@ -160,7 +160,7 @@ namespace EasyTool.IOCategory
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var line = await _reader.ReadLineAsync();
+                var line = await _reader.ReadLineAsync().ConfigureAwait(false);
 
                 if (line == null)
                     return null;
@@ -197,7 +197,7 @@ namespace EasyTool.IOCategory
         {
             string[]? line;
 
-            while ((line = await ReadLineAsync(cancellationToken)) != null)
+            while ((line = await ReadLineAsync(cancellationToken).ConfigureAwait(false)) != null)
             {
                 yield return line;
             }
@@ -232,7 +232,7 @@ namespace EasyTool.IOCategory
 
             string[]? line;
 
-            while ((line = await ReadLineAsync(cancellationToken)) != null)
+            while ((line = await ReadLineAsync(cancellationToken).ConfigureAwait(false)) != null)
             {
                 yield return LineToDict(line);
             }
@@ -397,7 +397,7 @@ namespace EasyTool.IOCategory
         public async Task WriteLineAsync(params string[] fields)
         {
             var line = FormatLine(fields);
-            await _writer.WriteLineAsync(line);
+            await _writer.WriteLineAsync(line).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -421,7 +421,7 @@ namespace EasyTool.IOCategory
         {
             var columns = columnOrder ?? dict.Keys.ToArray();
             var fields = columns.Select(c => dict.TryGetValue(c, out var v) ? v : "").ToArray();
-            await WriteLineAsync(fields);
+            await WriteLineAsync(fields).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace EasyTool.IOCategory
         /// </summary>
         public async Task FlushAsync()
         {
-            await _writer.FlushAsync();
+            await _writer.FlushAsync().ConfigureAwait(false);
         }
 
         private string FormatLine(string[] fields)

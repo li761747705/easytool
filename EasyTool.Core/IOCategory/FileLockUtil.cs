@@ -111,8 +111,8 @@ namespace EasyTool.IOCategory
 
                     var lockInfo = $"{Environment.MachineName}|{Process.GetCurrentProcess().Id}|{DateTime.UtcNow:O}";
                     var bytes = System.Text.Encoding.UTF8.GetBytes(lockInfo);
-                    await fileStream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
-                    await fileStream.FlushAsync(cancellationToken);
+                    await fileStream.WriteAsync(bytes, 0, bytes.Length, cancellationToken).ConfigureAwait(false);
+                    await fileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
 
                     return new FileLock(lockFilePath, fileStream);
                 }
@@ -123,7 +123,7 @@ namespace EasyTool.IOCategory
                         throw new TimeoutException($"获取文件锁超时: {filePath}");
                     }
 
-                    await Task.Delay(options.RetryInterval, cancellationToken);
+                    await Task.Delay(options.RetryInterval, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -256,8 +256,8 @@ namespace EasyTool.IOCategory
         /// <param name="cancellationToken">取消令牌</param>
         public static async Task WithLockAsync(string filePath, Func<Task> action, FileLockOptions? options = null, CancellationToken cancellationToken = default)
         {
-            using var fileLock = await AcquireAsync(filePath, options, cancellationToken);
-            await action();
+            using var fileLock = await AcquireAsync(filePath, options, cancellationToken).ConfigureAwait(false);
+            await action().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -271,8 +271,8 @@ namespace EasyTool.IOCategory
         /// <returns>操作结果</returns>
         public static async Task<T> WithLockAsync<T>(string filePath, Func<Task<T>> func, FileLockOptions? options = null, CancellationToken cancellationToken = default)
         {
-            using var fileLock = await AcquireAsync(filePath, options, cancellationToken);
-            return await func();
+            using var fileLock = await AcquireAsync(filePath, options, cancellationToken).ConfigureAwait(false);
+            return await func().ConfigureAwait(false);
         }
 
         private static string GetLockFilePath(string filePath, FileLockOptions options)

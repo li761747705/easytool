@@ -111,7 +111,7 @@ namespace EasyTool.NetCategory
         public static async Task<List<IPAddress>> QueryAAsync(string domain, DnsQueryOptions? options = null)
         {
             options ??= new DnsQueryOptions();
-            var records = await QueryAsync(domain, DnsRecordType.A, options);
+            var records = await QueryAsync(domain, DnsRecordType.A, options).ConfigureAwait(false);
 
             return records
                 .Select(r => IPAddress.TryParse(r.Value, out var ip) ? ip : null)
@@ -129,7 +129,7 @@ namespace EasyTool.NetCategory
         public static async Task<List<IPAddress>> QueryAaaaAsync(string domain, DnsQueryOptions? options = null)
         {
             options ??= new DnsQueryOptions();
-            var records = await QueryAsync(domain, DnsRecordType.AAAA, options);
+            var records = await QueryAsync(domain, DnsRecordType.AAAA, options).ConfigureAwait(false);
 
             return records
                 .Select(r => IPAddress.TryParse(r.Value, out var ip) ? ip : null)
@@ -147,7 +147,7 @@ namespace EasyTool.NetCategory
         public static async Task<List<(int Priority, string MailServer)>> QueryMxAsync(string domain, DnsQueryOptions? options = null)
         {
             options ??= new DnsQueryOptions();
-            var records = await QueryAsync(domain, DnsRecordType.MX, options);
+            var records = await QueryAsync(domain, DnsRecordType.MX, options).ConfigureAwait(false);
 
             return records
                 .Where(r => r.Priority.HasValue)
@@ -165,7 +165,7 @@ namespace EasyTool.NetCategory
         public static async Task<List<string>> QueryTxtAsync(string domain, DnsQueryOptions? options = null)
         {
             options ??= new DnsQueryOptions();
-            var records = await QueryAsync(domain, DnsRecordType.TXT, options);
+            var records = await QueryAsync(domain, DnsRecordType.TXT, options).ConfigureAwait(false);
             return records.Select(r => r.Value).ToList();
         }
 
@@ -178,7 +178,7 @@ namespace EasyTool.NetCategory
         public static async Task<string?> QueryCnameAsync(string domain, DnsQueryOptions? options = null)
         {
             options ??= new DnsQueryOptions();
-            var records = await QueryAsync(domain, DnsRecordType.CNAME, options);
+            var records = await QueryAsync(domain, DnsRecordType.CNAME, options).ConfigureAwait(false);
             return records.FirstOrDefault()?.Value;
         }
 
@@ -191,7 +191,7 @@ namespace EasyTool.NetCategory
         public static async Task<List<string>> QueryNsAsync(string domain, DnsQueryOptions? options = null)
         {
             options ??= new DnsQueryOptions();
-            var records = await QueryAsync(domain, DnsRecordType.NS, options);
+            var records = await QueryAsync(domain, DnsRecordType.NS, options).ConfigureAwait(false);
             return records.Select(r => r.Value).ToList();
         }
 
@@ -210,7 +210,7 @@ namespace EasyTool.NetCategory
             Array.Reverse(bytes);
             var ptrDomain = $"{string.Join(".", bytes)}.in-addr.arpa";
 
-            var records = await QueryAsync(ptrDomain, DnsRecordType.PTR, options);
+            var records = await QueryAsync(ptrDomain, DnsRecordType.PTR, options).ConfigureAwait(false);
             return records.Select(r => r.Value).ToList();
         }
 
@@ -233,11 +233,11 @@ namespace EasyTool.NetCategory
 
             if (options.UseTcp)
             {
-                responseBytes = await QueryOverTcpAsync(queryPacket, options);
+                responseBytes = await QueryOverTcpAsync(queryPacket, options).ConfigureAwait(false);
             }
             else
             {
-                responseBytes = await QueryOverUdpAsync(queryPacket, options);
+                responseBytes = await QueryOverUdpAsync(queryPacket, options).ConfigureAwait(false);
             }
 
             // 解析响应
@@ -260,7 +260,7 @@ namespace EasyTool.NetCategory
 
             foreach (var domain in domains)
             {
-                result[domain] = await QueryAsync(domain, recordType, options);
+                result[domain] = await QueryAsync(domain, recordType, options).ConfigureAwait(false);
             }
 
             return result;
@@ -353,9 +353,9 @@ namespace EasyTool.NetCategory
             using var client = new UdpClient();
             client.Client.ReceiveTimeout = (int)options.Timeout.TotalMilliseconds;
 
-            await client.SendAsync(query, query.Length, options.DnsServer.ToString(), options.Port);
+            await client.SendAsync(query, query.Length, options.DnsServer.ToString(), options.Port).ConfigureAwait(false);
 
-            var result = await client.ReceiveAsync();
+            var result = await client.ReceiveAsync().ConfigureAwait(false);
             return result.Buffer;
         }
 
@@ -364,12 +364,12 @@ namespace EasyTool.NetCategory
             using var client = new TcpClient();
             var connectTask = client.ConnectAsync(options.DnsServer, options.Port);
 
-            if (await Task.WhenAny(connectTask, Task.Delay(options.Timeout)) != connectTask)
+            if (await Task.WhenAny(connectTask, Task.Delay(options.Timeout)).ConfigureAwait(false) != connectTask)
             {
                 throw new TimeoutException("DNS 查询超时");
             }
 
-            await connectTask;
+            await connectTask.ConfigureAwait(false);
 
             var stream = client.GetStream();
             stream.ReadTimeout = (int)options.Timeout.TotalMilliseconds;
@@ -379,17 +379,17 @@ namespace EasyTool.NetCategory
             var lengthBytes = BitConverter.GetBytes((ushort)query.Length);
             Array.Reverse(lengthBytes); // Big-endian
 
-            await stream.WriteAsync(lengthBytes, 0, 2);
-            await stream.WriteAsync(query, 0, query.Length);
+            await stream.WriteAsync(lengthBytes, 0, 2).ConfigureAwait(false);
+            await stream.WriteAsync(query, 0, query.Length).ConfigureAwait(false);
 
             // 读取响应
             var responseLengthBytes = new byte[2];
-            await stream.ReadAsync(responseLengthBytes, 0, 2);
+            await stream.ReadAsync(responseLengthBytes, 0, 2).ConfigureAwait(false);
             Array.Reverse(responseLengthBytes);
             var responseLength = BitConverter.ToUInt16(responseLengthBytes, 0);
 
             var response = new byte[responseLength];
-            await stream.ReadAsync(response, 0, responseLength);
+            await stream.ReadAsync(response, 0, responseLength).ConfigureAwait(false);
 
             return response;
         }

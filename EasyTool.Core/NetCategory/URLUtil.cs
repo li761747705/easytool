@@ -91,8 +91,8 @@ namespace EasyTool.NetCategory
         /// <summary>
         /// 从URL中去掉查询参数和片段。
         /// </summary>
-        /// <param name="uri">要去掉查询参数和片段的
-        /// /// <returns>不包含查询参数和片段的URL。</returns>
+        /// <param name="uri">要去掉查询参数和片段的Uri。</param>
+        /// <returns>不包含查询参数和片段的URL。</returns>
         private static string StripQueryAndFragment(Uri uri)
         {
             return uri.GetLeftPart(UriPartial.Path);

@@ -55,7 +55,7 @@ namespace EasyTool.MediaCategory
         /// </summary>
         public static async Task<bool> ConvertAsync(string inputPath, string outputPath, string? videoCodec = null, string? audioCodec = null, int? crf = null)
         {
-            return await Task.Run(() => Convert(inputPath, outputPath, videoCodec, audioCodec, crf));
+            return await Task.Run(() => Convert(inputPath, outputPath, videoCodec, audioCodec, crf)).ConfigureAwait(false);
         }
 
         /// <summary>

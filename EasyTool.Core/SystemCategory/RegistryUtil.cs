@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +16,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static string? GetValue(string path, string name)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(path);
             return key?.GetValue(name)?.ToString();
         }
@@ -24,6 +30,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static string? GetValue(Microsoft.Win32.RegistryHive hive, string path, string name)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var baseKey = Microsoft.Win32.RegistryKey.OpenBaseKey(hive, Microsoft.Win32.RegistryView.Default);
             using var key = baseKey.OpenSubKey(path);
             return key?.GetValue(name)?.ToString();
@@ -34,6 +45,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static void SetValue(string path, string name, object value, Microsoft.Win32.RegistryValueKind valueKind = Microsoft.Win32.RegistryValueKind.String)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var key = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(path);
             key?.SetValue(name, value, valueKind);
         }
@@ -43,6 +59,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static void SetValue(Microsoft.Win32.RegistryHive hive, string path, string name, object value, Microsoft.Win32.RegistryValueKind valueKind = Microsoft.Win32.RegistryValueKind.String)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var baseKey = Microsoft.Win32.RegistryKey.OpenBaseKey(hive, Microsoft.Win32.RegistryView.Default);
             using var key = baseKey.CreateSubKey(path);
             key?.SetValue(name, value, valueKind);
@@ -53,6 +74,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static void DeleteValue(string path, string name)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(path, true);
             key?.DeleteValue(name, false);
         }
@@ -62,6 +88,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static void DeleteSubKey(string path)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var parentPath = System.IO.Path.GetDirectoryName(path)?.Replace('\\', '/');
             var keyName = System.IO.Path.GetFileName(path);
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(parentPath, true);
@@ -73,6 +104,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static bool KeyExists(string path)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(path);
             return key != null;
         }
@@ -82,6 +118,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static bool ValueExists(string path, string name)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(path);
             return key?.GetValue(name) != null;
         }
@@ -91,6 +132,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static string[] GetSubKeyNames(string path)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(path);
             return key?.GetSubKeyNames() ?? Array.Empty<string>();
         }
@@ -100,6 +146,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static string[] GetValueNames(string path)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(path);
             return key?.GetValueNames() ?? Array.Empty<string>();
         }
@@ -109,6 +160,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static System.Collections.Generic.Dictionary<string, string> GetStartupPrograms()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var programs = new System.Collections.Generic.Dictionary<string, string>();
             
             var paths = new[]
@@ -154,6 +210,11 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static System.Collections.Generic.List<InstalledProgram> GetInstalledPrograms()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var programs = new System.Collections.Generic.List<InstalledProgram>();
             
             var paths = new[]

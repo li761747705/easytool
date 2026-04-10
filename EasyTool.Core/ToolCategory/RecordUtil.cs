@@ -92,7 +92,7 @@ namespace EasyTool.ToolCategory
                 return With(record, propertyName, newValue);
             }
 
-            throw new ArgumentException("Invalid property expression");
+            throw new ArgumentException("无效的属性表达式");
         }
 
         /// <summary>

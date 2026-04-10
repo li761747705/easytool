@@ -135,7 +135,7 @@ namespace EasyTool.IOCategory
             if (!Directory.Exists(_tempDirectory))
                 return;
 
-            var cutoff = DateTime.Now - expiration;
+            var cutoff = DateTime.UtcNow - expiration;
 
             foreach (var file in Directory.GetFiles(_tempDirectory))
             {

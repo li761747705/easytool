@@ -292,11 +292,6 @@ namespace EasyTool.MathCategory
 
         #endregion
 
-        #region 数值判断
-
-
-        #endregion
-
         #region 数值格式化
 
         /// <summary>

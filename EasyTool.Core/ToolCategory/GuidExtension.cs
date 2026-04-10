@@ -162,7 +162,7 @@ namespace EasyTool.ToolCategory
         {
             var guidArray = Guid.NewGuid().ToByteArray();
             var baseDate = new DateTime(1900, 1, 1);
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var days = new TimeSpan(now.Ticks - baseDate.Ticks);
             var msecs = now.TimeOfDay;
 

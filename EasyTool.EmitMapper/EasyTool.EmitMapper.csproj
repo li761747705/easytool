@@ -8,11 +8,10 @@
 
 		<PackageId>Joce.EasyTool.EmitMapper</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>1.2.0</Version>
 		<Description>
-			A open source C# tool to make .NET easy
+			EasyTool 对象映射扩展 - 基于EmitMapper的高性能对象映射工具，支持批量映射和自定义映射规则
 		</Description>
-		<PackageTags>Tool Power</PackageTags>
+		<PackageTags>Tool EmitMapper Mapper ObjectMapping</PackageTags>
 		<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
 		<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>

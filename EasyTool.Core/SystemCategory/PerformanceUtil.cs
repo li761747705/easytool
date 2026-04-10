@@ -213,9 +213,9 @@ namespace EasyTool.SystemCategory
         public static DateTime GetSystemUptime()
         {
 #if NET5_0_OR_GREATER
-            return DateTime.Now - TimeSpan.FromMilliseconds(Environment.TickCount64);
+            return DateTime.UtcNow - TimeSpan.FromMilliseconds(Environment.TickCount64);
 #else
-            return DateTime.Now - TimeSpan.FromMilliseconds(Environment.TickCount);
+            return DateTime.UtcNow - TimeSpan.FromMilliseconds(Environment.TickCount);
 #endif
         }
 

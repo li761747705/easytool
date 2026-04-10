@@ -70,7 +70,8 @@ namespace EasyTool.CodeCategory
             return result.ToString();
         }
 
-        /// <        /// 将 Base58 字符串解码为字节数组
+        /// <summary>
+        /// 将 Base58 字符串解码为字节数组
         /// </summary>
         /// <param name="value">Base58 编码字符串</param>
         /// <returns>解码后的字节数组</returns>

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,12 @@ namespace EasyTool.Web.Development
 {
     public static class BuildWebApiToTS
     {
+        /// <summary>
+        /// 从程序集中扫描 API 控制器并生成 TypeScript 代码
+        /// </summary>
+        /// <param name="assembly">要扫描的程序集</param>
+        /// <param name="prefix">API 路由前缀</param>
+        /// <returns>TypeScript 代码字符串</returns>
         public static string Build(Assembly assembly, string prefix = "api/")
         {
             List<Controller> controllers = GetApis(assembly);
@@ -16,7 +22,12 @@ namespace EasyTool.Web.Development
             return code.ToString();
         }
 
-
+        /// <summary>
+        /// 从程序集中扫描 API 控制器并生成 TypeScript 代码写入文件
+        /// </summary>
+        /// <param name="assembly">要扫描的程序集</param>
+        /// <param name="path">输出文件路径</param>
+        /// <param name="prefix">API 路由前缀</param>
         public static void BuildToFile(Assembly assembly, string path, string prefix = "api/")
         {
             var code = Build(assembly, prefix);
@@ -32,7 +43,7 @@ namespace EasyTool.Web.Development
 
         #region 构造代码
 
-        public static string CreateCode(List<Controller> controllers, string prefix = "api/")
+        internal static string CreateCode(List<Controller> controllers, string prefix = "api/")
         {
             StringBuilder code = new StringBuilder();
             code.AppendLine("import { environment } from 'src/environments/environment';");
@@ -54,7 +65,7 @@ namespace EasyTool.Web.Development
                         var urlpars = action.ApiComments.ParamNames.Select(x => $"{x}=${{{x}}}").Aggregate((a, b) => a + "&" + b);
 
                         code.AppendLine($@"    {action.Name}Url({pars}): string {{ return `${{environment.host}}/{prefix}{coll.Name}/{action.Name}?{urlpars}`; }},");
-                        
+
                     }
                 }
                 code.AppendLine($"  }},");
@@ -62,30 +73,13 @@ namespace EasyTool.Web.Development
 
             code.AppendLine($"}};");
             return code.ToString();
-
-
-            /*
-import { environment } from "src/environments/environment";
-
-export const WebAPI = {
-
-  Debug: {
-    Controller: `${environment.host}/api/Debug`,
-
-    DeleteResultT: `${environment.host}/api/Debug/DeleteResultT`,
-
-    GetResult(a:string){
-      return `${environment.host}/api/Debug/GetResult?a=${a}`;
-    }
-  },
- * */
         }
 
         #endregion
 
         #region 获得接口清单
 
-        public static List<Controller> GetApis(Assembly assembly)
+        internal static List<Controller> GetApis(Assembly assembly)
         {
             List<Controller> controllers = new List<Controller>();
 
@@ -104,6 +98,7 @@ export const WebAPI = {
 
             return controllers;
         }
+
         private static List<Action> GetTypeMembers(Type type, Type whereType, string saveType)
         {
             var actonTypes = type.GetMembers().Where(x => x.GetCustomAttributes(whereType, false).Count() > 0);
@@ -119,7 +114,7 @@ export const WebAPI = {
             return actons;
         }
 
-        public class Controller
+        internal class Controller
         {
             public Controller(string name)
             {
@@ -130,7 +125,7 @@ export const WebAPI = {
             public List<Action> Actions { get; set; } = new List<Action>();
         }
 
-        public class Action
+        internal class Action
         {
             public Action(string type, string name)
             {
@@ -160,4 +155,3 @@ export const WebAPI = {
         }
     }
 }
-

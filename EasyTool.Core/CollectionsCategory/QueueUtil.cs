@@ -140,7 +140,7 @@ namespace EasyTool.CollectionsCategory
         /// <returns>元素</returns>
         public async Task<T?> DequeueAsync(CancellationToken cancellationToken = default)
         {
-            await _signal.WaitAsync(cancellationToken);
+            await _signal.WaitAsync(cancellationToken).ConfigureAwait(false);
 
             lock (_lock)
             {
@@ -156,7 +156,7 @@ namespace EasyTool.CollectionsCategory
         /// <returns>元素或默认值</returns>
         public async Task<(bool Success, T? Item)> TryDequeueAsync(TimeSpan timeout, CancellationToken cancellationToken = default)
         {
-            if (await _signal.WaitAsync(timeout, cancellationToken))
+            if (await _signal.WaitAsync(timeout, cancellationToken).ConfigureAwait(false))
             {
                 lock (_lock)
                 {

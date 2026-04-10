@@ -28,8 +28,8 @@ namespace EasyTool.NetCategory
         /// <returns></returns>
         public static async Task<TRsp?> PostFromJsonAsync<TRsp>(this HttpClient client, string requestUri, object value, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var httpResponse = await client.PostAsJsonAsync(requestUri, value, options, cancellationToken);
-            TRsp? rsp = await httpResponse.Content.ReadFromJsonAsync<TRsp>();
+            var httpResponse = await client.PostAsJsonAsync(requestUri, value, options, cancellationToken).ConfigureAwait(false);
+            TRsp? rsp = await httpResponse.Content.ReadFromJsonAsync<TRsp>().ConfigureAwait(false);
             return rsp;
         }
 
@@ -45,8 +45,8 @@ namespace EasyTool.NetCategory
         /// <returns></returns>
         public static async Task<TRsp?> PutFromJsonAsync<TRsp>(this HttpClient client, string requestUri, object value, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var httpResponse = await client.PutAsJsonAsync(requestUri, value, options, cancellationToken);
-            TRsp? rsp = await httpResponse.Content.ReadFromJsonAsync<TRsp>();
+            var httpResponse = await client.PutAsJsonAsync(requestUri, value, options, cancellationToken).ConfigureAwait(false);
+            TRsp? rsp = await httpResponse.Content.ReadFromJsonAsync<TRsp>().ConfigureAwait(false);
             return rsp;
         }
 
@@ -60,8 +60,8 @@ namespace EasyTool.NetCategory
         /// <returns></returns>
         public static async Task<TRsp?> DeleteFromJsonAsync<TRsp>(this HttpClient client, string requestUri, CancellationToken cancellationToken = default)
         {
-            var httpResponse = await client.DeleteAsync(requestUri, cancellationToken);
-            TRsp? rsp = await httpResponse.Content.ReadFromJsonAsync<TRsp>();
+            var httpResponse = await client.DeleteAsync(requestUri, cancellationToken).ConfigureAwait(false);
+            TRsp? rsp = await httpResponse.Content.ReadFromJsonAsync<TRsp>().ConfigureAwait(false);
             return rsp;
         }
 
@@ -81,7 +81,7 @@ namespace EasyTool.NetCategory
         {
             try
             {
-                var result = await client.GetFromJsonAsync<Result>(requestUri, options, cancellationToken);
+                var result = await client.GetFromJsonAsync<Result>(requestUri, options, cancellationToken).ConfigureAwait(false);
                 if (result == null)
                     return new Result(NetErrorMessage, false);
 
@@ -94,7 +94,7 @@ namespace EasyTool.NetCategory
         }
 
         /// <summary>
-        /// Get请求，并转换成Result<TRsp>结构
+        /// Get请求，并转换成Result&lt;TRsp&gt;结构
         /// </summary>
         /// <typeparam name="TRsp"></typeparam>
         /// <param name="client">HttpClient对象</param>
@@ -106,7 +106,7 @@ namespace EasyTool.NetCategory
         {
             try
             {
-                var result = await client.GetFromJsonAsync<Result<TRsp>>(requestUri, options, cancellationToken);
+                var result = await client.GetFromJsonAsync<Result<TRsp>>(requestUri, options, cancellationToken).ConfigureAwait(false);
                 if (result == null)
                     return new Result<TRsp>(NetErrorMessage, false);
 
@@ -133,10 +133,10 @@ namespace EasyTool.NetCategory
             try
             {
 
-                var httpResponse = await client.PostAsJsonAsync(requestUri, value, options, cancellationToken);
+                var httpResponse = await client.PostAsJsonAsync(requestUri, value, options, cancellationToken).ConfigureAwait(false);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    Result result = await httpResponse.Content.ReadFromJsonAsync<Result>() ?? new Result("数据异常", false);
+                    Result result = await httpResponse.Content.ReadFromJsonAsync<Result>().ConfigureAwait(false) ?? new Result("数据异常", false);
                     return result;
                 }
                 else
@@ -151,7 +151,7 @@ namespace EasyTool.NetCategory
         }
 
         /// <summary>
-        /// Post请求，并转换成Result<TRsp>结构
+        /// Post请求，并转换成Result&lt;TRsp&gt;结构
         /// </summary>
         /// <typeparam name="TRsp"></typeparam>
         /// <param name="client">HttpClient对象</param>
@@ -164,11 +164,11 @@ namespace EasyTool.NetCategory
         {
             try
             {
-                var httpResponse = await client.PostAsJsonAsync(requestUri, value, options, cancellationToken);
+                var httpResponse = await client.PostAsJsonAsync(requestUri, value, options, cancellationToken).ConfigureAwait(false);
 
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    Result<TRsp> result = await httpResponse.Content.ReadFromJsonAsync<Result<TRsp>>() ?? new Result<TRsp>("数据异常", false);
+                    Result<TRsp> result = await httpResponse.Content.ReadFromJsonAsync<Result<TRsp>>().ConfigureAwait(false) ?? new Result<TRsp>("数据异常", false);
                     return result;
                 }
                 else
@@ -191,8 +191,8 @@ namespace EasyTool.NetCategory
         /// <returns></returns>
         public static async Task<Result> DeleteResultAsync(this HttpClient client, string requestUri, CancellationToken cancellationToken = default)
         {
-            var httpResponse = await client.DeleteAsync(requestUri, cancellationToken);
-            Result rsp = await httpResponse.Content.ReadFromJsonAsync<Result>() ?? new Result(NetErrorMessage, false);
+            var httpResponse = await client.DeleteAsync(requestUri, cancellationToken).ConfigureAwait(false);
+            Result rsp = await httpResponse.Content.ReadFromJsonAsync<Result>().ConfigureAwait(false) ?? new Result(NetErrorMessage, false);
             return rsp;
         }
 

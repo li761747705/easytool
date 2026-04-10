@@ -300,7 +300,7 @@ namespace EasyTool.BusinessCategory
             int month = int.Parse(dateStr.Substring(4, 2));
             int day = int.Parse(dateStr.Substring(6, 2));
 
-            if (year < 1900 || year > DateTime.Now.Year)
+            if (year < 1900 || year > DateTime.UtcNow.Year)
             {
                 return false;
             }

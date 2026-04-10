@@ -307,19 +307,43 @@ namespace EasyTool.ValidationCategory
     /// <summary>
     /// 验证规则
     /// </summary>
+    /// <typeparam name="T">验证类型</typeparam>
     public class ValidationRule<T>
     {
+        /// <summary>
+        /// 属性名称
+        /// </summary>
         public string PropertyName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 验证函数
+        /// </summary>
         public Func<T, bool> Validate { get; set; } = _ => true;
+
+        /// <summary>
+        /// 错误消息
+        /// </summary>
         public string ErrorMessage { get; set; } = string.Empty;
     }
 
     /// <summary>
     /// 验证器接口
     /// </summary>
+    /// <typeparam name="T">验证类型</typeparam>
     public interface IValidator<T>
     {
+        /// <summary>
+        /// 验证对象
+        /// </summary>
+        /// <param name="instance">要验证的对象</param>
+        /// <returns>验证结果</returns>
         ValidationResult Validate(T instance);
+
+        /// <summary>
+        /// 异步验证对象
+        /// </summary>
+        /// <param name="instance">要验证的对象</param>
+        /// <returns>验证结果</returns>
         Task<ValidationResult> ValidateAsync(T instance);
     }
 
@@ -357,7 +381,7 @@ namespace EasyTool.ValidationCategory
 
         public async Task<ValidationResult> ValidateAsync(T instance)
         {
-            return await Task.Run(() => Validate(instance));
+            return await Task.Run(() => Validate(instance)).ConfigureAwait(false);
         }
     }
 

@@ -11,6 +11,8 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 获取单例实例
         /// </summary>
+        /// <typeparam name="T">类型参数，必须为引用类型且有无参构造函数</typeparam>
+        /// <returns>单例实例</returns>
         public static T GetInstance<T>() where T : class, new()
         {
             return Singleton<T>.Instance;
@@ -19,6 +21,9 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 获取单例实例（带初始化参数）
         /// </summary>
+        /// <typeparam name="T">类型参数，必须为引用类型</typeparam>
+        /// <param name="factory">用于创建实例的工厂函数</param>
+        /// <returns>单例实例</returns>
         public static T GetInstance<T>(Func<T> factory) where T : class
         {
             return Singleton<T>.GetInstance(factory);
@@ -39,7 +44,7 @@ namespace EasyTool.ToolCategory
             return (T)constructor.Invoke(null);
         });
 
-        private static T? _customInstance;
+        private static volatile T? _customInstance;
         private static readonly object _lock = new();
 
         /// <summary>
@@ -50,6 +55,8 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 获取实例（使用自定义工厂）
         /// </summary>
+        /// <param name="factory">用于创建实例的工厂函数</param>
+        /// <returns>单例实例</returns>
         public static T GetInstance(Func<T> factory)
         {
             if (_customInstance != null)

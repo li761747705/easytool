@@ -125,7 +125,7 @@ namespace EasyTool.ToolCategory
                 _collection.CompleteAdding();
             }
 
-            await System.Threading.Tasks.Task.WhenAll(_consumerTasks);
+            await System.Threading.Tasks.Task.WhenAll(_consumerTasks).ConfigureAwait(false);
 
             lock (_lock)
             {
@@ -194,7 +194,7 @@ namespace EasyTool.ToolCategory
 
             if (_capacitySemaphore != null)
             {
-                await _capacitySemaphore.WaitAsync();
+                await _capacitySemaphore.WaitAsync().ConfigureAwait(false);
             }
 
             _queue.Enqueue(item);
@@ -211,7 +211,7 @@ namespace EasyTool.ToolCategory
 
             if (_capacitySemaphore != null)
             {
-                if (!await _capacitySemaphore.WaitAsync(timeout))
+                if (!await _capacitySemaphore.WaitAsync(timeout).ConfigureAwait(false))
                     return false;
             }
 
@@ -225,7 +225,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public async System.Threading.Tasks.Task<T> ReceiveAsync()
         {
-            await _signal.WaitAsync();
+            await _signal.WaitAsync().ConfigureAwait(false);
 
             if (_queue.TryDequeue(out var item))
             {
@@ -241,7 +241,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public async System.Threading.Tasks.Task<(bool Success, T? Item)> TryReceiveAsync(TimeSpan timeout)
         {
-            if (!await _signal.WaitAsync(timeout))
+            if (!await _signal.WaitAsync(timeout).ConfigureAwait(false))
                 return (false, default);
 
             if (_queue.TryDequeue(out var item))
@@ -289,10 +289,10 @@ namespace EasyTool.ToolCategory
             var semaphore = new System.Threading.SemaphoreSlim(maxDegreeOfParallelism);
             var tasks = sources.Select(async source =>
             {
-                await semaphore.WaitAsync();
+                await semaphore.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    return await selector(source);
+                    return await selector(source).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -300,7 +300,7 @@ namespace EasyTool.ToolCategory
                 }
             });
 
-            var results = await System.Threading.Tasks.Task.WhenAll(tasks);
+            var results = await System.Threading.Tasks.Task.WhenAll(tasks).ConfigureAwait(false);
             return results.ToList();
         }
 
@@ -315,10 +315,10 @@ namespace EasyTool.ToolCategory
             var semaphore = new System.Threading.SemaphoreSlim(maxDegreeOfParallelism);
             var tasks = sources.Select(async source =>
             {
-                await semaphore.WaitAsync();
+                await semaphore.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    await action(source);
+                    await action(source).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -326,7 +326,7 @@ namespace EasyTool.ToolCategory
                 }
             });
 
-            await System.Threading.Tasks.Task.WhenAll(tasks);
+            await System.Threading.Tasks.Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -344,14 +344,14 @@ namespace EasyTool.ToolCategory
                 batch.Add(source);
                 if (batch.Count >= batchSize)
                 {
-                    await batchAction(batch);
+                    await batchAction(batch).ConfigureAwait(false);
                     batch = new List<TSource>(batchSize);
                 }
             }
 
             if (batch.Count > 0)
             {
-                await batchAction(batch);
+                await batchAction(batch).ConfigureAwait(false);
             }
         }
     }

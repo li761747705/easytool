@@ -26,7 +26,17 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public List<string> ErrorFields { get; set; } = new();
 
+        /// <summary>
+        /// 创建成功的验证结果
+        /// </summary>
+        /// <returns>验证结果</returns>
         public static ValidationResult Success() => new() { IsValid = true };
+
+        /// <summary>
+        /// 创建失败的验证结果
+        /// </summary>
+        /// <param name="errors">错误消息数组</param>
+        /// <returns>验证结果</returns>
         public static ValidationResult Failure(params string[] errors) => new() { IsValid = false, Errors = errors.ToList() };
     }
 
@@ -371,7 +381,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public static bool IsPast(DateTime value)
         {
-            return value < DateTime.Now;
+            return value < DateTime.UtcNow;
         }
 
         /// <summary>
@@ -379,7 +389,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public static bool IsFuture(DateTime value)
         {
-            return value > DateTime.Now;
+            return value > DateTime.UtcNow;
         }
 
         #endregion

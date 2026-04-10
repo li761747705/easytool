@@ -62,7 +62,7 @@ namespace EasyTool.CollectionsCategory
         {
             foreach (var batch in Batch(source, batchSize))
             {
-                await action(batch);
+                await action(batch).ConfigureAwait(false);
             }
         }
 
@@ -93,7 +93,7 @@ namespace EasyTool.CollectionsCategory
         {
             foreach (var batch in Batch(source, batchSize))
             {
-                var results = await action(batch);
+                var results = await action(batch).ConfigureAwait(false);
                 foreach (var result in results)
                 {
                     yield return result;

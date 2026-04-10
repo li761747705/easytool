@@ -55,7 +55,7 @@ namespace EasyTool.ValidationCategory
         /// </summary>
         public async System.Threading.Tasks.Task<FluentValidator<T>> MustAsync(Func<T, System.Threading.Tasks.Task<bool>> predicate, string errorMessage)
         {
-            if (ShouldValidate() && !await predicate(_value))
+            if (ShouldValidate() && !await predicate(_value).ConfigureAwait(false))
             {
                 AddError(errorMessage);
             }
@@ -387,14 +387,28 @@ namespace EasyTool.ValidationCategory
         /// </summary>
         public string? FirstError => Errors.FirstOrDefault();
 
+        /// <summary>
+        /// 创建验证结果
+        /// </summary>
+        /// <param name="isValid">是否有效</param>
+        /// <param name="errors">错误消息列表</param>
         public ValidationResult(bool isValid, List<string> errors)
         {
             IsValid = isValid;
             Errors = errors.AsReadOnly();
         }
 
+        /// <summary>
+        /// 创建成功的验证结果
+        /// </summary>
+        /// <returns>验证结果</returns>
         public static ValidationResult Success() => new ValidationResult(true, new List<string>());
 
+        /// <summary>
+        /// 创建失败的验证结果
+        /// </summary>
+        /// <param name="errors">错误消息数组</param>
+        /// <returns>验证结果</returns>
         public static ValidationResult Failure(params string[] errors) => new ValidationResult(false, errors.ToList());
     }
 
@@ -408,12 +422,20 @@ namespace EasyTool.ValidationCategory
         /// </summary>
         public IReadOnlyList<string> Errors { get; }
 
+        /// <summary>
+        /// 创建验证异常
+        /// </summary>
+        /// <param name="errors">错误消息集合</param>
         public ValidationException(IEnumerable<string> errors)
             : base(string.Join("; ", errors))
         {
             Errors = errors.ToList().AsReadOnly();
         }
 
+        /// <summary>
+        /// 创建验证异常（单个错误）
+        /// </summary>
+        /// <param name="error">错误消息</param>
         public ValidationException(string error)
             : base(error)
         {

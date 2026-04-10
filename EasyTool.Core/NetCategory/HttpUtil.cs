@@ -58,9 +58,9 @@ namespace EasyTool.NetCategory
         public static async Task<string> GetStringAsync(string url, CancellationToken cancellationToken = default)
         {
 #if NET5_0_OR_GREATER
-            return await _sharedClient.GetStringAsync(url, cancellationToken);
+            return await _sharedClient.GetStringAsync(url, cancellationToken).ConfigureAwait(false);
 #else
-            return await _sharedClient.GetStringAsync(url);
+            return await _sharedClient.GetStringAsync(url).ConfigureAwait(false);
 #endif
         }
 
@@ -79,12 +79,12 @@ namespace EasyTool.NetCategory
                 }
             }
 
-            using var response = await _sharedClient.SendAsync(request, cancellationToken);
+            using var response = await _sharedClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -94,9 +94,9 @@ namespace EasyTool.NetCategory
         public static async Task<byte[]> GetBytesAsync(string url, CancellationToken cancellationToken = default)
         {
 #if NET5_0_OR_GREATER
-            return await _sharedClient.GetByteArrayAsync(url, cancellationToken);
+            return await _sharedClient.GetByteArrayAsync(url, cancellationToken).ConfigureAwait(false);
 #else
-            return await _sharedClient.GetByteArrayAsync(url);
+            return await _sharedClient.GetByteArrayAsync(url).ConfigureAwait(false);
 #endif
         }
 
@@ -106,9 +106,9 @@ namespace EasyTool.NetCategory
         public static async Task<Stream> GetStreamAsync(string url, CancellationToken cancellationToken = default)
         {
 #if NET5_0_OR_GREATER
-            return await _sharedClient.GetStreamAsync(url, cancellationToken);
+            return await _sharedClient.GetStreamAsync(url, cancellationToken).ConfigureAwait(false);
 #else
-            return await _sharedClient.GetStreamAsync(url);
+            return await _sharedClient.GetStreamAsync(url).ConfigureAwait(false);
 #endif
         }
 
@@ -117,7 +117,7 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static async Task<T?> GetJsonAsync<T>(string url, CancellationToken cancellationToken = default)
         {
-            var json = await GetStringAsync(url, cancellationToken);
+            var json = await GetStringAsync(url, cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<T>(json, _jsonOptions);
         }
 
@@ -131,12 +131,12 @@ namespace EasyTool.NetCategory
         public static async Task<string> PostStringAsync(string url, string content, string? contentType = null, CancellationToken cancellationToken = default)
         {
             using var httpContent = new StringContent(content, Encoding.UTF8, contentType ?? "text/plain");
-            using var response = await _sharedClient.PostAsync(url, httpContent, cancellationToken);
+            using var response = await _sharedClient.PostAsync(url, httpContent, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -147,12 +147,12 @@ namespace EasyTool.NetCategory
         {
             var json = JsonSerializer.Serialize(data, _jsonOptions);
             using var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-            using var response = await _sharedClient.PostAsync(url, httpContent, cancellationToken);
+            using var response = await _sharedClient.PostAsync(url, httpContent, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -161,7 +161,7 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static async Task<TResponse?> PostJsonAsync<TRequest, TResponse>(string url, TRequest data, CancellationToken cancellationToken = default)
         {
-            var json = await PostJsonAsync(url, data, cancellationToken);
+            var json = await PostJsonAsync(url, data, cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<TResponse>(json, _jsonOptions);
         }
 
@@ -171,12 +171,12 @@ namespace EasyTool.NetCategory
         public static async Task<string> PostFormAsync(string url, Dictionary<string, string> formData, CancellationToken cancellationToken = default)
         {
             using var httpContent = new FormUrlEncodedContent(formData);
-            using var response = await _sharedClient.PostAsync(url, httpContent, cancellationToken);
+            using var response = await _sharedClient.PostAsync(url, httpContent, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -190,12 +190,12 @@ namespace EasyTool.NetCategory
         public static async Task<string> PutStringAsync(string url, string content, string? contentType = null, CancellationToken cancellationToken = default)
         {
             using var httpContent = new StringContent(content, Encoding.UTF8, contentType ?? "text/plain");
-            using var response = await _sharedClient.PutAsync(url, httpContent, cancellationToken);
+            using var response = await _sharedClient.PutAsync(url, httpContent, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -206,12 +206,12 @@ namespace EasyTool.NetCategory
         {
             var json = JsonSerializer.Serialize(data, _jsonOptions);
             using var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-            using var response = await _sharedClient.PutAsync(url, httpContent, cancellationToken);
+            using var response = await _sharedClient.PutAsync(url, httpContent, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -224,12 +224,12 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static async Task<string> DeleteAsync(string url, CancellationToken cancellationToken = default)
         {
-            using var response = await _sharedClient.DeleteAsync(url, cancellationToken);
+            using var response = await _sharedClient.DeleteAsync(url, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -242,7 +242,7 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
-            return await _sharedClient.SendAsync(request, cancellationToken);
+            return await _sharedClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -250,12 +250,12 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static async Task<string> SendAsStringAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
-            using var response = await _sharedClient.SendAsync(request, cancellationToken);
+            using var response = await _sharedClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -264,7 +264,7 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static async Task DownloadFileAsync(string url, string filePath, CancellationToken cancellationToken = default)
         {
-            using var response = await _sharedClient.GetAsync(url, cancellationToken);
+            using var response = await _sharedClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
             var directory = Path.GetDirectoryName(filePath);
@@ -275,9 +275,9 @@ namespace EasyTool.NetCategory
 
             using var fileStream = File.Create(filePath);
 #if NET5_0_OR_GREATER
-            await response.Content.CopyToAsync(fileStream, cancellationToken);
+            await response.Content.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
 #else
-            await response.Content.CopyToAsync(fileStream);
+            await response.Content.CopyToAsync(fileStream).ConfigureAwait(false);
 #endif
         }
 
@@ -295,12 +295,12 @@ namespace EasyTool.NetCategory
 
             formData.Add(streamContent, fieldName, fileName);
 
-            using var response = await _sharedClient.PostAsync(url, formData, cancellationToken);
+            using var response = await _sharedClient.PostAsync(url, formData, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 #if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #else
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -402,7 +402,7 @@ namespace EasyTool.NetCategory
                 try
                 {
                     using var request = requestFactory();
-                    var response = await _sharedClient.SendAsync(request, cancellationToken);
+                    var response = await _sharedClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
                     if (response.IsSuccessStatusCode || i == maxRetries)
                     {
@@ -412,7 +412,7 @@ namespace EasyTool.NetCategory
                     // 服务器错误时重试
                     if ((int)response.StatusCode >= 500)
                     {
-                        await Task.Delay(delay * (i + 1), cancellationToken);
+                        await Task.Delay(delay * (i + 1), cancellationToken).ConfigureAwait(false);
                         continue;
                     }
 
@@ -423,7 +423,7 @@ namespace EasyTool.NetCategory
                     lastException = ex;
                     if (i < maxRetries)
                     {
-                        await Task.Delay(delay * (i + 1), cancellationToken);
+                        await Task.Delay(delay * (i + 1), cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
@@ -431,7 +431,7 @@ namespace EasyTool.NetCategory
                     lastException = ex;
                     if (i < maxRetries)
                     {
-                        await Task.Delay(delay * (i + 1), cancellationToken);
+                        await Task.Delay(delay * (i + 1), cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -465,7 +465,7 @@ namespace EasyTool.NetCategory
                 try
                 {
                     using var request = requestFactory();
-                    var response = await _sharedClient.SendAsync(request, cancellationToken);
+                    var response = await _sharedClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
                     if (response.IsSuccessStatusCode || i == maxRetries)
                     {
@@ -475,7 +475,7 @@ namespace EasyTool.NetCategory
                     if ((int)response.StatusCode >= 500)
                     {
                         var delay = CalculateExponentialDelay(i, baseDelayTime, maxDelayTime, random);
-                        await Task.Delay(delay, cancellationToken);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                         continue;
                     }
 
@@ -487,7 +487,7 @@ namespace EasyTool.NetCategory
                     if (i < maxRetries)
                     {
                         var delay = CalculateExponentialDelay(i, baseDelayTime, maxDelayTime, random);
-                        await Task.Delay(delay, cancellationToken);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
@@ -496,7 +496,7 @@ namespace EasyTool.NetCategory
                     if (i < maxRetries)
                     {
                         var delay = CalculateExponentialDelay(i, baseDelayTime, maxDelayTime, random);
-                        await Task.Delay(delay, cancellationToken);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -560,8 +560,8 @@ namespace EasyTool.NetCategory
                 try
                 {
                     // 克隆请求（因为HttpRequestMessage只能发送一次）
-                    var clonedRequest = await CloneRequestAsync(request);
-                    var response = await _client.SendAsync(clonedRequest, cancellationToken);
+                    var clonedRequest = await CloneRequestAsync(request).ConfigureAwait(false);
+                    var response = await _client.SendAsync(clonedRequest, cancellationToken).ConfigureAwait(false);
 
                     if (response.IsSuccessStatusCode || i == _maxRetries)
                     {
@@ -570,7 +570,7 @@ namespace EasyTool.NetCategory
 
                     if ((int)response.StatusCode >= 500)
                     {
-                        await Task.Delay(_retryDelay * (i + 1), cancellationToken);
+                        await Task.Delay(_retryDelay * (i + 1), cancellationToken).ConfigureAwait(false);
                         continue;
                     }
 
@@ -581,7 +581,7 @@ namespace EasyTool.NetCategory
                     lastException = ex;
                     if (i < _maxRetries)
                     {
-                        await Task.Delay(_retryDelay * (i + 1), cancellationToken);
+                        await Task.Delay(_retryDelay * (i + 1), cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
@@ -589,7 +589,7 @@ namespace EasyTool.NetCategory
                     lastException = ex;
                     if (i < _maxRetries)
                     {
-                        await Task.Delay(_retryDelay * (i + 1), cancellationToken);
+                        await Task.Delay(_retryDelay * (i + 1), cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -603,7 +603,7 @@ namespace EasyTool.NetCategory
 
             if (request.Content != null)
             {
-                var content = await request.Content.ReadAsByteArrayAsync();
+                var content = await request.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 clone.Content = new ByteArrayContent(content);
 
                 foreach (var header in request.Content.Headers)
@@ -626,9 +626,9 @@ namespace EasyTool.NetCategory
         public async Task<string> GetStringAsync(string url, CancellationToken cancellationToken = default)
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            using var response = await SendAsync(request, cancellationToken);
+            using var response = await SendAsync(request, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -639,9 +639,9 @@ namespace EasyTool.NetCategory
             var json = JsonSerializer.Serialize(data);
             using var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-            using var response = await SendAsync(request, cancellationToken);
+            using var response = await SendAsync(request, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
     }
 }

@@ -15,6 +15,11 @@ namespace EasyTool.System
         /// </summary>
         public static CpuInfo GetCpuInfo()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var info = new CpuInfo();
 
             try
@@ -47,6 +52,11 @@ namespace EasyTool.System
         /// </summary>
         public static MemoryInfo GetMemoryInfo()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var info = new MemoryInfo();
 
             try
@@ -108,6 +118,11 @@ namespace EasyTool.System
         /// </summary>
         public static List<DiskInfo> GetDiskInfo()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var disks = new List<DiskInfo>();
 
             try
@@ -138,6 +153,11 @@ namespace EasyTool.System
         /// </summary>
         public static List<GpuInfo> GetGpuInfo()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var gpus = new List<GpuInfo>();
 
             try
@@ -170,6 +190,11 @@ namespace EasyTool.System
         /// </summary>
         public static MotherboardInfo GetMotherboardInfo()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var info = new MotherboardInfo();
 
             try
@@ -196,6 +221,11 @@ namespace EasyTool.System
         /// </summary>
         public static BiosInfo GetBiosInfo()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var info = new BiosInfo();
 
             try
@@ -223,6 +253,11 @@ namespace EasyTool.System
         /// </summary>
         public static OsInfo GetOsInfo()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var info = new OsInfo();
 
             try
@@ -254,6 +289,11 @@ namespace EasyTool.System
         /// </summary>
         public static List<NetworkAdapterInfo> GetNetworkAdapters()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var adapters = new List<NetworkAdapterInfo>();
 
             try
@@ -284,6 +324,11 @@ namespace EasyTool.System
         /// </summary>
         public static ComputerSystemInfo GetComputerSystemInfo()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             var info = new ComputerSystemInfo();
 
             try

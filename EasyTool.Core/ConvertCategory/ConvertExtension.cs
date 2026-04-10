@@ -303,7 +303,7 @@ namespace EasyTool.ConvertCategory
             {
                 if (parm > max)
                 {
-                    throw new Exception("越界，无法转换");
+                    throw new OverflowException("数值越界，无法转换");
                 }
 
             }
@@ -311,7 +311,7 @@ namespace EasyTool.ConvertCategory
             {
                 if (parm < -max)
                 {
-                    throw new Exception("越界，无法转换");
+                    throw new OverflowException("数值越界，无法转换");
                 }
 
             }

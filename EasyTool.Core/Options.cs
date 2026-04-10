@@ -226,12 +226,39 @@ namespace EasyTool
     /// </summary>
     public enum LogLevel
     {
+        /// <summary>
+        /// 跟踪级别
+        /// </summary>
         Trace = 0,
+
+        /// <summary>
+        /// 调试级别
+        /// </summary>
         Debug = 1,
+
+        /// <summary>
+        /// 信息级别
+        /// </summary>
         Information = 2,
+
+        /// <summary>
+        /// 警告级别
+        /// </summary>
         Warning = 3,
+
+        /// <summary>
+        /// 错误级别
+        /// </summary>
         Error = 4,
+
+        /// <summary>
+        /// 严重错误级别
+        /// </summary>
         Critical = 5,
+
+        /// <summary>
+        /// 无日志
+        /// </summary>
         None = 6
     }
 

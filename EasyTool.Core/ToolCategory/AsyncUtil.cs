@@ -24,12 +24,12 @@ namespace EasyTool.ToolCategory
         public static async Task<T> WithTimeout<T>(Task<T> task, int timeoutMilliseconds)
         {
             using var cts = new CancellationTokenSource();
-            var completedTask = await Task.WhenAny(task, Task.Delay(timeoutMilliseconds, cts.Token));
+            var completedTask = await Task.WhenAny(task, Task.Delay(timeoutMilliseconds, cts.Token)).ConfigureAwait(false);
 
             if (completedTask == task)
             {
                 cts.Cancel();
-                return await task;
+                return await task.ConfigureAwait(false);
             }
 
             throw new TimeoutException($"操作在 {timeoutMilliseconds} 毫秒后超时");
@@ -43,12 +43,12 @@ namespace EasyTool.ToolCategory
         public static async Task WithTimeout(Task task, int timeoutMilliseconds)
         {
             using var cts = new CancellationTokenSource();
-            var completedTask = await Task.WhenAny(task, Task.Delay(timeoutMilliseconds, cts.Token));
+            var completedTask = await Task.WhenAny(task, Task.Delay(timeoutMilliseconds, cts.Token)).ConfigureAwait(false);
 
             if (completedTask == task)
             {
                 cts.Cancel();
-                await task;
+                await task.ConfigureAwait(false);
                 return;
             }
 
@@ -67,7 +67,7 @@ namespace EasyTool.ToolCategory
         {
             try
             {
-                return await WithTimeout(task, timeoutMilliseconds);
+                return await WithTimeout(task, timeoutMilliseconds).ConfigureAwait(false);
             }
             catch (TimeoutException)
             {
@@ -100,7 +100,7 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    return await func();
+                    return await func().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -112,7 +112,7 @@ namespace EasyTool.ToolCategory
                             ? delayMilliseconds * (int)Math.Pow(2, attempt)
                             : delayMilliseconds;
 
-                        await Task.Delay(delay);
+                        await Task.Delay(delay).ConfigureAwait(false);
                     }
                 }
             }
@@ -135,7 +135,7 @@ namespace EasyTool.ToolCategory
         {
             await RetryAsync(async () =>
             {
-                await action();
+                await action().ConfigureAwait(false);
                 return true;
             }, maxRetries, delayMilliseconds, exponentialBackoff);
         }
@@ -161,10 +161,10 @@ namespace EasyTool.ToolCategory
 
             var wrappedTasks = taskList.Select(async taskFactory =>
             {
-                await semaphore.WaitAsync();
+                await semaphore.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    return await taskFactory();
+                    return await taskFactory().ConfigureAwait(false);
                 }
                 finally
                 {
@@ -172,7 +172,7 @@ namespace EasyTool.ToolCategory
                 }
             });
 
-            results.AddRange(await Task.WhenAll(wrappedTasks));
+            results.AddRange(await Task.WhenAll(wrappedTasks).ConfigureAwait(false));
             return results;
         }
 
@@ -190,10 +190,10 @@ namespace EasyTool.ToolCategory
 
             var wrappedTasks = actionList.Select(async action =>
             {
-                await semaphore.WaitAsync();
+                await semaphore.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    await action();
+                    await action().ConfigureAwait(false);
                 }
                 finally
                 {
@@ -201,7 +201,7 @@ namespace EasyTool.ToolCategory
                 }
             });
 
-            await Task.WhenAll(wrappedTasks);
+            await Task.WhenAll(wrappedTasks).ConfigureAwait(false);
         }
 
         #endregion
@@ -260,7 +260,7 @@ namespace EasyTool.ToolCategory
             int delayMilliseconds,
             CancellationToken cancellationToken = default)
         {
-            await Task.Delay(delayMilliseconds, cancellationToken);
+            await Task.Delay(delayMilliseconds, cancellationToken).ConfigureAwait(false);
             action();
         }
 
@@ -275,8 +275,8 @@ namespace EasyTool.ToolCategory
             int delayMilliseconds,
             CancellationToken cancellationToken = default)
         {
-            await Task.Delay(delayMilliseconds, cancellationToken);
-            await action();
+            await Task.Delay(delayMilliseconds, cancellationToken).ConfigureAwait(false);
+            await action().ConfigureAwait(false);
         }
 
         #endregion
@@ -294,7 +294,7 @@ namespace EasyTool.ToolCategory
             Func<CancellationToken, Task<T>> func,
             CancellationToken cancellationToken = default)
         {
-            return await func(cancellationToken);
+            return await func(cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace EasyTool.ToolCategory
             int timeoutMilliseconds)
         {
             using var cts = new CancellationTokenSource(timeoutMilliseconds);
-            return await func(cts.Token);
+            return await func(cts.Token).ConfigureAwait(false);
         }
 
         #endregion
@@ -328,7 +328,7 @@ namespace EasyTool.ToolCategory
 
             foreach (var taskFactory in tasks)
             {
-                results.Add(await taskFactory());
+                results.Add(await taskFactory().ConfigureAwait(false));
             }
 
             return results;
@@ -342,7 +342,7 @@ namespace EasyTool.ToolCategory
         {
             foreach (var action in actions)
             {
-                await action();
+                await action().ConfigureAwait(false);
             }
         }
 
@@ -366,7 +366,7 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    return (Success: true, Result: await taskFactory(), Exception: (Exception?)null);
+                    return (Success: true, Result: await taskFactory().ConfigureAwait(false), Exception: (Exception?)null);
                 }
                 catch (Exception ex)
                 {

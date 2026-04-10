@@ -26,6 +26,9 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 计算最佳位数组大小
         /// </summary>
+        /// <param name="expectedItemCount">预期元素数量</param>
+        /// <param name="falsePositiveProbability">可接受的假阳性概率（0-1）</param>
+        /// <returns>最佳位数组大小</returns>
         public static int CalculateOptimalBitSize(int expectedItemCount, double falsePositiveProbability)
         {
             return (int)Math.Ceiling(-expectedItemCount * Math.Log(falsePositiveProbability) / Math.Pow(Math.Log(2), 2));
@@ -34,6 +37,9 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 计算最佳哈希函数数量
         /// </summary>
+        /// <param name="bitSize">位数组大小</param>
+        /// <param name="expectedItemCount">预期元素数量</param>
+        /// <returns>最佳哈希函数数量</returns>
         public static int CalculateOptimalHashCount(int bitSize, int expectedItemCount)
         {
             return (int)Math.Ceiling(bitSize / (double)expectedItemCount * Math.Log(2));
@@ -50,6 +56,7 @@ namespace EasyTool.CollectionsCategory
         private readonly int _hashCount;
         private readonly Func<T, int>[] _hashFunctions;
         private int _itemCount;
+        private readonly object _lock = new();
 
         /// <summary>
         /// 位数组大小
@@ -64,7 +71,13 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 已添加元素数量
         /// </summary>
-        public int ItemCount => _itemCount;
+        public int ItemCount
+        {
+            get
+            {
+                lock (_lock) { return _itemCount; }
+            }
+        }
 
         /// <summary>
         /// 当前估计的假阳性概率
@@ -73,9 +86,12 @@ namespace EasyTool.CollectionsCategory
         {
             get
             {
-                if (_itemCount == 0) return 0;
-                double ratio = (double)_itemCount * _hashCount / BitSize;
-                return Math.Pow(1 - Math.Exp(-ratio), _hashCount);
+                lock (_lock)
+                {
+                    if (_itemCount == 0) return 0;
+                    double ratio = (double)_itemCount * _hashCount / BitSize;
+                    return Math.Pow(1 - Math.Exp(-ratio), _hashCount);
+                }
             }
         }
 
@@ -102,22 +118,29 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 添加元素
         /// </summary>
+        /// <param name="item">要添加的元素</param>
+        /// <exception cref="ArgumentNullException">当 item 为 null 时抛出</exception>
         public void Add(T item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
-            foreach (var hashFunc in _hashFunctions)
+            lock (_lock)
             {
-                int index = Math.Abs(hashFunc(item)) % BitSize;
-                _bits[index] = true;
+                foreach (var hashFunc in _hashFunctions)
+                {
+                    int index = Math.Abs(hashFunc(item)) % BitSize;
+                    _bits[index] = true;
+                }
+                _itemCount++;
             }
-            _itemCount++;
         }
 
         /// <summary>
         /// 批量添加元素
         /// </summary>
+        /// <param name="items">要添加的元素集合</param>
+        /// <exception cref="ArgumentNullException">当 items 为 null 时抛出</exception>
         public void AddRange(IEnumerable<T> items)
         {
             if (items == null)
@@ -132,19 +155,23 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 检查元素可能存在
         /// </summary>
+        /// <param name="item">要检查的元素</param>
         /// <returns>true 表示可能存在（可能有假阳性），false 表示一定不存在</returns>
         public bool MightContain(T item)
         {
             if (item == null)
                 return false;
 
-            foreach (var hashFunc in _hashFunctions)
+            lock (_lock)
             {
-                int index = Math.Abs(hashFunc(item)) % BitSize;
-                if (!_bits[index])
-                    return false;
+                foreach (var hashFunc in _hashFunctions)
+                {
+                    int index = Math.Abs(hashFunc(item)) % BitSize;
+                    if (!_bits[index])
+                        return false;
+                }
+                return true;
             }
-            return true;
         }
 
         /// <summary>
@@ -152,35 +179,49 @@ namespace EasyTool.CollectionsCategory
         /// </summary>
         public void Clear()
         {
-            _bits.SetAll(false);
-            _itemCount = 0;
+            lock (_lock)
+            {
+                _bits.SetAll(false);
+                _itemCount = 0;
+            }
         }
 
         /// <summary>
         /// 获取位数组数据
         /// </summary>
+        /// <returns>位数组的字节数组表示</returns>
         public byte[] GetBytes()
         {
-            byte[] bytes = new byte[(_bits.Length + 7) / 8];
-            _bits.CopyTo(bytes, 0);
-            return bytes;
+            lock (_lock)
+            {
+                byte[] bytes = new byte[(_bits.Length + 7) / 8];
+                _bits.CopyTo(bytes, 0);
+                return bytes;
+            }
         }
 
         /// <summary>
         /// 从字节数组恢复位数组
         /// </summary>
+        /// <param name="bytes">字节数组</param>
+        /// <exception cref="ArgumentNullException">当 bytes 为 null 时抛出</exception>
+        /// <exception cref="ArgumentException">当字节数组长度不匹配时抛出</exception>
         public void SetBytes(byte[] bytes)
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
 
-            var newBits = new BitArray(bytes);
-            if (newBits.Length != _bits.Length)
-                throw new ArgumentException("Byte array length does not match filter size", nameof(bytes));
-
-            for (int i = 0; i < _bits.Length; i++)
+            lock (_lock)
             {
-                _bits[i] = newBits[i];
+                int expectedByteLength = (_bits.Length + 7) / 8;
+                if (bytes.Length != expectedByteLength)
+                    throw new ArgumentException($"Byte array length ({bytes.Length}) does not match filter size (expected {expectedByteLength} bytes for {_bits.Length} bits)", nameof(bytes));
+
+                var newBits = new BitArray(bytes);
+                for (int i = 0; i < _bits.Length; i++)
+                {
+                    _bits[i] = newBits[i];
+                }
             }
         }
 

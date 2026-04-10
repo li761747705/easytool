@@ -141,7 +141,7 @@ namespace EasyTool.IOCategory
             {
                 try
                 {
-                    var content = await File.ReadAllTextAsync(file);
+                    var content = await File.ReadAllTextAsync(file).ConfigureAwait(false);
                     if (content.Contains(searchText, comparison))
                     {
                         results.Add(file);

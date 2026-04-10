@@ -89,6 +89,11 @@ namespace EasyTool.BusinessCategory
         private static readonly Regex CardNumberRegex = new(@"^\d{13,19}$", RegexOptions.Compiled);
 
         /// <summary>
+        /// 非数字字符正则表达式
+        /// </summary>
+        private static readonly Regex NonDigitRegex = new(@"\D", RegexOptions.Compiled);
+
+        /// <summary>
         /// 卡类型识别规则（前缀 -> 卡类型）
         /// </summary>
         private static readonly (string Prefix, CreditCardType Type, string Name, string Issuer)[] CardTypeRules =
@@ -234,7 +239,7 @@ namespace EasyTool.BusinessCategory
                 return false;
             }
 
-            string cleaned = Regex.Replace(cardNumber, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber, "");
             return CardNumberRegex.IsMatch(cleaned);
         }
 
@@ -250,7 +255,7 @@ namespace EasyTool.BusinessCategory
                 return false;
             }
 
-            string cleaned = Regex.Replace(cardNumber, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber, "");
             int sum = 0;
             int length = cleaned.Length;
             bool isEvenPosition = false;
@@ -296,7 +301,7 @@ namespace EasyTool.BusinessCategory
                 return CreditCardType.Unknown;
             }
 
-            string cleaned = Regex.Replace(cardNumber!, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber!, "");
 
             // 从最长前缀开始匹配
             for (int len = 6; len >= 1; len--)
@@ -328,7 +333,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(cardNumber!, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber!, "");
 
             for (int len = 6; len >= 1; len--)
             {
@@ -408,7 +413,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(cardNumber!, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber!, "");
             var groups = new List<string>();
 
             for (int i = 0; i < cleaned.Length; i += 4)
@@ -432,7 +437,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(cardNumber!, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber!, "");
             CreditCardType type = GetCardType(cleaned);
 
             // Amex特殊格式：4-6-5
@@ -457,7 +462,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(cardNumber!, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber!, "");
 
             if (cleaned.Length < 8)
             {

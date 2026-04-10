@@ -117,7 +117,7 @@ namespace EasyTool.CodeCategory
 
                 int c1 = data[i] < 256 ? DecodeMap[data[i]] : -1;
                 if (c1 < 0)
-                    throw new ArgumentException($"Invalid Base92 character: {data[i]}", nameof(encoded));
+                    throw new ArgumentException($"无效的 Base92 字符: {data[i]}", nameof(encoded));
 
                 if (c1 < 91)
                 {
@@ -131,7 +131,7 @@ namespace EasyTool.CodeCategory
 
                     int c2 = data[i + 1] < 256 ? DecodeMap[data[i + 1]] : -1;
                     if (c2 < 0)
-                        throw new ArgumentException($"Invalid Base92 character: {data[i + 1]}", nameof(encoded));
+                        throw new ArgumentException($"无效的 Base92 字符: {data[i + 1]}", nameof(encoded));
 
                     value = (c1 - 91) * 91 + c2 + 91;
                     i += 2;

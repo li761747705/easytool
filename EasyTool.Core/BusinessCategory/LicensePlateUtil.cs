@@ -129,6 +129,11 @@ namespace EasyTool.BusinessCategory
             RegexOptions.Compiled);
 
         /// <summary>
+        /// 非中文字母数字正则表达式
+        /// </summary>
+        private static readonly Regex NonChineseAlphanumericRegex = new Regex(@"[^\u4e00-\u9fa5A-Z0-9]", RegexOptions.Compiled);
+
+        /// <summary>
         /// 省份简称与名称映射
         /// </summary>
         private static readonly Dictionary<string, string> ProvinceMap = new Dictionary<string, string>
@@ -575,7 +580,7 @@ namespace EasyTool.BusinessCategory
             string normalized = plateNumber.ToUpper().Trim();
 
             // 保留汉字、字母、数字
-            normalized = Regex.Replace(normalized, @"[^\u4e00-\u9fa5A-Z0-9]", "");
+            normalized = NonChineseAlphanumericRegex.Replace(normalized, "");
 
             return normalized;
         }

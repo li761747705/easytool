@@ -34,7 +34,7 @@ namespace EasyTool.Web.Development
 
         #region 构造代码
 
-        public static string CreateCode(List<DtoClass> dtos)
+        internal static string CreateCode(List<DtoClass> dtos)
         {
             StringBuilder code = new StringBuilder();
             foreach (var dto in dtos)
@@ -136,7 +136,7 @@ namespace EasyTool.Web.Development
         }
 
 
-        public static List<DtoClass> GetDtos(Assembly assembly)
+        internal static List<DtoClass> GetDtos(Assembly assembly)
         {
             List<DtoClass> dtos = new List<DtoClass>();
 
@@ -184,7 +184,7 @@ namespace EasyTool.Web.Development
 
         #endregion
 
-        public class DtoClass
+        internal class DtoClass
         {
             public DtoClass(string name, string _namespace)
             {
@@ -204,7 +204,7 @@ namespace EasyTool.Web.Development
         /// <summary>
         /// DTO 属性信息，支持标准 .NET DataAnnotations 特性
         /// </summary>
-        public class DtoProperty
+        internal class DtoProperty
         {
             public DtoProperty(Type type, string name)
             {

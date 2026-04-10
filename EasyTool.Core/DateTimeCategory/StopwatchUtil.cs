@@ -56,7 +56,7 @@ namespace EasyTool.DateTimeCategory
         public static async Task<TimeSpan> MeasureAsync(Func<Task> action)
         {
             var stopwatch = StartNew();
-            await action();
+            await action().ConfigureAwait(false);
             stopwatch.Stop();
             return stopwatch.Elapsed;
         }
@@ -70,7 +70,7 @@ namespace EasyTool.DateTimeCategory
         public static async Task<(TimeSpan Elapsed, T Result)> MeasureAsync<T>(Func<Task<T>> func)
         {
             var stopwatch = StartNew();
-            var result = await func();
+            var result = await func().ConfigureAwait(false);
             stopwatch.Stop();
             return (stopwatch.Elapsed, result);
         }
@@ -107,7 +107,7 @@ namespace EasyTool.DateTimeCategory
         /// <param name="callback">计时回调</param>
         public static async Task WithTimerAsync(Func<Task> action, Action<TimeSpan> callback)
         {
-            var elapsed = await MeasureAsync(action);
+            var elapsed = await MeasureAsync(action).ConfigureAwait(false);
             callback(elapsed);
         }
 
@@ -120,7 +120,7 @@ namespace EasyTool.DateTimeCategory
         /// <returns>操作结果</returns>
         public static async Task<T> WithTimerAsync<T>(Func<Task<T>> func, Action<TimeSpan> callback)
         {
-            var (elapsed, result) = await MeasureAsync(func);
+            var (elapsed, result) = await MeasureAsync(func).ConfigureAwait(false);
             callback(elapsed);
             return result;
         }
@@ -170,7 +170,7 @@ namespace EasyTool.DateTimeCategory
 
             try
             {
-                await action();
+                await action().ConfigureAwait(false);
                 return true;
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
@@ -216,7 +216,7 @@ namespace EasyTool.DateTimeCategory
 
             try
             {
-                var result = await func();
+                var result = await func().ConfigureAwait(false);
                 return (true, result);
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)

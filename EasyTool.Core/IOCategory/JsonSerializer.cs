@@ -111,7 +111,7 @@ namespace EasyTool.IOCategory
                 System.IO.Directory.CreateDirectory(directory);
 
             var json = Serialize(value, indented);
-            await System.IO.File.WriteAllTextAsync(filePath, json);
+            await System.IO.File.WriteAllTextAsync(filePath, json).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace EasyTool.IOCategory
             if (!System.IO.File.Exists(filePath))
                 throw new System.IO.FileNotFoundException("文件不存在", filePath);
 
-            var json = await System.IO.File.ReadAllTextAsync(filePath);
+            var json = await System.IO.File.ReadAllTextAsync(filePath).ConfigureAwait(false);
             return Deserialize<T>(json);
         }
 

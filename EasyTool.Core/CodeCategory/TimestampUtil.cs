@@ -94,7 +94,8 @@ namespace EasyTool.CodeCategory
             return (long)(dateTime.ToUniversalTime() - Epoch).TotalMilliseconds;
         }
 
-        /// <        /// 将 DateTime 转换为指定精度的时间戳
+        /// <summary>
+        /// 将 DateTime 转换为指定精度的时间戳
         /// </summary>
         /// <param name="dateTime">日期时间</param>
         /// <param name="precision">精度：s, ms, us, ns</param>

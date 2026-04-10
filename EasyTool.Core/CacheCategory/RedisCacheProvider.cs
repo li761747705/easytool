@@ -84,11 +84,10 @@ namespace EasyTool.CacheCategory
         /// 获取 Redis 连接（需要 StackExchange.Redis）
         /// 此方法为扩展点，子类可重写以实现具体的 Redis 连接逻辑
         /// </summary>
+        [Obsolete("请引入 StackExchange.Redis 包并实现 Redis 连接逻辑")]
         protected virtual object? GetConnection()
         {
-            // 这是一个占位实现
-            // 实际使用时需要引入 StackExchange.Redis 并实现连接逻辑
-            throw new NotImplementedException(
+            throw new NotSupportedException(
                 "请引入 StackExchange.Redis 包并实现 Redis 连接逻辑，" +
                 "或使用 DistributedCacheUtil.CreateRedisProvider 方法");
         }
@@ -104,7 +103,7 @@ namespace EasyTool.CacheCategory
             var expiration = GetExpiration(options);
 
             // 这里需要实际的 Redis 实现来设置值
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -117,7 +116,7 @@ namespace EasyTool.CacheCategory
         public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
         {
             ThrowIfNotImplemented();
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
             return default;
         }
 
@@ -130,15 +129,15 @@ namespace EasyTool.CacheCategory
         /// <inheritdoc/>
         public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> factory, CacheOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var value = await GetAsync<T>(key, cancellationToken);
+            var value = await GetAsync<T>(key, cancellationToken).ConfigureAwait(false);
             if (value != null || typeof(T).IsValueType)
             {
                 if (value != null)
                     return value;
             }
 
-            value = await factory();
-            await SetAsync(key, value, options, cancellationToken);
+            value = await factory().ConfigureAwait(false);
+            await SetAsync(key, value, options, cancellationToken).ConfigureAwait(false);
             return value;
         }
 
@@ -152,7 +151,7 @@ namespace EasyTool.CacheCategory
         public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
         {
             ThrowIfNotImplemented();
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
             return false;
         }
 
@@ -166,7 +165,7 @@ namespace EasyTool.CacheCategory
         public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
         {
             ThrowIfNotImplemented();
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -179,7 +178,7 @@ namespace EasyTool.CacheCategory
         public async Task RemoveAsync(IEnumerable<string> keys, CancellationToken cancellationToken = default)
         {
             ThrowIfNotImplemented();
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -192,7 +191,7 @@ namespace EasyTool.CacheCategory
         public async Task<bool> SetExpirationAsync(string key, TimeSpan expiration, CancellationToken cancellationToken = default)
         {
             ThrowIfNotImplemented();
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
             return false;
         }
 
@@ -206,7 +205,7 @@ namespace EasyTool.CacheCategory
         public async Task ClearAsync(CancellationToken cancellationToken = default)
         {
             ThrowIfNotImplemented();
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -219,7 +218,7 @@ namespace EasyTool.CacheCategory
         public async Task<long> CountAsync(CancellationToken cancellationToken = default)
         {
             ThrowIfNotImplemented();
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
             return 0;
         }
 
@@ -247,7 +246,7 @@ namespace EasyTool.CacheCategory
         {
             if (_connectionMultiplexer == null)
             {
-                throw new NotImplementedException(
+                throw new NotSupportedException(
                     "Redis 缓存提供者需要实际实现。请引入 StackExchange.Redis 包，" +
                     "或使用 MemoryCacheProvider 作为替代。");
             }
@@ -274,7 +273,7 @@ namespace EasyTool.CacheCategory
             {
                 if (_connectionMultiplexer is IAsyncDisposable asyncDisposable)
                 {
-                    await asyncDisposable.DisposeAsync();
+                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
                 }
                 else if (_connectionMultiplexer is IDisposable disposable)
                 {

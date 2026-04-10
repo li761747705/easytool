@@ -8,7 +8,6 @@
 
 		<PackageId>Joce.EasyTool.Media</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>1.2.0</Version>
 		<Description>
 			EasyTool 媒体处理扩展 - 图片、视频、音频处理工具
 		</Description>

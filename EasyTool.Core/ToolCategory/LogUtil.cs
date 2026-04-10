@@ -9,11 +9,34 @@ namespace EasyTool.ToolCategory
     /// </summary>
     public enum LogLevel
     {
+        /// <summary>
+        /// 跟踪级别
+        /// </summary>
         Trace,
+
+        /// <summary>
+        /// 调试级别
+        /// </summary>
         Debug,
+
+        /// <summary>
+        /// 信息级别
+        /// </summary>
         Information,
+
+        /// <summary>
+        /// 警告级别
+        /// </summary>
         Warning,
+
+        /// <summary>
+        /// 错误级别
+        /// </summary>
         Error,
+
+        /// <summary>
+        /// 严重错误级别
+        /// </summary>
         Critical
     }
 

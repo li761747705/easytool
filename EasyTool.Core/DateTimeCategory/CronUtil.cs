@@ -105,7 +105,7 @@ namespace EasyTool.DateTimeCategory
             var dayField = parts[3];
             var monthField = parts[4];
 
-            var currentTime = fromTime ?? DateTime.Now;
+            var currentTime = fromTime ?? DateTime.UtcNow;
             var nextTime = currentTime.AddSeconds(1);
 
             while (true)
@@ -163,7 +163,7 @@ namespace EasyTool.DateTimeCategory
         public static List<DateTime> GetNextExecutionTimes(string cronExpression, int count, DateTime? fromTime = null)
         {
             var result = new List<DateTime>();
-            var nextTime = fromTime ?? DateTime.Now;
+            var nextTime = fromTime ?? DateTime.UtcNow;
 
             for (int i = 0; i < count; i++)
             {

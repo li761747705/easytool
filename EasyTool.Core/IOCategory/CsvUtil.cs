@@ -53,7 +53,7 @@ namespace EasyTool.IOCategory
                 throw new FileNotFoundException("CSV文件不存在", filePath);
 
             encoding ??= Encoding.UTF8;
-            var lines = await File.ReadAllLinesAsync(filePath, encoding);
+            var lines = await File.ReadAllLinesAsync(filePath, encoding).ConfigureAwait(false);
             var result = new List<string[]>();
 
             int startRow = hasHeader ? 1 : 0;
@@ -124,7 +124,7 @@ namespace EasyTool.IOCategory
                 throw new FileNotFoundException("CSV文件不存在", filePath);
 
             encoding ??= Encoding.UTF8;
-            var lines = await File.ReadAllLinesAsync(filePath, encoding);
+            var lines = await File.ReadAllLinesAsync(filePath, encoding).ConfigureAwait(false);
 
             if (lines.Length == 0)
                 return new List<T>();
@@ -266,7 +266,7 @@ namespace EasyTool.IOCategory
                 lines.Add(FormatLine(row, delimiter));
             }
 
-            await File.WriteAllLinesAsync(filePath, lines, encoding);
+            await File.WriteAllLinesAsync(filePath, lines, encoding).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -346,7 +346,7 @@ namespace EasyTool.IOCategory
                 lines.Add(FormatLine(values, delimiter));
             }
 
-            await File.WriteAllLinesAsync(filePath, lines, encoding);
+            await File.WriteAllLinesAsync(filePath, lines, encoding).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -378,7 +378,7 @@ namespace EasyTool.IOCategory
                 lines.Add(FormatLine(row, delimiter));
             }
 
-            await File.AppendAllLinesAsync(filePath, lines, encoding);
+            await File.AppendAllLinesAsync(filePath, lines, encoding).ConfigureAwait(false);
         }
 
         #endregion

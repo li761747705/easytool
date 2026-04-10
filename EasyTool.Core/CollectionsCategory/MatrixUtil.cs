@@ -179,7 +179,7 @@ namespace EasyTool.CollectionsCategory
                 _data[row, i] = values[i];
         }
 
-        /// <section>
+        /// <summary>
         /// 设置列
         /// </summary>
         public void SetColumn(int col, T[] values)

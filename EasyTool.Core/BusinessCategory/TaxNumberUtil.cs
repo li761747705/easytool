@@ -492,7 +492,7 @@ namespace EasyTool.BusinessCategory
             char? checkCode = CalculateCheckCode(code17);
             if (!checkCode.HasValue)
             {
-                throw new InvalidOperationException("Failed to calculate check code");
+                throw new InvalidOperationException("计算校验码失败");
             }
 
             return code17 + checkCode.Value;

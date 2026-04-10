@@ -8,7 +8,6 @@
 
 		<PackageId>Joce.EasyTool.AI</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>1.2.0</Version>
 		<Description>
 			EasyTool AI 扩展 - 向量相似度、Prompt模板、Token计数、文本摘要等AI辅助工具
 		</Description>

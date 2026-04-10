@@ -98,7 +98,7 @@ namespace EasyTool.NetCategory
         {
             try
             {
-                var entry = await Dns.GetHostEntryAsync(hostName);
+                var entry = await Dns.GetHostEntryAsync(hostName).ConfigureAwait(false);
                 return entry.AddressList
                     .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork || ip.AddressFamily == AddressFamily.InterNetworkV6)
                     .Select(ip => ip.ToString())
@@ -159,7 +159,7 @@ namespace EasyTool.NetCategory
         {
             try
             {
-                var entry = await Dns.GetHostEntryAsync(ipAddress);
+                var entry = await Dns.GetHostEntryAsync(ipAddress).ConfigureAwait(false);
                 return entry.HostName;
             }
             catch
@@ -294,7 +294,7 @@ namespace EasyTool.NetCategory
         {
             try
             {
-                var entry = await Dns.GetHostEntryAsync(hostName);
+                var entry = await Dns.GetHostEntryAsync(hostName).ConfigureAwait(false);
                 return entry.AddressList.Length > 0;
             }
             catch

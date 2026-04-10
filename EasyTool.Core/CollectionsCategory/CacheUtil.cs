@@ -173,7 +173,7 @@ namespace EasyTool.CollectionsCategory
                     return value!;
             }
 
-            value = await factory();
+            value = await factory().ConfigureAwait(false);
 
             if (expiration.HasValue)
                 Set(key, value, expiration.Value);

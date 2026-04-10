@@ -44,7 +44,7 @@ namespace EasyTool.ValidationCategory
         /// </summary>
         public static async Task<ValidationResult> ValidateAsync<T>(T model, bool validateAllProperties = true)
         {
-            return await Task.Run(() => Validate(model, validateAllProperties));
+            return await Task.Run(() => Validate(model, validateAllProperties)).ConfigureAwait(false);
         }
 
         /// <summary>

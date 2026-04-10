@@ -205,7 +205,7 @@ namespace EasyTool.SystemCategory
                 tcs.TrySetCanceled(cancellationToken);
             }))
             {
-                await tcs.Task;
+                await tcs.Task.ConfigureAwait(false);
             }
 
             return new ProcessResult
@@ -508,7 +508,7 @@ namespace EasyTool.SystemCategory
 
             using (cancellationToken.Register(() => tcs.TrySetCanceled()))
             {
-                await tcs.Task;
+                await tcs.Task.ConfigureAwait(false);
             }
         }
 

@@ -213,7 +213,7 @@ namespace EasyTool.DataCategory
             {
                 throw new ArgumentException("pastYears 和 futureYears 不能同时小于等于 0");
             }
-            var start = DateTime.Now.AddYears(-pastYears);
+            var start = DateTime.UtcNow.AddYears(-pastYears);
             var range = (pastYears + futureYears) * 365;
             return start.AddDays(RandomInt(range));
         }

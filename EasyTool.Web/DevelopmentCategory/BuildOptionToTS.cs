@@ -31,7 +31,7 @@ namespace EasyTool.Web.Development
 
         #region 构造代码
 
-        public static string CreateCode(List<OptionClass> options)
+        internal static string CreateCode(List<OptionClass> options)
         {
             StringBuilder codeOption = new StringBuilder();
             codeOption.AppendLine(@"import { OptionCore, OptionCoreT } from ""src/app/shared/services/result-dto"";");
@@ -97,7 +97,7 @@ export enum WorkRecord_EOperatingEnum {
         }
 
 
-        public static List<OptionClass> GetOptions(Assembly assembly)
+        internal static List<OptionClass> GetOptions(Assembly assembly)
         {
             List<OptionClass> dtos = new List<OptionClass>();
 
@@ -130,7 +130,7 @@ export enum WorkRecord_EOperatingEnum {
 
         #endregion
 
-        public class OptionClass
+        internal class OptionClass
         {
             public OptionClass(string name, string _namespace)
             {
@@ -148,7 +148,7 @@ export enum WorkRecord_EOperatingEnum {
         }
 
 
-        public class OptionProperty
+        internal class OptionProperty
         {
             public string Text { get; set; } = string.Empty;
 

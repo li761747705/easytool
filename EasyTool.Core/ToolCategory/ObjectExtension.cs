@@ -195,8 +195,8 @@ namespace EasyTool.ToolCategory
             if (obj == null)
                 return default;
 
-            var json = await Task.Run(() => obj.ToJson());
-            return await Task.Run(() => json.FromJson<T>());
+            var json = await Task.Run(() => obj.ToJson()).ConfigureAwait(false);
+            return await Task.Run(() => json.FromJson<T>()).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -535,10 +535,6 @@ namespace EasyTool.ToolCategory
                 .Where(p => baseType.IsAssignableFrom(p) && p != baseType)
                 .ToArray();
         }
-
-        #endregion
-
-        #region 对象转字符串
 
         #endregion
 
@@ -908,7 +904,7 @@ namespace EasyTool.ToolCategory
         public static T ThrowIf<T>(this T obj, bool condition, string message) where T : class
         {
             if (condition)
-                throw new Exception(message);
+                throw new ArgumentException(message);
 
             return obj;
         }

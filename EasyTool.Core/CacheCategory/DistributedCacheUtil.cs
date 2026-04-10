@@ -200,7 +200,7 @@ namespace EasyTool.CacheCategory
 
             foreach (var key in keys)
             {
-                var value = await DefaultProvider.GetAsync<T>(key, cancellationToken);
+                var value = await DefaultProvider.GetAsync<T>(key, cancellationToken).ConfigureAwait(false);
                 result[key] = value;
             }
 
@@ -218,7 +218,7 @@ namespace EasyTool.CacheCategory
         {
             foreach (var item in items)
             {
-                await DefaultProvider.SetAsync(item.Key, item.Value, options, cancellationToken);
+                await DefaultProvider.SetAsync(item.Key, item.Value, options, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -239,7 +239,7 @@ namespace EasyTool.CacheCategory
             TimeSpan? lockTimeout = null,
             CancellationToken cancellationToken = default)
         {
-            var value = await DefaultProvider.GetAsync<T>(key, cancellationToken);
+            var value = await DefaultProvider.GetAsync<T>(key, cancellationToken).ConfigureAwait(false);
             if (value != null || typeof(T).IsValueType)
             {
                 if (value != null)
@@ -253,12 +253,12 @@ namespace EasyTool.CacheCategory
 
             while (DateTime.UtcNow - startTime < timeout)
             {
-                value = await DefaultProvider.GetAsync<T>(key, cancellationToken);
+                value = await DefaultProvider.GetAsync<T>(key, cancellationToken).ConfigureAwait(false);
                 if (value != null || (typeof(T).IsValueType && value != null))
                     return value!;
 
-                value = await factory();
-                await DefaultProvider.SetAsync(key, value, options, cancellationToken);
+                value = await factory().ConfigureAwait(false);
+                await DefaultProvider.SetAsync(key, value, options, cancellationToken).ConfigureAwait(false);
                 return value;
             }
 
@@ -276,9 +276,9 @@ namespace EasyTool.CacheCategory
         /// <returns>新的缓存值</returns>
         public static async Task<T> RefreshAsync<T>(string key, Func<Task<T>> factory, CacheOptions? options = null, CancellationToken cancellationToken = default)
         {
-            await DefaultProvider.RemoveAsync(key, cancellationToken);
-            var value = await factory();
-            await DefaultProvider.SetAsync(key, value, options, cancellationToken);
+            await DefaultProvider.RemoveAsync(key, cancellationToken).ConfigureAwait(false);
+            var value = await factory().ConfigureAwait(false);
+            await DefaultProvider.SetAsync(key, value, options, cancellationToken).ConfigureAwait(false);
             return value;
         }
 
@@ -315,12 +315,12 @@ namespace EasyTool.CacheCategory
             {
                 AbsoluteExpirationRelativeToNow = _localCacheExpiration
             };
-            await _localCache.SetAsync(key, value, localOptions, cancellationToken);
+            await _localCache.SetAsync(key, value, localOptions, cancellationToken).ConfigureAwait(false);
 
             // 再设置分布式缓存
             if (_distributedCache != null)
             {
-                await _distributedCache.SetAsync(key, value, options, cancellationToken);
+                await _distributedCache.SetAsync(key, value, options, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -334,7 +334,7 @@ namespace EasyTool.CacheCategory
         public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
         {
             // 先查本地缓存
-            var value = await _localCache.GetAsync<T>(key, cancellationToken);
+            var value = await _localCache.GetAsync<T>(key, cancellationToken).ConfigureAwait(false);
             if (value != null || typeof(T).IsValueType)
             {
                 if (value != null)
@@ -344,7 +344,7 @@ namespace EasyTool.CacheCategory
             // 再查分布式缓存
             if (_distributedCache != null)
             {
-                value = await _distributedCache.GetAsync<T>(key, cancellationToken);
+                value = await _distributedCache.GetAsync<T>(key, cancellationToken).ConfigureAwait(false);
                 if (value != null)
                 {
                     // 回填本地缓存
@@ -367,15 +367,15 @@ namespace EasyTool.CacheCategory
         /// <inheritdoc/>
         public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> factory, CacheOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var value = await GetAsync<T>(key, cancellationToken);
+            var value = await GetAsync<T>(key, cancellationToken).ConfigureAwait(false);
             if (value != null || typeof(T).IsValueType)
             {
                 if (value != null)
                     return value;
             }
 
-            value = await factory();
-            await SetAsync(key, value, options, cancellationToken);
+            value = await factory().ConfigureAwait(false);
+            await SetAsync(key, value, options, cancellationToken).ConfigureAwait(false);
             return value;
         }
 
@@ -388,10 +388,10 @@ namespace EasyTool.CacheCategory
         /// <inheritdoc/>
         public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
         {
-            if (await _localCache.ExistsAsync(key, cancellationToken))
+            if (await _localCache.ExistsAsync(key, cancellationToken).ConfigureAwait(false))
                 return true;
 
-            return _distributedCache != null && await _distributedCache.ExistsAsync(key, cancellationToken);
+            return _distributedCache != null && await _distributedCache.ExistsAsync(key, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -403,11 +403,11 @@ namespace EasyTool.CacheCategory
         /// <inheritdoc/>
         public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
         {
-            await _localCache.RemoveAsync(key, cancellationToken);
+            await _localCache.RemoveAsync(key, cancellationToken).ConfigureAwait(false);
 
             if (_distributedCache != null)
             {
-                await _distributedCache.RemoveAsync(key, cancellationToken);
+                await _distributedCache.RemoveAsync(key, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -420,11 +420,11 @@ namespace EasyTool.CacheCategory
         /// <inheritdoc/>
         public async Task RemoveAsync(IEnumerable<string> keys, CancellationToken cancellationToken = default)
         {
-            await _localCache.RemoveAsync(keys, cancellationToken);
+            await _localCache.RemoveAsync(keys, cancellationToken).ConfigureAwait(false);
 
             if (_distributedCache != null)
             {
-                await _distributedCache.RemoveAsync(keys, cancellationToken);
+                await _distributedCache.RemoveAsync(keys, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -437,11 +437,11 @@ namespace EasyTool.CacheCategory
         /// <inheritdoc/>
         public async Task<bool> SetExpirationAsync(string key, TimeSpan expiration, CancellationToken cancellationToken = default)
         {
-            var localResult = await _localCache.SetExpirationAsync(key, expiration, cancellationToken);
+            var localResult = await _localCache.SetExpirationAsync(key, expiration, cancellationToken).ConfigureAwait(false);
 
             if (_distributedCache != null)
             {
-                return await _distributedCache.SetExpirationAsync(key, expiration, cancellationToken);
+                return await _distributedCache.SetExpirationAsync(key, expiration, cancellationToken).ConfigureAwait(false);
             }
 
             return localResult;
@@ -456,11 +456,11 @@ namespace EasyTool.CacheCategory
         /// <inheritdoc/>
         public async Task ClearAsync(CancellationToken cancellationToken = default)
         {
-            await _localCache.ClearAsync(cancellationToken);
+            await _localCache.ClearAsync(cancellationToken).ConfigureAwait(false);
 
             if (_distributedCache != null)
             {
-                await _distributedCache.ClearAsync(cancellationToken);
+                await _distributedCache.ClearAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -473,11 +473,11 @@ namespace EasyTool.CacheCategory
         /// <inheritdoc/>
         public async Task<long> CountAsync(CancellationToken cancellationToken = default)
         {
-            var count = await _localCache.CountAsync(cancellationToken);
+            var count = await _localCache.CountAsync(cancellationToken).ConfigureAwait(false);
 
             if (_distributedCache != null)
             {
-                count = await _distributedCache.CountAsync(cancellationToken);
+                count = await _distributedCache.CountAsync(cancellationToken).ConfigureAwait(false);
             }
 
             return count;

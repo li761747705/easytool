@@ -285,7 +285,7 @@ namespace EasyTool.CodeCategory
         /// <param name="hex">16进制字符串</param>
         /// <param name="index">位置下标</param>
         /// <param name="newByte">字符</param>
-        /// <returns新16进制字符串></returns>
+        /// <returns>新16进制字符串</returns>
         public static string InsertHexChar(string hex, int index, byte newByte)
         {
             string newHexChar = newByte.ToString("X2");

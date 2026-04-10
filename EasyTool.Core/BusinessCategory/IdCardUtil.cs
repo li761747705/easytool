@@ -32,16 +32,93 @@ namespace EasyTool.BusinessCategory
 
         /// <summary>
         /// 省份代码与名称映射
+        /// 索引对应省份代码（如索引11对应北京）
         /// </summary>
-        private static readonly string[] ProvinceCodes = {
-            "", "北京", "天津", "河北", "山西", "内蒙古", // 11-15
-            "", "辽宁", "吉林", "黑龙江", "", // 21-23
-            "", "上海", "江苏", "浙江", "安徽", "福建", "江西", "山东", // 31-37
-            "", "河南", "湖北", "湖南", "广东", "广西", "海南", // 41-46
-            "", "重庆", "四川", "贵州", "云南", "西藏", // 50-54
-            "", "陕西", "甘肃", "青海", "宁夏", "新疆", // 61-65
-            "", "台湾", // 71
-            "", "香港", "澳门" // 81-82
+        private static readonly string[] ProvinceCodes =
+        {
+            "", // 0 - 未使用
+            "", // 1 - 未使用
+            "", // 2 - 未使用
+            "", // 3 - 未使用
+            "", // 4 - 未使用
+            "", // 5 - 未使用
+            "", // 6 - 未使用
+            "", // 7 - 未使用
+            "", // 8 - 未使用
+            "", // 9 - 未使用
+            "", // 10 - 未使用
+            "北京", // 11
+            "天津", // 12
+            "河北", // 13
+            "山西", // 14
+            "内蒙古", // 15
+            "", // 16 - 未使用
+            "", // 17 - 未使用
+            "", // 18 - 未使用
+            "", // 19 - 未使用
+            "", // 20 - 未使用
+            "辽宁", // 21
+            "吉林", // 22
+            "黑龙江", // 23
+            "", // 24 - 未使用
+            "", // 25 - 未使用
+            "", // 26 - 未使用
+            "", // 27 - 未使用
+            "", // 28 - 未使用
+            "", // 29 - 未使用
+            "", // 30 - 未使用
+            "上海", // 31
+            "江苏", // 32
+            "浙江", // 33
+            "安徽", // 34
+            "福建", // 35
+            "江西", // 36
+            "山东", // 37
+            "", // 38 - 未使用
+            "", // 39 - 未使用
+            "", // 40 - 未使用
+            "河南", // 41
+            "湖北", // 42
+            "湖南", // 43
+            "广东", // 44
+            "广西", // 45
+            "海南", // 46
+            "", // 47 - 未使用
+            "", // 48 - 未使用
+            "", // 49 - 未使用
+            "重庆", // 50
+            "四川", // 51
+            "贵州", // 52
+            "云南", // 53
+            "西藏", // 54
+            "", // 55 - 未使用
+            "", // 56 - 未使用
+            "", // 57 - 未使用
+            "", // 58 - 未使用
+            "", // 59 - 未使用
+            "", // 60 - 未使用
+            "陕西", // 61
+            "甘肃", // 62
+            "青海", // 63
+            "宁夏", // 64
+            "新疆", // 65
+            "", // 66 - 未使用
+            "", // 67 - 未使用
+            "", // 68 - 未使用
+            "", // 69 - 未使用
+            "", // 70 - 未使用
+            "台湾", // 71
+            "", // 72 - 未使用
+            "", // 73 - 未使用
+            "", // 74 - 未使用
+            "", // 75 - 未使用
+            "", // 76 - 未使用
+            "", // 77 - 未使用
+            "", // 78 - 未使用
+            "", // 79 - 未使用
+            "", // 80 - 未使用
+            "香港", // 81
+            "澳门", // 82
         };
 
         /// <summary>
@@ -364,8 +441,22 @@ namespace EasyTool.BusinessCategory
         /// <returns>18位身份证号</returns>
         public static string GenerateRandom(string? provinceCode = null, DateTime? birthday = null, int? gender = null)
         {
-            // 省份代码
-            string province = provinceCode ?? GetRandomProvinceCode();
+            // 省份代码/行政区划代码
+            string areaCode;
+            if (string.IsNullOrWhiteSpace(provinceCode))
+            {
+                areaCode = GetRandomProvinceCode() + EasyTool.MathCategory.RandomUtil.RandomDigitString(4);
+            }
+            else if (provinceCode.Length == 2)
+            {
+                // 只有省份代码，生成随后的4位区县代码
+                areaCode = provinceCode + EasyTool.MathCategory.RandomUtil.RandomDigitString(4);
+            }
+            else
+            {
+                // 使用完整的6位行政区划代码
+                areaCode = provinceCode;
+            }
 
             // 出生日期
             DateTime birth = birthday ?? EasyTool.MathCategory.RandomUtil.GetRandomDateTime(
@@ -389,7 +480,7 @@ namespace EasyTool.BusinessCategory
             sequence += genderDigit.ToString();
 
             // 前17位
-            string idCard17 = province + birthStr + sequence;
+            string idCard17 = areaCode + birthStr + sequence;
 
             // 计算校验码
             int sum = 0;

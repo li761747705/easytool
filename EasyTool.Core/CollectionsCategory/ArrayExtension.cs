@@ -395,10 +395,5 @@ namespace EasyTool.CollectionsCategory
         }
 
         #endregion
-
-        #region 数组统计
-
-
-        #endregion
     }
 }

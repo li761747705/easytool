@@ -31,8 +31,8 @@ namespace EasyTool.NetCategory
                     }
                 }
 
-                var response = await _httpClient.SendAsync(request);
-                var responseBody = await response.Content.ReadAsStringAsync();
+                var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 return new WebhookResponse
                 {
@@ -85,11 +85,29 @@ namespace EasyTool.NetCategory
             return Math.Abs(now - timestamp) <= toleranceSeconds;
         }
 
+        /// <summary>
+        /// Webhook 响应
+        /// </summary>
         public class WebhookResponse
         {
+            /// <summary>
+            /// 是否成功
+            /// </summary>
             public bool Success { get; set; }
+
+            /// <summary>
+            /// HTTP 状态码
+            /// </summary>
             public int StatusCode { get; set; }
+
+            /// <summary>
+            /// 响应内容
+            /// </summary>
             public string? Body { get; set; }
+
+            /// <summary>
+            /// 错误信息（失败时）
+            /// </summary>
             public string? Error { get; set; }
         }
     }

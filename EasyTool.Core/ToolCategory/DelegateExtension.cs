@@ -127,7 +127,7 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    await action();
+                    await action().ConfigureAwait(false);
                     return;
                 }
                 catch (Exception ex)
@@ -136,7 +136,7 @@ namespace EasyTool.ToolCategory
 
                     if (i < retryCount && delayMs > 0)
                     {
-                        await Task.Delay(delayMs);
+                        await Task.Delay(delayMs).ConfigureAwait(false);
                     }
                 }
             }
@@ -158,7 +158,7 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    return await func();
+                    return await func().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -166,7 +166,7 @@ namespace EasyTool.ToolCategory
 
                     if (i < retryCount && delayMs > 0)
                     {
-                        await Task.Delay(delayMs);
+                        await Task.Delay(delayMs).ConfigureAwait(false);
                     }
                 }
             }
@@ -241,7 +241,7 @@ namespace EasyTool.ToolCategory
             DateTime lastRun = DateTime.MinValue;
             return () =>
             {
-                var now = DateTime.Now;
+                var now = DateTime.UtcNow;
                 if ((now - lastRun).TotalMilliseconds >= intervalMs)
                 {
                     action();
@@ -273,7 +273,7 @@ namespace EasyTool.ToolCategory
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            await Task.Delay(delayMs);
+            await Task.Delay(delayMs).ConfigureAwait(false);
             action();
         }
 
@@ -285,7 +285,7 @@ namespace EasyTool.ToolCategory
             if (func == null)
                 throw new ArgumentNullException(nameof(func));
 
-            await Task.Delay(delayMs);
+            await Task.Delay(delayMs).ConfigureAwait(false);
             return func();
         }
 

@@ -68,7 +68,7 @@ namespace EasyTool.SystemCategory
         /// <param name="text">文本内容</param>
         public static async Task SetTextAsync(string text)
         {
-            await Task.Run(() => SetText(text));
+            await Task.Run(() => SetText(text)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace EasyTool.SystemCategory
         /// <returns>文本内容</returns>
         public static async Task<string?> GetTextAsync()
         {
-            return await Task.Run(() => GetText());
+            return await Task.Run(() => GetText()).ConfigureAwait(false);
         }
 
         #endregion

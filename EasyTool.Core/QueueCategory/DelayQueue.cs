@@ -139,7 +139,7 @@ namespace EasyTool.QueueCategory
 
                 if (waitTime > TimeSpan.Zero)
                 {
-                    await Task.Delay(waitTime, cancellationToken);
+                    await Task.Delay(waitTime, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -246,8 +246,8 @@ namespace EasyTool.QueueCategory
                 {
                     try
                     {
-                        var value = await TakeAsync(cancellationToken);
-                        await handler(value);
+                        var value = await TakeAsync(cancellationToken).ConfigureAwait(false);
+                        await handler(value).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
@@ -287,7 +287,7 @@ namespace EasyTool.QueueCategory
             {
                 try
                 {
-                    await _signal.WaitAsync(cancellationToken);
+                    await _signal.WaitAsync(cancellationToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {

@@ -10,7 +10,7 @@ namespace EasyTool.CodeCategory
     /// 格式：{prefix}_{base32-encoded-uuidv7}
     /// 例如：user_01ARZ3NDEKTSV4RRFFQ69G5FAV
     /// </summary>
-    public static class TypeIDUtil
+    public static class TypeIdUtil
     {
         private const string Base32Chars = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

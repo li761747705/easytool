@@ -66,7 +66,7 @@ namespace EasyTool.QueueCategory
         {
             foreach (var item in items)
             {
-                await channel.Writer.WriteAsync(item, cancellationToken);
+                await channel.Writer.WriteAsync(item, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -84,7 +84,7 @@ namespace EasyTool.QueueCategory
 
             for (int i = 0; i < count; i++)
             {
-                if (await channel.Reader.WaitToReadAsync(cancellationToken))
+                if (await channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     if (channel.Reader.TryRead(out var item))
                     {
@@ -181,7 +181,7 @@ namespace EasyTool.QueueCategory
         {
             await foreach (var item in reader.ReadAllAsync(cancellationToken))
             {
-                await processAction(item);
+                await processAction(item).ConfigureAwait(false);
             }
         }
 
@@ -194,7 +194,7 @@ namespace EasyTool.QueueCategory
         {
             var batch = new List<T>(batchSize);
 
-            while (await reader.WaitToReadAsync(cancellationToken))
+            while (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
             {
                 batch.Clear();
 
@@ -206,14 +206,14 @@ namespace EasyTool.QueueCategory
 
                 if (batch.Count > 0)
                 {
-                    await processAction(batch);
+                    await processAction(batch).ConfigureAwait(false);
                 }
             }
 
             // 处理剩余数据
             if (batch.Count > 0)
             {
-                await processAction(batch);
+                await processAction(batch).ConfigureAwait(false);
             }
         }
     }
@@ -266,7 +266,7 @@ namespace EasyTool.QueueCategory
         /// <param name="cancellationToken">取消令牌</param>
         public async ValueTask EnqueueAsync(T item, CancellationToken cancellationToken = default)
         {
-            await _channel.Writer.WriteAsync(item, cancellationToken);
+            await _channel.Writer.WriteAsync(item, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -286,7 +286,7 @@ namespace EasyTool.QueueCategory
         /// <returns>元素</returns>
         public async ValueTask<T> DequeueAsync(CancellationToken cancellationToken = default)
         {
-            return await _channel.Reader.ReadAsync(cancellationToken);
+            return await _channel.Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

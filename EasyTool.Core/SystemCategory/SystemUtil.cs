@@ -67,13 +67,13 @@ namespace EasyTool.SystemCategory
             {
                 if (!Directory.Exists(directory))
                 {
-                    throw new Exception("LoadAllDllsFromDirectory Error: Directory not exist.");
+                    throw new InvalidOperationException("LoadAllDllsFromDirectory Error: Directory not exist.");
                 }
 
                 string[] dllFiles = Directory.GetFiles(directory, "*.dll");
                 if (dllFiles.Length == 0)
                 {
-                    throw new Exception("LoadAllDllsFromDirectory Error: No DLL file found.");
+                    throw new InvalidOperationException("LoadAllDllsFromDirectory Error: No DLL file found.");
                 }
 
                 Assembly[] assemblies = new Assembly[dllFiles.Length];
@@ -85,7 +85,7 @@ namespace EasyTool.SystemCategory
             }
             catch (Exception ex)
             {
-                throw new Exception("LoadAllDllsFromDirectory Error: " + ex.Message);
+                throw new InvalidOperationException("LoadAllDllsFromDirectory Error: " + ex.Message, ex);
             }
         }
 
@@ -306,7 +306,7 @@ namespace EasyTool.SystemCategory
         {
             using (HttpClient client = new HttpClient())
             {
-                return await client.GetStringAsync(url);
+                return await client.GetStringAsync(url).ConfigureAwait(false);
             }
         }
 
@@ -321,8 +321,8 @@ namespace EasyTool.SystemCategory
             using (HttpClient client = new HttpClient())
             {
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/x-www-form-urlencoded");
-                HttpResponseMessage response = await client.PostAsync(url, content);
-                return await response.Content.ReadAsStringAsync();
+                HttpResponseMessage response = await client.PostAsync(url, content).ConfigureAwait(false);
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
         }
 

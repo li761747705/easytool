@@ -41,9 +41,10 @@ namespace EasyTool.System
                     NetworkReceivedCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", networkInstance);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // 性能计数器可能在某些环境不可用
+                // 性能计数器可能在某些环境不可用，静默失败
+                // 忽略异常：{ex.Message}
             }
         }
 
@@ -55,8 +56,9 @@ namespace EasyTool.System
                 var instances = category.GetInstanceNames();
                 return instances.Length > 0 ? instances[0] : null;
             }
-            catch
+            catch (Exception ex)
             {
+                // 忽略获取磁盘实例失败：{ex.Message}
                 return null;
             }
         }
@@ -69,8 +71,9 @@ namespace EasyTool.System
                 var instances = category.GetInstanceNames();
                 return instances.Length > 0 ? instances[0] : null;
             }
-            catch
+            catch (Exception ex)
             {
+                // 忽略获取网络接口实例失败：{ex.Message}
                 return null;
             }
         }
@@ -86,8 +89,9 @@ namespace EasyTool.System
                 Thread.Sleep(100);
                 return CpuCounter?.NextValue() ?? 0;
             }
-            catch
+            catch (Exception ex)
             {
+                // 忽略获取CPU使用率失败：{ex.Message}
                 return 0;
             }
         }
@@ -101,8 +105,9 @@ namespace EasyTool.System
             {
                 return MemoryCounter?.NextValue() ?? 0;
             }
-            catch
+            catch (Exception ex)
             {
+                // 忽略获取可用内存失败：{ex.Message}
                 return 0;
             }
         }

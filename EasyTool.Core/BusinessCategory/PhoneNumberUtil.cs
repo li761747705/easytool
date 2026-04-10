@@ -48,6 +48,11 @@ namespace EasyTool.BusinessCategory
         private static readonly Regex PhoneRegex = new Regex(@"^1[3-9]\d{9}$", RegexOptions.Compiled);
 
         /// <summary>
+        /// 非数字字符正则表达式
+        /// </summary>
+        private static readonly Regex NonDigitRegex = new Regex(@"\D", RegexOptions.Compiled);
+
+        /// <summary>
         /// 中国移动号段（前3-4位）
         /// </summary>
         private static readonly HashSet<string> ChinaMobilePrefixes = new HashSet<string>
@@ -115,7 +120,13 @@ namespace EasyTool.BusinessCategory
             }
 
             // 去除所有非数字字符
-            string normalized = Regex.Replace(phoneNumber, @"\D", "");
+            string normalized = NonDigitRegex.Replace(phoneNumber, "");
+
+            // 处理中国国际区号 +86
+            if (normalized.StartsWith("86") && normalized.Length > 11)
+            {
+                normalized = normalized.Substring(2);
+            }
 
             if (!IsValid(normalized))
             {

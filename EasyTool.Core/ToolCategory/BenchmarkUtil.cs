@@ -100,7 +100,7 @@ namespace EasyTool.ToolCategory
         public static async Task<TimeSpan> MeasureAsync(Func<Task> action)
         {
             var stopwatch = Stopwatch.StartNew();
-            await action();
+            await action().ConfigureAwait(false);
             stopwatch.Stop();
             return stopwatch.Elapsed;
         }
@@ -114,7 +114,7 @@ namespace EasyTool.ToolCategory
         public static async Task<(TimeSpan Elapsed, T Result)> MeasureAsync<T>(Func<Task<T>> func)
         {
             var stopwatch = Stopwatch.StartNew();
-            var result = await func();
+            var result = await func().ConfigureAwait(false);
             stopwatch.Stop();
             return (stopwatch.Elapsed, result);
         }
@@ -175,7 +175,7 @@ namespace EasyTool.ToolCategory
             // 预热
             for (int i = 0; i < warmupIterations; i++)
             {
-                await action();
+                await action().ConfigureAwait(false);
             }
 
             // 正式测试
@@ -186,7 +186,7 @@ namespace EasyTool.ToolCategory
 
             for (int i = 0; i < iterations; i++)
             {
-                var time = await MeasureAsync(action);
+                var time = await MeasureAsync(action).ConfigureAwait(false);
                 times.Add(time);
                 totalTime += time;
 
@@ -235,7 +235,7 @@ namespace EasyTool.ToolCategory
 
             foreach (var (name, action) in actions)
             {
-                results.Add(await RunAsync(name, action, iterations));
+                results.Add(await RunAsync(name, action, iterations).ConfigureAwait(false));
             }
 
             return results.OrderBy(r => r.AverageTime).ToList();
@@ -259,7 +259,7 @@ namespace EasyTool.ToolCategory
         /// <param name="elapsed">耗时回调</param>
         public static async Task WithTimerAsync(Func<Task> action, Action<TimeSpan> elapsed)
         {
-            var time = await MeasureAsync(action);
+            var time = await MeasureAsync(action).ConfigureAwait(false);
             elapsed(time);
         }
 

@@ -59,6 +59,11 @@ namespace EasyTool.BusinessCategory
         private static readonly Regex BankCardRegex = new(@"^\d{13,19}$", RegexOptions.Compiled);
 
         /// <summary>
+        /// 非数字字符正则表达式
+        /// </summary>
+        private static readonly Regex NonDigitRegex = new(@"\D", RegexOptions.Compiled);
+
+        /// <summary>
         /// 银行BIN码映射（前6位 -> 银行信息）
         /// 注：此处仅包含部分常见银行BIN码，实际应用中应使用完整的BIN码库
         /// </summary>
@@ -74,7 +79,6 @@ namespace EasyTool.BusinessCategory
             { "622208", new BankInfo { Name = "中国工商银行", Type = BankType.Debit, Code = "ICBC" } },
             { "622209", new BankInfo { Name = "中国工商银行", Type = BankType.Debit, Code = "ICBC" } },
             { "622210", new BankInfo { Name = "中国工商银行", Type = BankType.Debit, Code = "ICBC" } },
-            { "622588", new BankInfo { Name = "中国工商银行", Type = BankType.Credit, Code = "ICBC" } },
 
             // 农业银行
             { "622848", new BankInfo { Name = "中国农业银行", Type = BankType.Debit, Code = "ABC" } },
@@ -438,7 +442,7 @@ namespace EasyTool.BusinessCategory
             }
 
             // 移除非数字字符
-            string cleaned = Regex.Replace(cardNumber, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber, "");
 
             if (!IsValidFormat(cleaned))
             {
@@ -469,7 +473,7 @@ namespace EasyTool.BusinessCategory
             }
 
             // 移除非数字字符
-            string cleaned = Regex.Replace(cardNumber, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(cardNumber, "");
 
             if (cleaned.Length < 8)
             {

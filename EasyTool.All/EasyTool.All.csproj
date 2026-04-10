@@ -8,7 +8,6 @@
 
 		<PackageId>Joce.EasyTool.All</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>1.2.0</Version>
 		<Description>
 			EasyTool 全功能整合包 - .NET 版的 Hutool，一站式小工具库。包含核心工具、媒体处理、AI辅助、系统操作等所有模块。
 		</Description>
@@ -38,6 +37,8 @@
 	<!-- 引用所有模块 -->
 	<ItemGroup>
 		<ProjectReference Include="..\EasyTool.Core\EasyTool.Core.csproj" />
+		<ProjectReference Include="..\EasyTool.Web\EasyTool.Web.csproj" />
+		<ProjectReference Include="..\EasyTool.Image\EasyTool.Image.csproj" />
 		<ProjectReference Include="..\EasyTool.Media\EasyTool.Media.csproj" />
 		<ProjectReference Include="..\EasyTool.AI\EasyTool.AI.csproj" />
 		<ProjectReference Include="..\EasyTool.System\EasyTool.System.csproj" />

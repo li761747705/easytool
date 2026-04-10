@@ -8,7 +8,6 @@
 
 		<PackageId>Joce.EasyTool.System</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>1.2.0</Version>
 		<Description>
 			EasyTool 系统扩展 - 系统信息、进程管理、剪贴板、键鼠模拟等系统操作工具
 		</Description>

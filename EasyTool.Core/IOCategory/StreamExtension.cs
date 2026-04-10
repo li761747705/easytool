@@ -35,7 +35,7 @@ namespace EasyTool.IOCategory
                 throw new ArgumentNullException(nameof(stream));
 
             using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms, cancellationToken);
+            await stream.CopyToAsync(ms, cancellationToken).ConfigureAwait(false);
             return ms.ToArray();
         }
 
@@ -80,7 +80,7 @@ namespace EasyTool.IOCategory
             encoding ??= Encoding.UTF8;
 
             using var reader = new StreamReader(stream, encoding, true);
-            return await reader.ReadToEndAsync();
+            return await reader.ReadToEndAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace EasyTool.IOCategory
             if (bytes == null || bytes.Length == 0)
                 return;
 
-            await stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
+            await stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace EasyTool.IOCategory
             encoding ??= Encoding.UTF8;
 
             var bytes = encoding.GetBytes(text);
-            await stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
+            await stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -210,11 +210,6 @@ namespace EasyTool.IOCategory
             stream.CopyTo(ms);
             return ms;
         }
-
-        #endregion
-
-        #region 位置操作
-
 
         #endregion
 

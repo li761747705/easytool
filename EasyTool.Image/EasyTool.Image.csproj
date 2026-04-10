@@ -8,11 +8,10 @@
 
 		<PackageId>Joce.EasyTool.Image</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>1.2.0</Version>
 		<Description>
-			A open source C# tool to make .NET easy
+			EasyTool 图像处理扩展 - 基于SkiaSharp的图像处理工具，支持缩放、裁剪、旋转、水印、格式转换、亮度/对比度调整等操作
 		</Description>
-		<PackageTags>Tool Power</PackageTags>
+		<PackageTags>Tool Image SkiaSharp Resize Crop Watermark Convert</PackageTags>
 		<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
 		<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>

@@ -226,7 +226,7 @@ namespace EasyTool.SecurityCategory
         /// </summary>
         public static bool IsPasswordExpired(DateTime lastChangeDate, int maxAgeDays = 90)
         {
-            return (DateTime.Now - lastChangeDate).TotalDays > maxAgeDays;
+            return (DateTime.UtcNow - lastChangeDate).TotalDays > maxAgeDays;
         }
 
         /// <summary>

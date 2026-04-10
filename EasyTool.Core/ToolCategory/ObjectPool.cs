@@ -43,6 +43,7 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 从池中获取对象
         /// </summary>
+        /// <returns>对象实例</returns>
         public T Get()
         {
             lock (_lock)
@@ -56,15 +57,16 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 将对象归还到池中
         /// </summary>
+        /// <param name="item">要归还的对象</param>
         public void Return(T item)
         {
             if (item == null)
                 return;
 
-            _reset?.Invoke(item);
-
             lock (_lock)
             {
+                _reset?.Invoke(item);
+
                 if (_pool.Count < _maxSize)
                     _pool.Push(item);
             }
@@ -73,6 +75,9 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 使用池中对象执行操作
         /// </summary>
+        /// <typeparam name="TResult">返回值类型</typeparam>
+        /// <param name="action">要执行的操作</param>
+        /// <returns>操作的结果</returns>
         public TResult Use<TResult>(Func<T, TResult> action)
         {
             var item = Get();
@@ -89,6 +94,7 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 使用池中对象执行操作
         /// </summary>
+        /// <param name="action">要执行的操作</param>
         public void Use(Action<T> action)
         {
             var item = Get();
@@ -116,6 +122,7 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 预热池（创建指定数量的对象）
         /// </summary>
+        /// <param name="count">要预热的对象数量</param>
         public void WarmUp(int count)
         {
             for (int i = 0; i < count; i++)
@@ -134,6 +141,11 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 创建对象池
         /// </summary>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="factory">对象工厂函数</param>
+        /// <param name="maxSize">最大池大小</param>
+        /// <param name="reset">重置动作</param>
+        /// <returns>对象池实例</returns>
         public static ObjectPool<T> CreatePool<T>(this Func<T> factory, int maxSize = 100, Action<T>? reset = null)
             where T : class
         {
@@ -144,56 +156,7 @@ namespace EasyTool.ToolCategory
     /// <summary>
     /// StringBuilder 对象池
     /// </summary>
-    public static class StringBuilderPool
-    {
-        private static readonly ObjectPool<System.Text.StringBuilder> _pool = new(
-            () => new System.Text.StringBuilder(1024),
-            maxSize: 50,
-            reset: sb => sb.Clear());
-
-        /// <summary>
-        /// 获取 StringBuilder
-        /// </summary>
-        public static System.Text.StringBuilder Get() => _pool.Get();
-
-        /// <summary>
-        /// 归还 StringBuilder
-        /// </summary>
-        public static void Return(System.Text.StringBuilder sb) => _pool.Return(sb);
-
-        /// <summary>
-        /// 使用 StringBuilder 执行操作并返回结果字符串
-        /// </summary>
-        public static string Use(Action<System.Text.StringBuilder> action)
-        {
-            var sb = Get();
-            try
-            {
-                action(sb);
-                return sb.ToString();
-            }
-            finally
-            {
-                Return(sb);
-            }
-        }
-
-        /// <summary>
-        /// 使用 StringBuilder 执行操作
-        /// </summary>
-        public static TResult Use<TResult>(Func<System.Text.StringBuilder, TResult> action)
-        {
-            var sb = Get();
-            try
-            {
-                return action(sb);
-            }
-            finally
-            {
-                Return(sb);
-            }
-        }
-    }
+    
 
     /// <summary>
     /// MemoryStream 对象池
@@ -212,16 +175,21 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 获取 MemoryStream
         /// </summary>
+        /// <returns>MemoryStream 实例</returns>
         public static System.IO.MemoryStream Get() => _pool.Get();
 
         /// <summary>
         /// 归还 MemoryStream
         /// </summary>
+        /// <param name="ms">要归还的 MemoryStream</param>
         public static void Return(System.IO.MemoryStream ms) => _pool.Return(ms);
 
         /// <summary>
         /// 使用 MemoryStream 执行操作
         /// </summary>
+        /// <typeparam name="TResult">返回值类型</typeparam>
+        /// <param name="action">要执行的操作</param>
+        /// <returns>操作的结果</returns>
         public static TResult Use<TResult>(Func<System.IO.MemoryStream, TResult> action)
         {
             var ms = Get();
@@ -238,6 +206,7 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 使用 MemoryStream 执行操作
         /// </summary>
+        /// <param name="action">要执行的操作</param>
         public static void Use(Action<System.IO.MemoryStream> action)
         {
             var ms = Get();
@@ -280,6 +249,10 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 使用字节数组执行操作
         /// </summary>
+        /// <typeparam name="TResult">返回值类型</typeparam>
+        /// <param name="minimumLength">最小长度</param>
+        /// <param name="action">要执行的操作</param>
+        /// <returns>操作的结果</returns>
         public static TResult Use<TResult>(int minimumLength, Func<byte[], TResult> action)
         {
             var array = Rent(minimumLength);
@@ -296,6 +269,8 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 使用字节数组执行操作
         /// </summary>
+        /// <param name="minimumLength">最小长度</param>
+        /// <param name="action">要执行的操作</param>
         public static void Use(int minimumLength, Action<byte[]> action)
         {
             var array = Rent(minimumLength);
@@ -338,6 +313,10 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 使用字符数组执行操作
         /// </summary>
+        /// <typeparam name="TResult">返回值类型</typeparam>
+        /// <param name="minimumLength">最小长度</param>
+        /// <param name="action">要执行的操作</param>
+        /// <returns>操作的结果</returns>
         public static TResult Use<TResult>(int minimumLength, Func<char[], TResult> action)
         {
             var array = Rent(minimumLength);

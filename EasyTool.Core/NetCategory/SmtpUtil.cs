@@ -34,7 +34,7 @@ namespace EasyTool.NetCategory
         {
             using var smtpClient = CreateSmtpClient(options);
             using var mailMessage = CreateMailMessage(message);
-            await smtpClient.SendMailAsync(mailMessage);
+            await smtpClient.SendMailAsync(mailMessage).ConfigureAwait(false);
         }
 
         /// <summary>

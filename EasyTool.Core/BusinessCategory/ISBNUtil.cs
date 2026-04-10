@@ -60,6 +60,11 @@ namespace EasyTool.BusinessCategory
             RegexOptions.Compiled);
 
         /// <summary>
+        /// 空格和连字符正则表达式
+        /// </summary>
+        private static readonly Regex SpaceHyphenRegex = new Regex(@"[\s\-]", RegexOptions.Compiled);
+
+        /// <summary>
         /// ISBN前缀与国家/地区/语言映射
         /// </summary>
         private static readonly (string Prefix, string Region)[] PrefixRegionMap =
@@ -459,7 +464,7 @@ namespace EasyTool.BusinessCategory
             }
 
             // 去除空格和横线
-            return Regex.Replace(isbn, @"[\s\-]", "").ToUpper();
+            return SpaceHyphenRegex.Replace(isbn, "").ToUpper();
         }
 
         /// <summary>

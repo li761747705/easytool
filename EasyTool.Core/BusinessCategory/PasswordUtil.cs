@@ -102,7 +102,7 @@ namespace EasyTool.BusinessCategory
         public bool RequireSpecialChar { get; set; } = true;
 
         /// <summary>
-        /// 允许的特殊字符（默认!@#$%^&*()_+-=[]{}|;:',.&lt;&gt;?）
+        /// 允许的特殊字符（默认!@#$%^&amp;*()_+-=[]{}|;:',.&lt;&gt;?）
         /// </summary>
         public string AllowedSpecialChars { get; set; } = "!@#$%^&*()_+-=[]{}|;:',.<>?";
 
@@ -157,6 +157,26 @@ namespace EasyTool.BusinessCategory
             "qwertyuiop".ToUpper(), "asdfghjkl".ToUpper(), "zxcvbnm".ToUpper()
         };
 
+        /// <summary>
+        /// 小写字母正则表达式
+        /// </summary>
+        private static readonly Regex LowercaseRegex = new(@"[a-z]", RegexOptions.Compiled);
+
+        /// <summary>
+        /// 大写字母正则表达式
+        /// </summary>
+        private static readonly Regex UppercaseRegex = new(@"[A-Z]", RegexOptions.Compiled);
+
+        /// <summary>
+        /// 数字正则表达式
+        /// </summary>
+        private static readonly Regex DigitRegex = new(@"\d", RegexOptions.Compiled);
+
+        /// <summary>
+        /// 特殊字符正则表达式
+        /// </summary>
+        private static readonly Regex SpecialCharRegex = new(@"[!@#$%^&*()_+\-=\[\]{}|;:',.<>?]", RegexOptions.Compiled);
+
         #endregion
 
         #region 验证方法
@@ -203,10 +223,10 @@ namespace EasyTool.BusinessCategory
             }
 
             // 字符类型检查
-            bool hasLowercase = Regex.IsMatch(password, @"[a-z]");
-            bool hasUppercase = Regex.IsMatch(password, @"[A-Z]");
-            bool hasDigit = Regex.IsMatch(password, @"\d");
-            bool hasSpecial = Regex.IsMatch(password, @"[!@#$%^&*()_+\-=\[\]{}|;:',.<>?]");
+            bool hasLowercase = LowercaseRegex.IsMatch(password);
+            bool hasUppercase = UppercaseRegex.IsMatch(password);
+            bool hasDigit = DigitRegex.IsMatch(password);
+            bool hasSpecial = SpecialCharRegex.IsMatch(password);
 
             if (options.RequireLowercase && !hasLowercase)
             {
@@ -289,7 +309,7 @@ namespace EasyTool.BusinessCategory
 
             bool hasLower = Regex.IsMatch(password, @"[a-z]");
             bool hasUpper = Regex.IsMatch(password, @"[A-Z]");
-            bool hasDigit = Regex.IsMatch(password, @"\d");
+            bool hasDigit = DigitRegex.IsMatch(password);
 
             return hasLower && hasUpper && hasDigit;
         }
@@ -312,8 +332,8 @@ namespace EasyTool.BusinessCategory
 
             bool hasLower = Regex.IsMatch(password, @"[a-z]");
             bool hasUpper = Regex.IsMatch(password, @"[A-Z]");
-            bool hasDigit = Regex.IsMatch(password, @"\d");
-            bool hasSpecial = Regex.IsMatch(password, @"[!@#$%^&*()_+\-=\[\]{}|;:',.<>?]");
+            bool hasDigit = DigitRegex.IsMatch(password);
+            bool hasSpecial = SpecialCharRegex.IsMatch(password);
 
             int score = CalculateScore(password, hasLower, hasUpper, hasDigit, hasSpecial);
             return GetStrengthFromScore(score);
@@ -333,8 +353,8 @@ namespace EasyTool.BusinessCategory
 
             bool hasLower = Regex.IsMatch(password, @"[a-z]");
             bool hasUpper = Regex.IsMatch(password, @"[A-Z]");
-            bool hasDigit = Regex.IsMatch(password, @"\d");
-            bool hasSpecial = Regex.IsMatch(password, @"[!@#$%^&*()_+\-=\[\]{}|;:',.<>?]");
+            bool hasDigit = DigitRegex.IsMatch(password);
+            bool hasSpecial = SpecialCharRegex.IsMatch(password);
 
             return CalculateScore(password, hasLower, hasUpper, hasDigit, hasSpecial);
         }

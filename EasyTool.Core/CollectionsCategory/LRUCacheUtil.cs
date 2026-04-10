@@ -33,11 +33,18 @@ namespace EasyTool.CollectionsCategory
         private readonly int _capacity;
         private readonly Dictionary<TKey, LinkedListNode<CacheItem>> _cache;
         private readonly LinkedList<CacheItem> _lruList;
+        private readonly object _lock = new();
 
         /// <summary>
         /// 当前缓存数量
         /// </summary>
-        public int Count => _cache.Count;
+        public int Count
+        {
+            get
+            {
+                lock (_lock) { return _cache.Count; }
+            }
+        }
 
         /// <summary>
         /// 缓存容量
@@ -47,7 +54,13 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 缓存命中率
         /// </summary>
-        public double HitRate => _totalRequests == 0 ? 0 : (double)_hits / _totalRequests;
+        public double HitRate
+        {
+            get
+            {
+                lock (_lock) { return _totalRequests == 0 ? 0 : (double)_hits / _totalRequests; }
+            }
+        }
 
         private long _hits;
         private long _totalRequests;
@@ -69,6 +82,9 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 获取或设置缓存值
         /// </summary>
+        /// <param name="key">键</param>
+        /// <returns>缓存值</returns>
+        /// <exception cref="KeyNotFoundException">当键不存在时抛出</exception>
         public TValue this[TKey key]
         {
             get => Get(key);
@@ -78,51 +94,81 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 获取缓存值
         /// </summary>
+        /// <param name="key">键</param>
+        /// <returns>缓存值</returns>
+        /// <exception cref="KeyNotFoundException">当键不存在时抛出</exception>
         public TValue Get(TKey key)
         {
-            _totalRequests++;
-
-            if (_cache.TryGetValue(key, out var node))
+            lock (_lock)
             {
-                _hits++;
-                // 移动到链表头部（最近使用）
-                _lruList.Remove(node);
-                _lruList.AddFirst(node);
-                return node.Value.Value;
-            }
+                _totalRequests++;
 
-            throw new KeyNotFoundException($"Key '{key}' not found in cache");
+                if (_cache.TryGetValue(key, out var node))
+                {
+                    _hits++;
+                    // 移动到链表头部（最近使用）
+                    _lruList.Remove(node);
+                    _lruList.AddFirst(node);
+                    return node.Value.Value;
+                }
+
+                throw new KeyNotFoundException($"Key '{key}' not found in cache");
+            }
         }
 
         /// <summary>
         /// 尝试获取缓存值
         /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="value">缓存值（如果找到）</param>
+        /// <returns>如果找到缓存返回 true，否则返回 false</returns>
         public bool TryGet(TKey key, out TValue value)
         {
-            _totalRequests++;
-
-            if (_cache.TryGetValue(key, out var node))
+            lock (_lock)
             {
-                _hits++;
-                _lruList.Remove(node);
-                _lruList.AddFirst(node);
-                value = node.Value.Value;
-                return true;
-            }
+                _totalRequests++;
 
-            value = default;
-            return false;
+                if (_cache.TryGetValue(key, out var node))
+                {
+                    _hits++;
+                    _lruList.Remove(node);
+                    _lruList.AddFirst(node);
+                    value = node.Value.Value;
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
         }
 
         /// <summary>
         /// 获取缓存值，不存在则通过工厂创建并缓存
         /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="factory">用于创建值的工厂函数</param>
+        /// <returns>缓存值</returns>
+        /// <exception cref="ArgumentNullException">当 factory 为 null 时抛出</exception>
         public TValue GetOrAdd(TKey key, Func<TKey, TValue> factory)
         {
-            if (TryGet(key, out var value))
-                return value;
+            if (factory == null)
+                throw new ArgumentNullException(nameof(factory));
 
-            value = factory(key);
+            lock (_lock)
+            {
+                _totalRequests++;
+
+                if (_cache.TryGetValue(key, out var node))
+                {
+                    _hits++;
+                    _lruList.Remove(node);
+                    _lruList.AddFirst(node);
+                    return node.Value.Value;
+                }
+            }
+
+            // 在锁外执行工厂方法，避免在锁内执行用户代码导致死锁
+            var value = factory(key);
             Put(key, value);
             return value;
         }
@@ -130,52 +176,64 @@ namespace EasyTool.CollectionsCategory
         /// <summary>
         /// 添加或更新缓存
         /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
         public void Put(TKey key, TValue value)
         {
-            if (_cache.TryGetValue(key, out var existingNode))
+            lock (_lock)
             {
-                // 更新已存在的键
-                _lruList.Remove(existingNode);
-                existingNode.Value.Value = value;
-                _lruList.AddFirst(existingNode);
-            }
-            else
-            {
-                // 添加新键
-                if (_cache.Count >= _capacity)
+                if (_cache.TryGetValue(key, out var existingNode))
                 {
-                    // 淘汰最久未使用的项
-                    var last = _lruList.Last;
-                    _lruList.RemoveLast();
-                    _cache.Remove(last.Value.Key);
+                    // 更新已存在的键
+                    _lruList.Remove(existingNode);
+                    existingNode.Value.Value = value;
+                    _lruList.AddFirst(existingNode);
                 }
+                else
+                {
+                    // 添加新键
+                    if (_cache.Count >= _capacity)
+                    {
+                        // 淘汰最久未使用的项
+                        var last = _lruList.Last;
+                        _lruList.RemoveLast();
+                        _cache.Remove(last.Value.Key);
+                    }
 
-                var cacheItem = new CacheItem { Key = key, Value = value };
-                var node = _lruList.AddFirst(cacheItem);
-                _cache[key] = node;
+                    var cacheItem = new CacheItem { Key = key, Value = value };
+                    var node = _lruList.AddFirst(cacheItem);
+                    _cache[key] = node;
+                }
             }
         }
 
         /// <summary>
         /// 移除缓存
         /// </summary>
+        /// <param name="key">键</param>
+        /// <returns>如果移除成功返回 true，否则返回 false</returns>
         public bool Remove(TKey key)
         {
-            if (_cache.TryGetValue(key, out var node))
+            lock (_lock)
             {
-                _lruList.Remove(node);
-                _cache.Remove(key);
-                return true;
+                if (_cache.TryGetValue(key, out var node))
+                {
+                    _lruList.Remove(node);
+                    _cache.Remove(key);
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
 
         /// <summary>
         /// 是否包含键
         /// </summary>
+        /// <param name="key">键</param>
+        /// <returns>如果包含返回 true，否则返回 false</returns>
         public bool ContainsKey(TKey key)
         {
-            return _cache.ContainsKey(key);
+            lock (_lock) { return _cache.ContainsKey(key); }
         }
 
         /// <summary>
@@ -183,35 +241,46 @@ namespace EasyTool.CollectionsCategory
         /// </summary>
         public void Clear()
         {
-            _cache.Clear();
-            _lruList.Clear();
-            _hits = 0;
-            _totalRequests = 0;
+            lock (_lock)
+            {
+                _cache.Clear();
+                _lruList.Clear();
+                _hits = 0;
+                _totalRequests = 0;
+            }
         }
 
         /// <summary>
         /// 获取所有键
         /// </summary>
+        /// <returns>键的集合（按 LRU 顺序）</returns>
         public IEnumerable<TKey> GetKeys()
         {
-            var node = _lruList.First;
-            while (node != null)
+            lock (_lock)
             {
-                yield return node.Value.Key;
-                node = node.Next;
+                var node = _lruList.First;
+                while (node != null)
+                {
+                    yield return node.Value.Key;
+                    node = node.Next;
+                }
             }
         }
 
         /// <summary>
         /// 获取所有值（按LRU顺序）
         /// </summary>
+        /// <returns>值的集合（按 LRU 顺序）</returns>
         public IEnumerable<TValue> GetValues()
         {
-            var node = _lruList.First;
-            while (node != null)
+            lock (_lock)
             {
-                yield return node.Value.Value;
-                node = node.Next;
+                var node = _lruList.First;
+                while (node != null)
+                {
+                    yield return node.Value.Value;
+                    node = node.Next;
+                }
             }
         }
 
@@ -220,8 +289,11 @@ namespace EasyTool.CollectionsCategory
         /// </summary>
         public void ResetStatistics()
         {
-            _hits = 0;
-            _totalRequests = 0;
+            lock (_lock)
+            {
+                _hits = 0;
+                _totalRequests = 0;
+            }
         }
 
         private class CacheItem

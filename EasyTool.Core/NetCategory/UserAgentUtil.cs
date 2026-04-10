@@ -27,6 +27,11 @@ namespace EasyTool.NetCategory
             @"(Googlebot|Bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebot|facebookexternalhit|ia_archiver|Twitterbot|LinkedInBot|Embedly|Quora Link Preview|ShowyouBot|outbrain|pinterest|applebot|SemrushBot|AhrefsBot)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        /// <summary>
+        /// 设备型号提取正则表达式
+        /// </summary>
+        private static readonly Regex DeviceModelRegex = new Regex(@"\(([^)]+)\)", RegexOptions.Compiled);
+
         #endregion
 
         /// <summary>
@@ -192,7 +197,7 @@ namespace EasyTool.NetCategory
             }
 
             // 提取设备型号（简化处理）
-            var modelMatch = Regex.Match(userAgent, @"\(([^)]+)\)");
+            var modelMatch = DeviceModelRegex.Match(userAgent);
             if (modelMatch.Success)
             {
                 var parts = modelMatch.Groups[1].Value.Split(';');

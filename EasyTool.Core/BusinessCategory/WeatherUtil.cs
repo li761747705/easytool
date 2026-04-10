@@ -207,7 +207,7 @@ namespace EasyTool.BusinessCategory
             try
             {
                 var url = $"https://devapi.qweather.com/v7/weather/now?location={Uri.EscapeDataString(city)}&key={WeatherApiConfig.QWeatherApiKey}";
-                var response = await _httpClient.GetStringAsync(url);
+                var response = await _httpClient.GetStringAsync(url).ConfigureAwait(false);
                 var json = JsonDocument.Parse(response);
 
                 var root = json.RootElement;
@@ -252,7 +252,7 @@ namespace EasyTool.BusinessCategory
             try
             {
                 var url = $"https://devapi.qweather.com/v7/weather/3d?location={Uri.EscapeDataString(city)}&key={WeatherApiConfig.QWeatherApiKey}";
-                var response = await _httpClient.GetStringAsync(url);
+                var response = await _httpClient.GetStringAsync(url).ConfigureAwait(false);
                 var json = JsonDocument.Parse(response);
 
                 var root = json.RootElement;
@@ -299,7 +299,7 @@ namespace EasyTool.BusinessCategory
             try
             {
                 var url = $"https://devapi.qweather.com/v7/air/now?location={Uri.EscapeDataString(city)}&key={WeatherApiConfig.QWeatherApiKey}";
-                var response = await _httpClient.GetStringAsync(url);
+                var response = await _httpClient.GetStringAsync(url).ConfigureAwait(false);
                 var json = JsonDocument.Parse(response);
 
                 var root = json.RootElement;
@@ -390,7 +390,7 @@ namespace EasyTool.BusinessCategory
             try
             {
                 var url = $"https://geoapi.qweather.com/v2/city/lookup?location={Uri.EscapeDataString(keyword)}&key={WeatherApiConfig.QWeatherApiKey}";
-                var response = await _httpClient.GetStringAsync(url);
+                var response = await _httpClient.GetStringAsync(url).ConfigureAwait(false);
                 var json = JsonDocument.Parse(response);
 
                 var root = json.RootElement;

@@ -53,10 +53,10 @@ namespace EasyTool.NetCategory
             var request = CreateRequest(config, remoteFilePath, WebRequestMethods.Ftp.UploadFile);
 
             using var fileStream = File.OpenRead(localFilePath);
-            using var requestStream = await request.GetRequestStreamAsync();
-            await fileStream.CopyToAsync(requestStream);
+            using var requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false);
+            await fileStream.CopyToAsync(requestStream).ConfigureAwait(false);
 
-            using var response = (FtpWebResponse)await request.GetResponseAsync();
+            using var response = (FtpWebResponse)await request.GetResponseAsync().ConfigureAwait(false);
             return response.StatusCode == FtpStatusCode.ClosingData;
         }
 
@@ -91,10 +91,10 @@ namespace EasyTool.NetCategory
             var request = CreateRequest(config, remoteFilePath, WebRequestMethods.Ftp.UploadFile);
             request.ContentLength = data.Length;
 
-            using var requestStream = await request.GetRequestStreamAsync();
-            await requestStream.WriteAsync(data, 0, data.Length);
+            using var requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false);
+            await requestStream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
 
-            using var response = (FtpWebResponse)await request.GetResponseAsync();
+            using var response = (FtpWebResponse)await request.GetResponseAsync().ConfigureAwait(false);
             return response.StatusCode == FtpStatusCode.ClosingData;
         }
 
@@ -132,13 +132,13 @@ namespace EasyTool.NetCategory
         {
             var request = CreateRequest(config, remoteFilePath, WebRequestMethods.Ftp.DownloadFile);
 
-            using var response = (FtpWebResponse)await request.GetResponseAsync();
+            using var response = (FtpWebResponse)await request.GetResponseAsync().ConfigureAwait(false);
             using var responseStream = response.GetResponseStream();
             using var fileStream = File.Create(localFilePath);
             
             if (responseStream != null)
             {
-                await responseStream.CopyToAsync(fileStream);
+                await responseStream.CopyToAsync(fileStream).ConfigureAwait(false);
             }
 
             return response.StatusCode == FtpStatusCode.ClosingData;
@@ -171,13 +171,13 @@ namespace EasyTool.NetCategory
         {
             var request = CreateRequest(config, remoteFilePath, WebRequestMethods.Ftp.DownloadFile);
 
-            using var response = (FtpWebResponse)await request.GetResponseAsync();
+            using var response = (FtpWebResponse)await request.GetResponseAsync().ConfigureAwait(false);
             using var responseStream = response.GetResponseStream();
             using var memoryStream = new MemoryStream();
             
             if (responseStream != null)
             {
-                await responseStream.CopyToAsync(memoryStream);
+                await responseStream.CopyToAsync(memoryStream).ConfigureAwait(false);
             }
             
             return memoryStream.ToArray();
@@ -206,7 +206,7 @@ namespace EasyTool.NetCategory
         /// <returns>文件内容</returns>
         public static async Task<string> DownloadStringAsync(FtpConfig config, string remoteFilePath, Encoding? encoding = null)
         {
-            var data = await DownloadDataAsync(config, remoteFilePath);
+            var data = await DownloadDataAsync(config, remoteFilePath).ConfigureAwait(false);
             encoding ??= Encoding.UTF8;
             return encoding.GetString(data);
         }
@@ -254,12 +254,12 @@ namespace EasyTool.NetCategory
             var request = CreateRequest(config, remotePath, WebRequestMethods.Ftp.ListDirectoryDetails);
             var items = new List<FtpItem>();
 
-            using var response = (FtpWebResponse)await request.GetResponseAsync();
+            using var response = (FtpWebResponse)await request.GetResponseAsync().ConfigureAwait(false);
             using var responseStream = response.GetResponseStream();
             using var reader = new StreamReader(responseStream ?? Stream.Null, Encoding.UTF8);
 
             string? line;
-            while ((line = await reader.ReadLineAsync()) != null)
+            while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
             {
                 var item = ParseFtpLine(line);
                 if (item != null)

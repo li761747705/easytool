@@ -345,13 +345,13 @@ namespace EasyTool.ToolCategory
         {
             while (!_cts.Token.IsCancellationRequested)
             {
-                await _signal.WaitAsync(_cts.Token);
+                await _signal.WaitAsync(_cts.Token).ConfigureAwait(false);
 
                 if (_queue.TryDequeue(out var item))
                 {
                     try
                     {
-                        await _processor(item);
+                        await _processor(item).ConfigureAwait(false);
                     }
                     catch
                     {
@@ -368,7 +368,7 @@ namespace EasyTool.ToolCategory
         {
             while (_queue.Count > 0 || _signal.CurrentCount > 0)
             {
-                await Task.Delay(100);
+                await Task.Delay(100).ConfigureAwait(false);
             }
         }
 

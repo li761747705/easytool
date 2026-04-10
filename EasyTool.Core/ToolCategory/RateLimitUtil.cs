@@ -79,7 +79,7 @@ namespace EasyTool.ToolCategory
                 while (!TryAcquire(tokens))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await Task.Delay(10, cancellationToken);
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -179,7 +179,7 @@ namespace EasyTool.ToolCategory
                 while (!TryAcquire())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await Task.Delay(10, cancellationToken);
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -268,7 +268,7 @@ namespace EasyTool.ToolCategory
                 while (!TryAcquire())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await Task.Delay(10, cancellationToken);
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -369,7 +369,7 @@ namespace EasyTool.ToolCategory
                 while (!TryAcquire())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await Task.Delay(10, cancellationToken);
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -445,7 +445,7 @@ namespace EasyTool.ToolCategory
             /// </summary>
             public async Task<IDisposable> AcquireAsync(CancellationToken cancellationToken = default)
             {
-                await _semaphore.WaitAsync(cancellationToken);
+                await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
                 return new ReleaseDisposable(_semaphore);
             }
 
@@ -531,7 +531,7 @@ namespace EasyTool.ToolCategory
                 while (!TryAcquire(key))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await Task.Delay(10, cancellationToken);
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                 }
             }
 

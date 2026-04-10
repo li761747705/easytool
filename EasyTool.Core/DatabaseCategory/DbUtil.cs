@@ -29,7 +29,7 @@ namespace EasyTool.DatabaseCategory
                 ?? throw new InvalidOperationException("无法创建数据库连接");
 
             connection.ConnectionString = connectionString;
-            await connection.OpenAsync();
+            await connection.OpenAsync().ConfigureAwait(false);
             return connection;
         }
 
@@ -65,7 +65,7 @@ namespace EasyTool.DatabaseCategory
             int? commandTimeout = null)
         {
             using var command = CreateCommand(connection, sql, parameters, transaction, commandTimeout);
-            return await command.ExecuteNonQueryAsync();
+            return await command.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace EasyTool.DatabaseCategory
             int? commandTimeout = null)
         {
             using var command = CreateCommand(connection, sql, parameters, transaction, commandTimeout);
-            var result = await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
             if (result == null || result == DBNull.Value)
                 return default;
@@ -152,7 +152,7 @@ namespace EasyTool.DatabaseCategory
             CommandBehavior commandBehavior = CommandBehavior.Default)
         {
             var command = CreateCommand(connection, sql, parameters, transaction, commandTimeout);
-            return await command.ExecuteReaderAsync(commandBehavior);
+            return await command.ExecuteReaderAsync(commandBehavior).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -199,9 +199,9 @@ namespace EasyTool.DatabaseCategory
         {
             var result = new List<T>();
 
-            using var reader = await ExecuteReaderAsync(connection, sql, parameters, transaction, commandTimeout);
+            using var reader = await ExecuteReaderAsync(connection, sql, parameters, transaction, commandTimeout).ConfigureAwait(false);
 
-            while (await reader.ReadAsync())
+            while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 result.Add(MapToObject<T>(reader));
             }
@@ -250,7 +250,7 @@ namespace EasyTool.DatabaseCategory
                 connection, sql, parameters, transaction, commandTimeout,
                 CommandBehavior.SingleRow);
 
-            if (await reader.ReadAsync())
+            if (await reader.ReadAsync().ConfigureAwait(false))
             {
                 return MapToObject<T>(reader);
             }
@@ -297,9 +297,9 @@ namespace EasyTool.DatabaseCategory
         {
             var result = new List<T>();
 
-            using var reader = await ExecuteReaderAsync(connection, sql, parameters, transaction, commandTimeout);
+            using var reader = await ExecuteReaderAsync(connection, sql, parameters, transaction, commandTimeout).ConfigureAwait(false);
 
-            while (await reader.ReadAsync())
+            while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 var value = reader.GetValue(0);
                 if (value != null && value != DBNull.Value)
@@ -355,7 +355,7 @@ namespace EasyTool.DatabaseCategory
                         parameters[$"@p{j}"] = properties[j].GetValue(entity);
                     }
 
-                    totalRows += await ExecuteNonQueryAsync(connection, sql, parameters, transaction, commandTimeout);
+                    totalRows += await ExecuteNonQueryAsync(connection, sql, parameters, transaction, commandTimeout).ConfigureAwait(false);
                 }
             }
 
@@ -406,7 +406,7 @@ namespace EasyTool.DatabaseCategory
                 var keyProp = properties.First(p => p.Name == keyColumn);
                 parameters["@key"] = keyProp.GetValue(entity);
 
-                totalRows += await ExecuteNonQueryAsync(connection, sql, parameters, transaction, commandTimeout);
+                totalRows += await ExecuteNonQueryAsync(connection, sql, parameters, transaction, commandTimeout).ConfigureAwait(false);
             }
 
             return totalRows;
@@ -429,19 +429,19 @@ namespace EasyTool.DatabaseCategory
         {
             if (connection.State != ConnectionState.Open)
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().ConfigureAwait(false);
             }
 
-            using var transaction = await connection.BeginTransactionAsync(isolationLevel);
+            using var transaction = await connection.BeginTransactionAsync(isolationLevel).ConfigureAwait(false);
 
             try
             {
-                await action(transaction);
-                await transaction.CommitAsync();
+                await action(transaction).ConfigureAwait(false);
+                await transaction.CommitAsync().ConfigureAwait(false);
             }
             catch
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync().ConfigureAwait(false);
                 throw;
             }
         }
@@ -461,20 +461,20 @@ namespace EasyTool.DatabaseCategory
         {
             if (connection.State != ConnectionState.Open)
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().ConfigureAwait(false);
             }
 
-            using var transaction = await connection.BeginTransactionAsync(isolationLevel);
+            using var transaction = await connection.BeginTransactionAsync(isolationLevel).ConfigureAwait(false);
 
             try
             {
-                var result = await func(transaction);
-                await transaction.CommitAsync();
+                var result = await func(transaction).ConfigureAwait(false);
+                await transaction.CommitAsync().ConfigureAwait(false);
                 return result;
             }
             catch
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync().ConfigureAwait(false);
                 throw;
             }
         }

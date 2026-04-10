@@ -427,7 +427,7 @@ namespace EasyTool.MathCategory
         /// <returns>随机日期时间</returns>
         public static DateTime GetRandomDateTime()
         {
-            return GetRandomDateTime(new DateTime(1970, 1, 1), DateTime.Now);
+            return GetRandomDateTime(new DateTime(1970, 1, 1), DateTime.UtcNow);
         }
 
         /// <summary>

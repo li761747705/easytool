@@ -112,7 +112,7 @@ namespace EasyTool.NetCategory
         {
             using var message = CreateMessage(config, options);
             using var client = CreateClient(config);
-            await client.SendMailAsync(message);
+            await client.SendMailAsync(message).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace EasyTool.NetCategory
         /// <param name="messages">邮件选项列表</param>
         /// <param name="parallel">是否并行发送</param>
         /// <returns>发送结果列表</returns>
-        public static List<SendResult> SendBatch(SmtpConfig config, List<MailMessageOptions> messages, bool parallel = false)
+        public static async Task<List<SendResult>> SendBatch(SmtpConfig config, List<MailMessageOptions> messages, bool parallel = false)
         {
             var results = new List<SendResult>();
 
@@ -141,7 +141,7 @@ namespace EasyTool.NetCategory
                     }
                 })).ToArray();
 
-                Task.WaitAll(tasks);
+                await Task.WhenAll(tasks).ConfigureAwait(false);
                 results = tasks.Select(t => t.Result).ToList();
             }
             else
@@ -177,10 +177,10 @@ namespace EasyTool.NetCategory
 
             var tasks = messages.Select(async msg =>
             {
-                await semaphore.WaitAsync();
+                await semaphore.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    await SendAsync(config, msg);
+                    await SendAsync(config, msg).ConfigureAwait(false);
                     return new SendResult { Success = true, Recipients = msg.To };
                 }
                 catch (Exception ex)
@@ -193,7 +193,7 @@ namespace EasyTool.NetCategory
                 }
             });
 
-            results = (await Task.WhenAll(tasks)).ToList();
+            results = (await Task.WhenAll(tasks).ConfigureAwait(false)).ToList();
             return results;
         }
 

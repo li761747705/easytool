@@ -382,7 +382,7 @@ namespace EasyTool.TextCategory
                 if (!File.Exists(filePath))
                     return words;
 
-                var lines = await File.ReadAllLinesAsync(filePath);
+                var lines = await File.ReadAllLinesAsync(filePath).ConfigureAwait(false);
                 foreach (var line in lines)
                 {
                     var word = line.Trim();

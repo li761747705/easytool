@@ -143,7 +143,8 @@ namespace EasyTool.CodeCategory
             return AppendCheckDigit(string.Join("", digits));
         }
 
-        /// <        /// 生成指定前缀的有效 Luhn 数字
+        /// <summary>
+        /// 生成指定前缀的有效 Luhn 数字
         /// </summary>
         /// <param name="prefix">前缀</param>
         /// <param name="totalLength">总长度（包括校验位）</param>

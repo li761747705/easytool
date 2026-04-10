@@ -513,7 +513,7 @@ namespace EasyTool.NetCategory
             {
                 try
                 {
-                    response = await base.SendAsync(request, cancellationToken);
+                    response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -538,7 +538,7 @@ namespace EasyTool.NetCategory
 
                 if (i < _retryCount)
                 {
-                    await Task.Delay(_retryDelay, cancellationToken);
+                    await Task.Delay(_retryDelay, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -566,7 +566,7 @@ namespace EasyTool.NetCategory
 
             try
             {
-                return await base.SendAsync(request, cts.Token);
+                return await base.SendAsync(request, cts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
             {
@@ -596,7 +596,7 @@ namespace EasyTool.NetCategory
 
             try
             {
-                var response = await base.SendAsync(request, cancellationToken);
+                var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 stopwatch.Stop();
 
                 _logger($"[{DateTime.UtcNow:HH:mm:ss.fff}] HTTP {request.Method} {request.RequestUri} -> {(int)response.StatusCode} ({stopwatch.ElapsedMilliseconds}ms)");

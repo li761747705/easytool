@@ -36,9 +36,6 @@ namespace EasyTool.TextCategory
 
         #endregion
 
-        #region 文本可为空判断
-        #endregion
-
         #region 字符串验证
 
         /// <summary>

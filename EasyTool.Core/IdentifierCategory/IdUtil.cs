@@ -32,7 +32,7 @@ namespace EasyTool.IdentifierCategory
         private static readonly DateTime epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static int objectIdCounter = 0;
 
-        private static long _counter = DateTime.Now.Ticks;
+        private static long _counter = DateTime.UtcNow.Ticks;
         /// <summary>
         /// 生成UUID
         /// </summary>
@@ -158,7 +158,7 @@ namespace EasyTool.IdentifierCategory
 
                 if (timestamp < lastTimestamp)
                 {
-                    throw new Exception("Clock moved backwards, refusing to generate Snowflake ID");
+                    throw new InvalidOperationException("时钟回拨，拒绝生成雪花ID");
                 }
 
                 if (timestamp == lastTimestamp)

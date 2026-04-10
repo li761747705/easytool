@@ -112,7 +112,7 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    return await action();
+                    return await action().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -129,7 +129,7 @@ namespace EasyTool.ToolCategory
                         _ => Exponential(attempt, delay, max)
                     };
 
-                    await Task.Delay(waitTime);
+                    await Task.Delay(waitTime).ConfigureAwait(false);
                 }
             }
 
@@ -149,7 +149,7 @@ namespace EasyTool.ToolCategory
         {
             await ExecuteWithBackoffAsync(async () =>
             {
-                await action();
+                await action().ConfigureAwait(false);
                 return true;
             }, maxRetries, strategy, baseDelay, maxDelay, shouldRetry);
         }

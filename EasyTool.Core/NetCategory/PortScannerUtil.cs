@@ -22,7 +22,7 @@ namespace EasyTool.NetCategory
                 var connectTask = client.ConnectAsync(host, port);
                 var timeoutTask = Task.Delay(timeoutMs);
 
-                var completedTask = await Task.WhenAny(connectTask, timeoutTask);
+                var completedTask = await Task.WhenAny(connectTask, timeoutTask).ConfigureAwait(false);
                 return completedTask == connectTask && client.Connected;
             }
             catch
@@ -44,9 +44,9 @@ namespace EasyTool.NetCategory
         /// </summary>
         public static PortScanResult ScanPort(string host, int port, int timeoutMs = 1000)
         {
-            var startTime = DateTime.Now;
+            var startTime = DateTime.UtcNow;
             var isOpen = IsPortOpen(host, port, timeoutMs);
-            var duration = DateTime.Now - startTime;
+            var duration = DateTime.UtcNow - startTime;
 
             return new PortScanResult
             {
@@ -85,19 +85,19 @@ namespace EasyTool.NetCategory
                 tasks.Add(ScanPortAsync(host, port, timeoutMs, semaphore));
             }
 
-            var completedResults = await Task.WhenAll(tasks);
+            var completedResults = await Task.WhenAll(tasks).ConfigureAwait(false);
             results.AddRange(completedResults);
             return results;
         }
 
         private static async Task<PortScanResult> ScanPortAsync(string host, int port, int timeoutMs, SemaphoreSlim semaphore)
         {
-            await semaphore.WaitAsync();
+            await semaphore.WaitAsync().ConfigureAwait(false);
             try
             {
-                var startTime = DateTime.Now;
-                var isOpen = await IsPortOpenAsync(host, port, timeoutMs);
-                var duration = DateTime.Now - startTime;
+                var startTime = DateTime.UtcNow;
+                var isOpen = await IsPortOpenAsync(host, port, timeoutMs).ConfigureAwait(false);
+                var duration = DateTime.UtcNow - startTime;
 
                 return new PortScanResult
                 {

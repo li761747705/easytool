@@ -17,6 +17,11 @@ namespace EasyTool.BusinessCategory
         private static readonly Regex PostalCodeRegex = new Regex(@"^\d{6}$", RegexOptions.Compiled);
 
         /// <summary>
+        /// 非数字字符正则表达式
+        /// </summary>
+        private static readonly Regex NonDigitRegex = new Regex(@"\D", RegexOptions.Compiled);
+
+        /// <summary>
         /// 省份编码前缀与名称映射（邮政编码前2位）
         /// </summary>
         private static readonly Dictionary<string, string> ProvincePrefixMap = new Dictionary<string, string>
@@ -311,7 +316,7 @@ namespace EasyTool.BusinessCategory
             }
 
             // 去除所有非数字字符
-            string normalized = Regex.Replace(postalCode, @"\D", "");
+            string normalized = NonDigitRegex.Replace(postalCode, "");
 
             if (normalized.Length != 6)
             {

@@ -13,11 +13,12 @@ namespace EasyTool.AI.LLM
     /// OpenAI API 工具类
     /// 提供 GPT、DALL-E、Whisper 等 AI 服务的集成
     /// </summary>
-    public class OpenAIClient
+    public class OpenAIClient : IDisposable
     {
         private readonly string _apiKey;
         private readonly string _baseUrl;
         private readonly HttpClient _httpClient;
+        private bool _disposed;
 
         /// <summary>
         /// 创建 OpenAI 客户端
@@ -61,8 +62,8 @@ namespace EasyTool.AI.LLM
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/chat/completions", content, cancellationToken);
-            var responseJson = await ReadContentAsStringAsync(response.Content);
+            var response = await _httpClient.PostAsync($"{_baseUrl}/chat/completions", content, cancellationToken).ConfigureAwait(false);
+            var responseJson = await ReadContentAsStringAsync(response.Content).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -90,7 +91,7 @@ namespace EasyTool.AI.LLM
                 new() { Role = "user", Content = prompt }
             };
 
-            var response = await ChatAsync(messages, model, temperature, cancellationToken: cancellationToken);
+            var response = await ChatAsync(messages, model, temperature, cancellationToken: cancellationToken).ConfigureAwait(false);
             return response.Choices[0].Message.Content;
         }
 
@@ -115,15 +116,15 @@ namespace EasyTool.AI.LLM
                 Content = content
             };
 
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
-            using var stream = await ReadContentAsStreamAsync(response.Content);
+            using var stream = await ReadContentAsStreamAsync(response.Content).ConfigureAwait(false);
             using var reader = new StreamReader(stream);
 
             while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
             {
-                var line = await reader.ReadLineAsync();
+                var line = await reader.ReadLineAsync().ConfigureAwait(false);
                 if (string.IsNullOrEmpty(line) || !line.StartsWith("data: "))
                     continue;
 
@@ -165,8 +166,8 @@ namespace EasyTool.AI.LLM
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/embeddings", content, cancellationToken);
-            var responseJson = await ReadContentAsStringAsync(response.Content);
+            var response = await _httpClient.PostAsync($"{_baseUrl}/embeddings", content, cancellationToken).ConfigureAwait(false);
+            var responseJson = await ReadContentAsStringAsync(response.Content).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -195,8 +196,8 @@ namespace EasyTool.AI.LLM
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/embeddings", content, cancellationToken);
-            var responseJson = await ReadContentAsStringAsync(response.Content);
+            var response = await _httpClient.PostAsync($"{_baseUrl}/embeddings", content, cancellationToken).ConfigureAwait(false);
+            var responseJson = await ReadContentAsStringAsync(response.Content).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -244,8 +245,8 @@ namespace EasyTool.AI.LLM
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/images/generations", content, cancellationToken);
-            var responseJson = await ReadContentAsStringAsync(response.Content);
+            var response = await _httpClient.PostAsync($"{_baseUrl}/images/generations", content, cancellationToken).ConfigureAwait(false);
+            var responseJson = await ReadContentAsStringAsync(response.Content).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -291,8 +292,8 @@ namespace EasyTool.AI.LLM
             if (!string.IsNullOrEmpty(language))
                 formContent.Add(new StringContent(language), "language");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/audio/transcriptions", formContent, cancellationToken);
-            var responseJson = await ReadContentAsStringAsync(response.Content);
+            var response = await _httpClient.PostAsync($"{_baseUrl}/audio/transcriptions", formContent, cancellationToken).ConfigureAwait(false);
+            var responseJson = await ReadContentAsStringAsync(response.Content).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -328,16 +329,16 @@ namespace EasyTool.AI.LLM
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/audio/speech", content, cancellationToken);
+            var response = await _httpClient.PostAsync($"{_baseUrl}/audio/speech", content, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
-                var errorJson = await ReadContentAsStringAsync(response.Content);
+                var errorJson = await ReadContentAsStringAsync(response.Content).ConfigureAwait(false);
                 throw new OpenAIException($"API 请求失败: {response.StatusCode}", errorJson);
             }
 
-            var audioData = await ReadContentAsByteArrayAsync(response.Content);
-            await File.WriteAllBytesAsync(outputFilePath, audioData, cancellationToken);
+            var audioData = await ReadContentAsByteArrayAsync(response.Content).ConfigureAwait(false);
+            await File.WriteAllBytesAsync(outputFilePath, audioData, cancellationToken).ConfigureAwait(false);
 
             return true;
         }
@@ -349,28 +350,44 @@ namespace EasyTool.AI.LLM
         private static async Task<string> ReadContentAsStringAsync(HttpContent content)
         {
 #if NETSTANDARD2_1
-            return await content.ReadAsStringAsync();
+            return await content.ReadAsStringAsync().ConfigureAwait(false);
 #else
-            return await content.ReadAsStringAsync(default);
+            return await content.ReadAsStringAsync(default).ConfigureAwait(false);
 #endif
         }
 
         private static async Task<Stream> ReadContentAsStreamAsync(HttpContent content)
         {
 #if NETSTANDARD2_1
-            return await content.ReadAsStreamAsync();
+            return await content.ReadAsStreamAsync().ConfigureAwait(false);
 #else
-            return await content.ReadAsStreamAsync(default);
+            return await content.ReadAsStreamAsync(default).ConfigureAwait(false);
 #endif
         }
 
         private static async Task<byte[]> ReadContentAsByteArrayAsync(HttpContent content)
         {
 #if NETSTANDARD2_1
-            return await content.ReadAsByteArrayAsync();
+            return await content.ReadAsByteArrayAsync().ConfigureAwait(false);
 #else
-            return await content.ReadAsByteArrayAsync(default);
+            return await content.ReadAsByteArrayAsync(default).ConfigureAwait(false);
 #endif
+        }
+
+        #endregion
+
+        #region IDisposable Implementation
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                _httpClient?.Dispose();
+                _disposed = true;
+            }
         }
 
         #endregion

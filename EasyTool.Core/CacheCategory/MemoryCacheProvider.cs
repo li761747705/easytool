@@ -145,7 +145,7 @@ namespace EasyTool.CacheCategory
                     return value;
             }
 
-            value = await factory();
+            value = await factory().ConfigureAwait(false);
             Set(key, value, options);
             return value;
         }

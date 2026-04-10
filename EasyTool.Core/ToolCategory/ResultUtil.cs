@@ -103,7 +103,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public async Task MatchAsync(Func<Task> onSuccess, Action<string> onFailure)
         {
-            if (IsSuccess) await onSuccess();
+            if (IsSuccess) await onSuccess().ConfigureAwait(false);
             else onFailure(Error ?? "");
         }
     }
@@ -180,7 +180,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public async Task<Result<TResult>> BindAsync<TResult>(Func<T, Task<Result<TResult>>> next)
         {
-            return IsSuccess ? await next(Value!) : Failure<TResult>(Error!, ErrorCode);
+            return IsSuccess ? await next(Value!).ConfigureAwait(false) : Failure<TResult>(Error!, ErrorCode);
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public async Task<Result<TResult>> MapAsync<TResult>(Func<T, Task<TResult>> mapper)
         {
-            return IsSuccess ? Success(await mapper(Value!)) : Failure<TResult>(Error!, ErrorCode);
+            return IsSuccess ? Success(await mapper(Value!).ConfigureAwait(false)) : Failure<TResult>(Error!, ErrorCode);
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace EasyTool.ToolCategory
         {
             try
             {
-                await action();
+                await action().ConfigureAwait(false);
                 return Result.Success();
             }
             catch (Exception ex)
@@ -284,7 +284,7 @@ namespace EasyTool.ToolCategory
         {
             try
             {
-                return Result.Success(await func());
+                return Result.Success(await func().ConfigureAwait(false));
             }
             catch (Exception ex)
             {

@@ -111,7 +111,7 @@ namespace EasyTool.NetCategory
 
             try
             {
-                await ConnectInternalAsync(_cts.Token);
+                await ConnectInternalAsync(_cts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -135,7 +135,7 @@ namespace EasyTool.NetCategory
 
             _isConnected = false;
             OnDisconnected(null);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace EasyTool.NetCategory
                         request.Headers.TryAddWithoutValidation("Last-Event-ID", LastEventId);
                     }
 
-                    using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                    using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     response.EnsureSuccessStatusCode();
 
                     _isConnected = true;
@@ -204,13 +204,13 @@ namespace EasyTool.NetCategory
                     OnConnected();
 
 #if NETSTANDARD2_1
-                    using var stream = await response.Content.ReadAsStreamAsync();
+                    using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #else
-                    using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                    using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
 #endif
                     using var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
 
-                    await ProcessEventStreamAsync(reader, cancellationToken);
+                    await ProcessEventStreamAsync(reader, cancellationToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
@@ -230,7 +230,7 @@ namespace EasyTool.NetCategory
 
                     try
                     {
-                        await Task.Delay(ReconnectDelay * reconnectAttempts, cancellationToken);
+                        await Task.Delay(ReconnectDelay * reconnectAttempts, cancellationToken).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
@@ -250,7 +250,7 @@ namespace EasyTool.NetCategory
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var line = await reader.ReadLineAsync();
+                var line = await reader.ReadLineAsync().ConfigureAwait(false);
                 if (line == null)
                 {
                     // 流结束
@@ -334,6 +334,10 @@ namespace EasyTool.NetCategory
             Disconnected?.Invoke(this, new SseDisconnectEventArgs(reconnectAttempt));
         }
 
+        /// <summary>
+        /// 触发错误事件
+        /// </summary>
+        /// <param name="ex">异常对象</param>
         protected virtual void OnError(Exception ex)
         {
             Error?.Invoke(this, ex);
@@ -511,9 +515,9 @@ namespace EasyTool.NetCategory
 
             _ = client.ConnectAsync(cts.Token);
 
-            var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(timeout, cts.Token));
+            var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(timeout, cts.Token)).ConfigureAwait(false);
 
-            await client.DisconnectAsync();
+            await client.DisconnectAsync().ConfigureAwait(false);
 
             return completedTask == tcs.Task ? result : null;
         }

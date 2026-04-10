@@ -89,6 +89,11 @@ namespace EasyTool.BusinessCategory
             @"^([A-Za-z]{1,3}\d{6,9}|\d{8,9})$",
             RegexOptions.Compiled);
 
+        /// <summary>
+        /// 非字母数字正则表达式
+        /// </summary>
+        private static readonly Regex NonAlphanumericRegex = new Regex(@"[^A-Z0-9]", RegexOptions.Compiled);
+
         #endregion
 
         #region 验证方法
@@ -319,7 +324,7 @@ namespace EasyTool.BusinessCategory
 
             // 去除空格和特殊字符，转大写
             string normalized = passportNumber.ToUpper().Trim();
-            normalized = Regex.Replace(normalized, @"[^A-Z0-9]", "");
+            normalized = NonAlphanumericRegex.Replace(normalized, "");
 
             return normalized;
         }

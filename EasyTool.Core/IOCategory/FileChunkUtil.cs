@@ -83,7 +83,7 @@ namespace EasyTool.IOCategory
         /// </summary>
         public static async Task<ChunkInfo> SplitAsync(string filePath, string outputDir, long chunkSize = 5 * 1024 * 1024, Action<double>? progress = null)
         {
-            return await Task.Run(() => Split(filePath, outputDir, chunkSize, progress));
+            return await Task.Run(() => Split(filePath, outputDir, chunkSize, progress)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace EasyTool.IOCategory
         /// </summary>
         public static async Task MergeAsync(ChunkInfo chunkInfo, string chunkDir, string outputPath, Action<double>? progress = null)
         {
-            await Task.Run(() => Merge(chunkInfo, chunkDir, outputPath, progress));
+            await Task.Run(() => Merge(chunkInfo, chunkDir, outputPath, progress)).ConfigureAwait(false);
         }
 
         /// <summary>

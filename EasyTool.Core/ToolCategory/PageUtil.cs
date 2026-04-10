@@ -84,7 +84,7 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 判断是否有上一页
         /// </summary>
-        /// <returns>如果有上一页，返回true
+        /// <returns>如果有上一页，返回true</returns>
         public bool HasPreviousPage()
         {
             return currentPage > 1;

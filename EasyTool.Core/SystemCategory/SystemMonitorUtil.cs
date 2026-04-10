@@ -35,7 +35,7 @@ namespace EasyTool.SystemCategory
         /// <returns>CPU 使用率</returns>
         public static async Task<float> GetCpuUsageAsync()
         {
-            return await Task.Run(() => GetCpuUsage());
+            return await Task.Run(() => GetCpuUsage()).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -920,7 +920,7 @@ namespace EasyTool.SystemCategory
             {
                 var data = new MonitorData
                 {
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     CpuUsage = SystemMonitorUtil.GetCpuUsage(),
                     MemoryUsage = SystemMonitorUtil.GetMemoryUsage(),
                     CurrentProcessMemory = SystemMonitorUtil.GetCurrentProcessMemory(),

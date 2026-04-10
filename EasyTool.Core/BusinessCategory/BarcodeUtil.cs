@@ -77,6 +77,11 @@ namespace EasyTool.BusinessCategory
         private static readonly Regex ITF14Regex = new(@"^\d{14}$", RegexOptions.Compiled);
 
         /// <summary>
+        /// 非数字字符正则表达式
+        /// </summary>
+        private static readonly Regex NonDigitRegex = new(@"\D", RegexOptions.Compiled);
+
+        /// <summary>
         /// 国家代码（GS1前缀）与地区映射
         /// </summary>
         private static readonly (string Prefix, string Region)[] Gs1PrefixMap =
@@ -572,7 +577,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(barcode, @"\D", "");
+            string cleaned = NonDigitRegex.Replace(barcode, "");
             return cleaned.Length >= 6 ? cleaned : null;
         }
 

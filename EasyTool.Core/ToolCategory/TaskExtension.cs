@@ -59,12 +59,12 @@ namespace EasyTool.ToolCategory
         {
             var delayTask = Task.Delay(timeout);
 
-            var completedTask = await Task.WhenAny(task, delayTask);
+            var completedTask = await Task.WhenAny(task, delayTask).ConfigureAwait(false);
 
             if (completedTask == delayTask)
                 throw new TimeoutException($"操作超时（{timeout.TotalSeconds}秒）");
 
-            return await task;
+            return await task.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -76,12 +76,12 @@ namespace EasyTool.ToolCategory
         {
             var delayTask = Task.Delay(timeout);
 
-            var completedTask = await Task.WhenAny(task, delayTask);
+            var completedTask = await Task.WhenAny(task, delayTask).ConfigureAwait(false);
 
             if (completedTask == delayTask)
                 throw new TimeoutException($"操作超时（{timeout.TotalSeconds}秒）");
 
-            await task;
+            await task.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -94,12 +94,12 @@ namespace EasyTool.ToolCategory
         {
             var delayTask = Task.Delay(timeout);
 
-            var completedTask = await Task.WhenAny(task, delayTask);
+            var completedTask = await Task.WhenAny(task, delayTask).ConfigureAwait(false);
 
             if (completedTask == delayTask)
                 return defaultValue;
 
-            return await task;
+            return await task.ConfigureAwait(false);
         }
 
         #endregion
@@ -123,14 +123,14 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    return await taskFactory();
+                    return await taskFactory().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     lastException = ex;
 
                     if (i < retryCount && delay.HasValue)
-                        await Task.Delay(delay.Value);
+                        await Task.Delay(delay.Value).ConfigureAwait(false);
                 }
             }
 
@@ -154,7 +154,7 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    await taskFactory();
+                    await taskFactory().ConfigureAwait(false);
                     return;
                 }
                 catch (Exception ex)
@@ -162,7 +162,7 @@ namespace EasyTool.ToolCategory
                     lastException = ex;
 
                     if (i < retryCount && delay.HasValue)
-                        await Task.Delay(delay.Value);
+                        await Task.Delay(delay.Value).ConfigureAwait(false);
                 }
             }
 
@@ -189,7 +189,7 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    return await taskFactory();
+                    return await taskFactory().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -198,7 +198,7 @@ namespace EasyTool.ToolCategory
                     if (i < retryCount && shouldRetry(ex))
                     {
                         if (delay.HasValue)
-                            await Task.Delay(delay.Value);
+                            await Task.Delay(delay.Value).ConfigureAwait(false);
                     }
                     else
                     {
@@ -244,7 +244,7 @@ namespace EasyTool.ToolCategory
                 }, TaskContinuationOptions.ExecuteSynchronously);
             }
 
-            return await tcs.Task;
+            return await tcs.Task.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace EasyTool.ToolCategory
             if (taskArray.Length == 0)
                 throw new ArgumentException("至少需要一个任务", nameof(tasks));
 
-            return await Task.WhenAny(taskArray);
+            return await Task.WhenAny(taskArray).ConfigureAwait(false);
         }
 
         #endregion
@@ -276,7 +276,7 @@ namespace EasyTool.ToolCategory
 
             try
             {
-                return await task;
+                return await task.ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (timeoutCts.Token.IsCancellationRequested)
             {
@@ -299,7 +299,7 @@ namespace EasyTool.ToolCategory
 
             try
             {
-                await task;
+                await task.ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (timeoutCts.Token.IsCancellationRequested)
             {
@@ -323,7 +323,7 @@ namespace EasyTool.ToolCategory
         {
             try
             {
-                var result = await task;
+                var result = await task.ConfigureAwait(false);
                 return onSuccess(result);
             }
             catch (Exception ex)
@@ -339,7 +339,7 @@ namespace EasyTool.ToolCategory
         {
             try
             {
-                await task;
+                await task.ConfigureAwait(false);
                 onSuccess();
             }
             catch (Exception ex)
@@ -360,8 +360,8 @@ namespace EasyTool.ToolCategory
             if (taskFactory == null)
                 throw new ArgumentNullException(nameof(taskFactory));
 
-            await Task.Delay(delay);
-            return await taskFactory();
+            await Task.Delay(delay).ConfigureAwait(false);
+            return await taskFactory().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -372,8 +372,8 @@ namespace EasyTool.ToolCategory
             if (taskFactory == null)
                 throw new ArgumentNullException(nameof(taskFactory));
 
-            await Task.Delay(delay);
-            await taskFactory();
+            await Task.Delay(delay).ConfigureAwait(false);
+            await taskFactory().ConfigureAwait(false);
         }
 
         #endregion

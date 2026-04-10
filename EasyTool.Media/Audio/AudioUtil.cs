@@ -46,7 +46,7 @@ namespace EasyTool.Media.Audio
         /// </summary>
         public static async Task<bool> ConvertAsync(string inputPath, string outputPath, string format, string? bitrate = null, int? sampleRate = null)
         {
-            return await Task.Run(() => Convert(inputPath, outputPath, format, bitrate, sampleRate));
+            return await Task.Run(() => Convert(inputPath, outputPath, format, bitrate, sampleRate)).ConfigureAwait(false);
         }
 
         /// <summary>

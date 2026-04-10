@@ -131,7 +131,7 @@ namespace EasyTool.ToolCategory
             {
                 using var cts = new System.Threading.CancellationTokenSource(_options.Timeout);
                 var task = action();
-                var completedTask = await Task.WhenAny(task, Task.Delay(_options.Timeout));
+                var completedTask = await Task.WhenAny(task, Task.Delay(_options.Timeout)).ConfigureAwait(false);
 
                 if (completedTask != task)
                 {
@@ -139,7 +139,7 @@ namespace EasyTool.ToolCategory
                     throw new TimeoutException("操作超时");
                 }
 
-                var result = await task;
+                var result = await task.ConfigureAwait(false);
                 OnSuccess();
                 return result;
             }
@@ -157,7 +157,7 @@ namespace EasyTool.ToolCategory
         {
             await ExecuteAsync(async () =>
             {
-                await action();
+                await action().ConfigureAwait(false);
                 return true;
             });
         }
@@ -169,7 +169,7 @@ namespace EasyTool.ToolCategory
         {
             try
             {
-                var result = await ExecuteAsync(action);
+                var result = await ExecuteAsync(action).ConfigureAwait(false);
                 return (true, result, null);
             }
             catch (Exception ex)

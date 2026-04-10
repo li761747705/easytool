@@ -278,9 +278,6 @@ namespace EasyTool.ColorCategory
 
         #endregion
 
-        #region 命名颜色
-        #endregion
-
         /// <summary>
         /// 获取颜色名称
         /// </summary>

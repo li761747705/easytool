@@ -151,7 +151,7 @@ namespace EasyTool.NetCategory
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cts.Token);
             cts.CancelAfter(_options.ConnectTimeout);
 
-            await _webSocket.ConnectAsync(uri, cts.Token);
+            await _webSocket.ConnectAsync(uri, cts.Token).ConfigureAwait(false);
 
             // 启动接收和发送任务
             _receiveTask = ReceiveLoopAsync(_cts.Token);
@@ -165,7 +165,7 @@ namespace EasyTool.NetCategory
         /// <param name="cancellationToken">取消令牌</param>
         public async Task ConnectAsync(string url, CancellationToken cancellationToken = default)
         {
-            await ConnectAsync(new Uri(url), cancellationToken);
+            await ConnectAsync(new Uri(url), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace EasyTool.NetCategory
         public async Task SendAsync(string message, CancellationToken cancellationToken = default)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
-            await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken);
+            await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace EasyTool.NetCategory
         /// <param name="cancellationToken">取消令牌</param>
         public async Task SendAsync(byte[] data, CancellationToken cancellationToken = default)
         {
-            await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, cancellationToken);
+            await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace EasyTool.NetCategory
         {
             if (_webSocket.State == WebSocketState.Open)
             {
-                await _webSocket.CloseAsync(closeStatus, reason, cancellationToken);
+                await _webSocket.CloseAsync(closeStatus, reason, cancellationToken).ConfigureAwait(false);
             }
             _cts.Cancel();
         }
@@ -238,11 +238,11 @@ namespace EasyTool.NetCategory
             {
                 while (!cancellationToken.IsCancellationRequested && _webSocket.State == WebSocketState.Open)
                 {
-                    var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
+                    var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken).ConfigureAwait(false);
 
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        await CloseAsync(WebSocketCloseStatus.NormalClosure, "Server closed", cancellationToken);
+                        await CloseAsync(WebSocketCloseStatus.NormalClosure, "Server closed", cancellationToken).ConfigureAwait(false);
                         OnClosed?.Invoke(result.CloseStatus, result.CloseStatusDescription);
                         break;
                     }
@@ -287,16 +287,16 @@ namespace EasyTool.NetCategory
                         if (message.MessageType == WebSocketMessageType.Text && message.Text != null)
                         {
                             var bytes = Encoding.UTF8.GetBytes(message.Text);
-                            await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, message.EndOfMessage, cancellationToken);
+                            await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, message.EndOfMessage, cancellationToken).ConfigureAwait(false);
                         }
                         else if (message.MessageType == WebSocketMessageType.Binary && message.Binary != null)
                         {
-                            await _webSocket.SendAsync(new ArraySegment<byte>(message.Binary), WebSocketMessageType.Binary, message.EndOfMessage, cancellationToken);
+                            await _webSocket.SendAsync(new ArraySegment<byte>(message.Binary), WebSocketMessageType.Binary, message.EndOfMessage, cancellationToken).ConfigureAwait(false);
                         }
                     }
                     else
                     {
-                        await Task.Delay(10, cancellationToken);
+                        await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -359,15 +359,15 @@ namespace EasyTool.NetCategory
                 }
             };
 
-            await client.ConnectAsync(url);
+            await client.ConnectAsync(url).ConfigureAwait(false);
 
             using var cts = new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(30));
             cts.Token.Register(() => tcs.TrySetCanceled());
 
             client.Send(message);
 
-            await Task.WhenAny(tcs.Task, Task.Delay(timeout ?? TimeSpan.FromSeconds(30)));
-            await client.CloseAsync();
+            await Task.WhenAny(tcs.Task, Task.Delay(timeout ?? TimeSpan.FromSeconds(30))).ConfigureAwait(false);
+            await client.CloseAsync().ConfigureAwait(false);
 
             return responses;
         }

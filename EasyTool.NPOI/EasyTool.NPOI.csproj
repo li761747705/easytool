@@ -8,9 +8,8 @@
 
 		<PackageId>Joce.EasyTool.NPOI</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>1.2.0</Version>
 		<Description>
-			依赖于NPOI 2.7.5
+			EasyTool Excel扩展 - 基于NPOI的Excel操作工具
 			支持通过文件地址或者流的方式读取Excel文件获取工作簿对象IWorkbook,
 			通过IWorkbook工作簿对象可以转化成Dataset对象
 			通过ISheet工作表对象可以转化成DataTable对象和List对象

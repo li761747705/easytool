@@ -165,7 +165,7 @@ namespace EasyTool.NetCategory
             {
                 try
                 {
-                    return await call();
+                    return await call().ConfigureAwait(false);
                 }
                 catch (Exception ex) when (IsRetryableError(ex))
                 {
@@ -173,7 +173,7 @@ namespace EasyTool.NetCategory
 
                     if (i < retryCount)
                     {
-                        await Task.Delay(delay, cancellationToken);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -199,7 +199,7 @@ namespace EasyTool.NetCategory
 
             try
             {
-                return await call(cts.Token);
+                return await call(cts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
             {

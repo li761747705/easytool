@@ -40,6 +40,11 @@ namespace EasyTool.BusinessCategory
             RegexOptions.Compiled);
 
         /// <summary>
+        /// 非数字字符正则表达式
+        /// </summary>
+        private static readonly Regex NonDigitRegex = new(@"[^\d]", RegexOptions.Compiled);
+
+        /// <summary>
         /// 区号与城市映射
         /// </summary>
         private static readonly Dictionary<string, string> AreaCodeMap = new()
@@ -215,7 +220,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(phone, @"[^\d]", "");
+            string cleaned = NonDigitRegex.Replace(phone, "");
 
             // 三位区号（0开头）
             if (cleaned.Length >= 10 && cleaned.StartsWith("0"))
@@ -284,7 +289,7 @@ namespace EasyTool.BusinessCategory
             // 400/800电话
             if (Is400Phone(phone) || Is800Phone(phone))
             {
-                string local = Regex.Replace(phone, @"[^\d]", "");
+                string local = NonDigitRegex.Replace(phone, "");
                 return local.Length >= 10 ? local.Substring(3) : null;
             }
 
@@ -294,7 +299,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(phone, @"[^\d]", "");
+            string cleaned = NonDigitRegex.Replace(phone, "");
             return cleaned.Substring(areaCode.Length);
         }
 
@@ -327,7 +332,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(phone, @"[^\d]", "");
+            string cleaned = NonDigitRegex.Replace(phone, "");
             return cleaned.Length >= 7 ? cleaned : null;
         }
 

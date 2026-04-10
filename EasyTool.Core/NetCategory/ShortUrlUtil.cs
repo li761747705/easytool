@@ -158,7 +158,7 @@ namespace EasyTool.NetCategory
             try
             {
                 var apiUrl = $"https://is.gd/create.php?format=simple&url={Uri.EscapeDataString(url)}";
-                return await _httpClient.GetStringAsync(apiUrl);
+                return await _httpClient.GetStringAsync(apiUrl).ConfigureAwait(false);
             }
             catch
             {
@@ -176,7 +176,7 @@ namespace EasyTool.NetCategory
             try
             {
                 var apiUrl = $"https://v.gd/create.php?format=simple&url={Uri.EscapeDataString(url)}";
-                return await _httpClient.GetStringAsync(apiUrl);
+                return await _httpClient.GetStringAsync(apiUrl).ConfigureAwait(false);
             }
             catch
             {
@@ -194,7 +194,7 @@ namespace EasyTool.NetCategory
             try
             {
                 var apiUrl = $"https://tinyurl.com/api-create.php?url={Uri.EscapeDataString(url)}";
-                return await _httpClient.GetStringAsync(apiUrl);
+                return await _httpClient.GetStringAsync(apiUrl).ConfigureAwait(false);
             }
             catch
             {
@@ -213,7 +213,7 @@ namespace EasyTool.NetCategory
 
             foreach (var url in urls)
             {
-                var shortUrl = await ShortenWithIsGdAsync(url);
+                var shortUrl = await ShortenWithIsGdAsync(url).ConfigureAwait(false);
                 if (!string.IsNullOrEmpty(shortUrl))
                 {
                     result[url] = shortUrl;

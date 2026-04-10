@@ -116,7 +116,7 @@ namespace EasyTool.ToolCategory
             if (tasks == null || tasks.Length == 0)
                 return;
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 
@@ -175,6 +175,10 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public double UsageRate => MaxWorkerThreads > 0 ? (double)ActiveWorkerThreads / MaxWorkerThreads : 0;
 
+        /// <summary>
+        /// 返回线程池信息的字符串表示
+        /// </summary>
+        /// <returns>线程池信息字符串</returns>
         public override string ToString()
         {
             return $"Worker: {ActiveWorkerThreads}/{MaxWorkerThreads} (Min: {MinWorkerThreads}), " +
@@ -401,6 +405,9 @@ namespace EasyTool.ToolCategory
                 throw new ObjectDisposedException(nameof(CustomThreadPool));
         }
 
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             if (_disposed)
@@ -606,6 +613,9 @@ namespace EasyTool.ToolCategory
                 throw new ObjectDisposedException(nameof(FixedThreadPool));
         }
 
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             if (_disposed)

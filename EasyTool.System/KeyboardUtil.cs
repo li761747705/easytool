@@ -16,6 +16,11 @@ namespace EasyTool.System
         /// </summary>
         public static bool IsKeyDown(VirtualKeyCode keyCode)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             return (GetKeyState((int)keyCode) & 0x8000) != 0;
         }
 
@@ -24,6 +29,11 @@ namespace EasyTool.System
         /// </summary>
         public static bool IsKeyToggled(VirtualKeyCode keyCode)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             return (GetKeyState((int)keyCode) & 0x0001) != 0;
         }
 
@@ -92,6 +102,11 @@ namespace EasyTool.System
         /// </summary>
         public static void KeyDown(VirtualKeyCode keyCode)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             keybd_event((byte)keyCode, 0, KEYEVENTF_KEYDOWN, 0);
         }
 
@@ -100,6 +115,11 @@ namespace EasyTool.System
         /// </summary>
         public static void KeyUp(VirtualKeyCode keyCode)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             keybd_event((byte)keyCode, 0, KEYEVENTF_KEYUP, 0);
         }
 
@@ -141,6 +161,11 @@ namespace EasyTool.System
         /// </summary>
         public static void SendText(string text)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("此功能仅支持 Windows 平台");
+            }
+
             foreach (var c in text)
             {
                 SendChar(c);

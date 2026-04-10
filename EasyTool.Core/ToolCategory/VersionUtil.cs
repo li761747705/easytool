@@ -352,6 +352,10 @@ namespace EasyTool.ToolCategory
         /// </summary>
         public bool IsStable => string.IsNullOrEmpty(PreRelease);
 
+        /// <summary>
+        /// 返回版本号的字符串表示
+        /// </summary>
+        /// <returns>版本号字符串</returns>
         public override string ToString()
         {
             var result = $"{Major}.{Minor}.{Patch}";
@@ -364,6 +368,11 @@ namespace EasyTool.ToolCategory
             return result;
         }
 
+        /// <summary>
+        /// 判断是否与另一个对象相等
+        /// </summary>
+        /// <param name="obj">要比较的对象</param>
+        /// <returns>是否相等</returns>
         public override bool Equals(object? obj)
         {
             if (obj is VersionInfo other)
@@ -377,6 +386,10 @@ namespace EasyTool.ToolCategory
             return false;
         }
 
+        /// <summary>
+        /// 返回哈希码
+        /// </summary>
+        /// <returns>哈希码</returns>
         public override int GetHashCode()
         {
             return HashCode.Combine(Major, Minor, Patch, Revision, PreRelease);

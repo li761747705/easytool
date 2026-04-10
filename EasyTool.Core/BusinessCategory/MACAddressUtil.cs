@@ -27,6 +27,11 @@ namespace EasyTool.BusinessCategory
         };
 
         /// <summary>
+        /// 非十六进制字符正则表达式
+        /// </summary>
+        private static readonly Regex NonHexRegex = new(@"[^\dA-Fa-f]", RegexOptions.Compiled);
+
+        /// <summary>
         /// OUI（组织唯一标识符）与厂商映射（部分）
         /// </summary>
         private static readonly (string Prefix, string Vendor)[] OuiPrefixMap =
@@ -404,7 +409,7 @@ namespace EasyTool.BusinessCategory
                 return null;
             }
 
-            string cleaned = Regex.Replace(mac, @"[^\dA-Fa-f]", "").ToUpper();
+            string cleaned = NonHexRegex.Replace(mac, "").ToUpper();
             return cleaned.Length == 12 ? cleaned : null;
         }
 

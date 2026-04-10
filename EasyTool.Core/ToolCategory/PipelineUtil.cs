@@ -125,12 +125,12 @@ namespace EasyTool.ToolCategory
             {
                 try
                 {
-                    await next(context);
+                    await next(context).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     if (handler != null)
-                        await handler(context, ex);
+                        await handler(context, ex).ConfigureAwait(false);
                     else
                         context.Set("Exception", ex);
                 }
@@ -146,7 +146,7 @@ namespace EasyTool.ToolCategory
             {
                 using var cts = new System.Threading.CancellationTokenSource(timeout);
                 var task = next(context);
-                var completed = await Task.WhenAny(task, Task.Delay(timeout));
+                var completed = await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false);
 
                 if (completed != task)
                 {
@@ -154,7 +154,7 @@ namespace EasyTool.ToolCategory
                     throw new TimeoutException($"管道执行超时: {timeout}");
                 }
 
-                await task;
+                await task.ConfigureAwait(false);
             });
         }
 
@@ -166,7 +166,7 @@ namespace EasyTool.ToolCategory
             return Use(async (context, next) =>
             {
                 log?.Invoke($"[{DateTime.Now:HH:mm:ss}] 开始执行管道");
-                await next(context);
+                await next(context).ConfigureAwait(false);
                 log?.Invoke($"[{DateTime.Now:HH:mm:ss}] 结束执行管道");
             });
         }
@@ -179,7 +179,7 @@ namespace EasyTool.ToolCategory
             return Use(async (context, next) =>
             {
                 var sw = System.Diagnostics.Stopwatch.StartNew();
-                await next(context);
+                await next(context).ConfigureAwait(false);
                 sw.Stop();
                 callback?.Invoke(sw.Elapsed);
                 context.Set("ElapsedTime", sw.Elapsed);
@@ -232,7 +232,7 @@ namespace EasyTool.ToolCategory
                 current = ctx => middleware(ctx, next);
             }
 
-            return await current(input);
+            return await current(input).ConfigureAwait(false);
         }
     }
 
@@ -265,7 +265,7 @@ namespace EasyTool.ToolCategory
             var builder = new PipelineBuilder();
             configure(builder);
             var pipeline = builder.Build();
-            await pipeline(context ?? new PipelineContext());
+            await pipeline(context ?? new PipelineContext()).ConfigureAwait(false);
         }
     }
 }

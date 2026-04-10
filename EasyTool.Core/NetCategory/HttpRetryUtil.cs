@@ -94,7 +94,7 @@ namespace EasyTool.NetCategory
                     using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                     cts.CancelAfter(options.TimeoutMs);
 
-                    response = await httpClient.SendAsync(request, cts.Token);
+                    response = await httpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
 
                     // 如果成功或不需要重试的状态码，直接返回
                     if (response.IsSuccessStatusCode || !ShouldRetry(response.StatusCode, options))
@@ -117,10 +117,10 @@ namespace EasyTool.NetCategory
                 if (attempt < options.MaxRetries)
                 {
                     var delay = CalculateDelay(attempt, options);
-                    await Task.Delay(delay, cancellationToken);
+                    await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
 
                     // 克隆请求以支持重试
-                    request = await CloneRequestAsync(request);
+                    request = await CloneRequestAsync(request).ConfigureAwait(false);
                 }
             }
 
@@ -137,9 +137,9 @@ namespace EasyTool.NetCategory
             CancellationToken cancellationToken = default)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            using var response = await ExecuteWithRetryAsync(httpClient, request, options, cancellationToken);
+            using var response = await ExecuteWithRetryAsync(httpClient, request, options, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace EasyTool.NetCategory
             CancellationToken cancellationToken = default)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
-            return await ExecuteWithRetryAsync(httpClient, request, options, cancellationToken);
+            return await ExecuteWithRetryAsync(httpClient, request, options, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -169,10 +169,10 @@ namespace EasyTool.NetCategory
             var json = JsonSerializer.Serialize(data);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await PostWithRetryAsync(httpClient, url, content, options, cancellationToken);
+            var response = await PostWithRetryAsync(httpClient, url, content, options, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
-            var responseText = await response.Content.ReadAsStringAsync();
+            var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonSerializer.Deserialize<TResponse>(responseText, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -229,7 +229,7 @@ namespace EasyTool.NetCategory
 
                 try
                 {
-                    var result = await action();
+                    var result = await action().ConfigureAwait(false);
                     OnSuccess();
                     return result;
                 }
@@ -314,7 +314,7 @@ namespace EasyTool.NetCategory
 
             if (request.Content != null)
             {
-                var content = await request.Content.ReadAsByteArrayAsync();
+                var content = await request.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 clone.Content = new ByteArrayContent(content);
 
                 foreach (var header in request.Content.Headers)

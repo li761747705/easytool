@@ -102,9 +102,17 @@ namespace EasyTool.IOCategory
                     files.AddRange(subdirectoryFiles);
                 }
             }
-            catch (Exception ex)
+            catch (DirectoryNotFoundException)
             {
-                throw new Exception($"遍历目录 {path} 中的文件时发生错误：{ex.Message}", ex);
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw;
+            }
+            catch (IOException)
+            {
+                throw;
             }
 
             return files;
@@ -145,9 +153,17 @@ namespace EasyTool.IOCategory
 
                 return true;
             }
-            catch (Exception ex)
+            catch (DirectoryNotFoundException)
             {
-                throw new Exception($"清空文件夹 {dirPath} 时发生错误：{ex.Message}", ex);
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw;
+            }
+            catch (IOException)
+            {
+                throw;
             }
         }
 
@@ -185,9 +201,17 @@ namespace EasyTool.IOCategory
 
                 return true;
             }
-            catch (Exception ex)
+            catch (DirectoryNotFoundException)
             {
-                throw new Exception($"清空文件夹 {dirPath} 时发生错误：{ex.Message}", ex);
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw;
+            }
+            catch (IOException)
+            {
+                throw;
             }
         }
 
@@ -345,9 +369,17 @@ namespace EasyTool.IOCategory
                     throw new ArgumentException($"复制源 {src} 不是文件也不是目录");
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                throw new Exception($"复制 {src} 到 {dest} 时发生错误：{ex.Message}", ex);
+                throw;
+            }
+            catch (IOException)
+            {
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw;
             }
         }
 
@@ -408,9 +440,17 @@ namespace EasyTool.IOCategory
 
                 return true;
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                throw new Exception($"移动 {src} 到 {dest} 时发生错误：{ex.Message}", ex);
+                throw;
+            }
+            catch (IOException)
+            {
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw;
             }
         }
 
@@ -468,9 +508,17 @@ namespace EasyTool.IOCategory
                 file.MoveTo(dest);
                 return new FileInfo(dest);
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                throw new Exception($"重命名文件 {file.FullName} 为 {newName} 时发生错误：{ex.Message}", ex);
+                throw;
+            }
+            catch (IOException)
+            {
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw;
             }
         }
 

@@ -35,7 +35,7 @@ namespace EasyTool.DateTimeCategory
             timer = new Timer(async _ =>
             {
                 timer?.Dispose();
-                await callback();
+                await callback().ConfigureAwait(false);
             }, null, delay, Timeout.InfiniteTimeSpan);
             return timer;
         }
@@ -62,7 +62,7 @@ namespace EasyTool.DateTimeCategory
             Timer? timer = null;
             timer = new Timer(async _ =>
             {
-                await callback();
+                await callback().ConfigureAwait(false);
             }, null, interval, interval);
             return timer;
         }
@@ -93,7 +93,7 @@ namespace EasyTool.DateTimeCategory
             {
                 try
                 {
-                    await Task.Delay(delay, cts.Token);
+                    await Task.Delay(delay, cts.Token).ConfigureAwait(false);
                     if (!cts.Token.IsCancellationRequested)
                     {
                         callback();
@@ -122,10 +122,10 @@ namespace EasyTool.DateTimeCategory
             {
                 try
                 {
-                    await Task.Delay(delay, cts.Token);
+                    await Task.Delay(delay, cts.Token).ConfigureAwait(false);
                     if (!cts.Token.IsCancellationRequested)
                     {
-                        await callback();
+                        await callback().ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException)
@@ -163,7 +163,7 @@ namespace EasyTool.DateTimeCategory
 
                     try
                     {
-                        await Task.Delay(interval, cts.Token);
+                        await Task.Delay(interval, cts.Token).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
@@ -194,14 +194,14 @@ namespace EasyTool.DateTimeCategory
                     if (maxCount > 0 && count >= maxCount)
                         break;
 
-                    if (!await action())
+                    if (!await action().ConfigureAwait(false))
                         break;
 
                     count++;
 
                     try
                     {
-                        await Task.Delay(interval, cts.Token);
+                        await Task.Delay(interval, cts.Token).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
@@ -270,7 +270,7 @@ namespace EasyTool.DateTimeCategory
             IsRunning = true;
 
             var dueTime = _startTime > DateTime.MinValue
-                ? _startTime - DateTime.Now
+                ? _startTime - DateTime.UtcNow
                 : TimeSpan.Zero;
 
             if (dueTime < TimeSpan.Zero)

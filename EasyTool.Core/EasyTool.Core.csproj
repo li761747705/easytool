@@ -10,11 +10,10 @@
 
 		<PackageId>Joce.EasyTool.Core</PackageId>
 		<Authors>一个大西瓜,TimChen</Authors>
-		<Version>1.2.0</Version>
 		<Description>
-			A open source C# tool to make .NET easy
+			EasyTool 核心包 - 300+ 工具类，包含编码加密(70+)、集合数据结构(45+)、文本处理(30+)、业务验证(40+)、日期时间、网络工具(20+)、IO操作(35+)、数学计算等。零外部依赖，基于 netstandard2.1
 		</Description>
-		<PackageTags>Tool Power</PackageTags>
+		<PackageTags>Tool Utility Encryption Encoding Collections Text Validation DateTime Network IO Math Chinese Hutool</PackageTags>
 		<RepositoryUrl>https://github.com/dotnet-easy/easytool</RepositoryUrl>
 		<PackageProjectUrl>https://easy-dotnet.com</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>

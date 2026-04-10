@@ -41,6 +41,11 @@ namespace EasyTool.ToolCategory
         private DateTime _windowStart;
         private readonly object _lock = new();
 
+        /// <summary>
+        /// 创建固定窗口限流器
+        /// </summary>
+        /// <param name="limit">时间窗口内允许的最大请求数</param>
+        /// <param name="window">时间窗口大小</param>
         public FixedWindowRateLimiter(int limit, TimeSpan window)
         {
             _limit = limit;
@@ -49,6 +54,10 @@ namespace EasyTool.ToolCategory
             _windowStart = DateTime.UtcNow;
         }
 
+        /// <summary>
+        /// 尝试获取许可
+        /// </summary>
+        /// <returns>如果获取成功返回 true，否则返回 false</returns>
         public bool TryAcquire()
         {
             lock (_lock)
@@ -69,6 +78,10 @@ namespace EasyTool.ToolCategory
             }
         }
 
+        /// <summary>
+        /// 获取需要等待的时间
+        /// </summary>
+        /// <returns>等待时间跨度</returns>
         public TimeSpan GetWaitTime()
         {
             lock (_lock)
@@ -89,6 +102,11 @@ namespace EasyTool.ToolCategory
         private readonly System.Collections.Generic.Queue<DateTime> _timestamps;
         private readonly object _lock = new();
 
+        /// <summary>
+        /// 创建滑动窗口限流器
+        /// </summary>
+        /// <param name="limit">时间窗口内允许的最大请求数</param>
+        /// <param name="window">时间窗口大小</param>
         public SlidingWindowRateLimiter(int limit, TimeSpan window)
         {
             _limit = limit;
@@ -96,6 +114,10 @@ namespace EasyTool.ToolCategory
             _timestamps = new();
         }
 
+        /// <summary>
+        /// 尝试获取许可
+        /// </summary>
+        /// <returns>如果获取成功返回 true，否则返回 false</returns>
         public bool TryAcquire()
         {
             lock (_lock)
@@ -117,6 +139,10 @@ namespace EasyTool.ToolCategory
             }
         }
 
+        /// <summary>
+        /// 获取需要等待的时间
+        /// </summary>
+        /// <returns>等待时间跨度</returns>
         public TimeSpan GetWaitTime()
         {
             lock (_lock)
@@ -142,6 +168,11 @@ namespace EasyTool.ToolCategory
         private DateTime _lastRefill;
         private readonly object _lock = new();
 
+        /// <summary>
+        /// 创建令牌桶限流器
+        /// </summary>
+        /// <param name="capacity">桶容量（最大令牌数）</param>
+        /// <param name="refillRate">令牌补充速率（令牌/秒）</param>
         public TokenBucketRateLimiter(int capacity, int refillRate)
         {
             _capacity = capacity;
@@ -150,6 +181,11 @@ namespace EasyTool.ToolCategory
             _lastRefill = DateTime.UtcNow;
         }
 
+        /// <summary>
+        /// 尝试获取指定数量的令牌
+        /// </summary>
+        /// <param name="tokens">要获取的令牌数量，默认为 1</param>
+        /// <returns>如果获取成功返回 true，否则返回 false</returns>
         public bool TryAcquire(int tokens = 1)
         {
             lock (_lock)
@@ -165,6 +201,9 @@ namespace EasyTool.ToolCategory
             }
         }
 
+        /// <summary>
+        /// 补充令牌
+        /// </summary>
         private void RefillTokens()
         {
             var now = DateTime.UtcNow;
@@ -178,6 +217,11 @@ namespace EasyTool.ToolCategory
             }
         }
 
+        /// <summary>
+        /// 获取需要等待的时间
+        /// </summary>
+        /// <param name="tokens">要获取的令牌数量，默认为 1</param>
+        /// <returns>等待时间跨度</returns>
         public TimeSpan GetWaitTime(int tokens = 1)
         {
             lock (_lock)
@@ -203,6 +247,11 @@ namespace EasyTool.ToolCategory
         private DateTime _lastLeak;
         private readonly object _lock = new();
 
+        /// <summary>
+        /// 创建漏桶限流器
+        /// </summary>
+        /// <param name="capacity">桶容量</param>
+        /// <param name="leakRate">漏水速率（单位/秒）</param>
         public LeakyBucketRateLimiter(int capacity, int leakRate)
         {
             _capacity = capacity;
@@ -211,6 +260,10 @@ namespace EasyTool.ToolCategory
             _lastLeak = DateTime.UtcNow;
         }
 
+        /// <summary>
+        /// 尝试获取许可
+        /// </summary>
+        /// <returns>如果获取成功返回 true，否则返回 false</returns>
         public bool TryAcquire()
         {
             lock (_lock)
@@ -226,6 +279,9 @@ namespace EasyTool.ToolCategory
             }
         }
 
+        /// <summary>
+        /// 漏水操作
+        /// </summary>
         private void Leak()
         {
             var now = DateTime.UtcNow;
@@ -239,6 +295,10 @@ namespace EasyTool.ToolCategory
             }
         }
 
+        /// <summary>
+        /// 获取需要等待的时间
+        /// </summary>
+        /// <returns>等待时间跨度</returns>
         public TimeSpan GetWaitTime()
         {
             lock (_lock)
@@ -260,6 +320,11 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 创建限流器
         /// </summary>
+        /// <param name="algorithm">限流算法</param>
+        /// <param name="limit">限制数量</param>
+        /// <param name="window">时间窗口</param>
+        /// <returns>限流器实例</returns>
+        /// <exception cref="ArgumentException">当算法不支持时抛出</exception>
         public static IRateLimiter Create(RateLimitAlgorithm algorithm, int limit, TimeSpan window)
         {
             return algorithm switch
@@ -275,25 +340,32 @@ namespace EasyTool.ToolCategory
         /// <summary>
         /// 使用限流器执行操作
         /// </summary>
+        /// <typeparam name="T">返回值类型</typeparam>
+        /// <param name="limiter">限流器实例</param>
+        /// <param name="action">要执行的异步操作</param>
+        /// <returns>操作的结果</returns>
         public static async Task<T> ExecuteWithRateLimitAsync<T>(IRateLimiter limiter, Func<Task<T>> action)
         {
             while (!limiter.TryAcquire())
             {
-                await Task.Delay(limiter.GetWaitTime());
+                await Task.Delay(limiter.GetWaitTime()).ConfigureAwait(false);
             }
-            return await action();
+            return await action().ConfigureAwait(false);
         }
 
         /// <summary>
         /// 使用限流器执行操作
         /// </summary>
+        /// <param name="limiter">限流器实例</param>
+        /// <param name="action">要执行的异步操作</param>
+        /// <returns>表示异步操作的 Task</returns>
         public static async Task ExecuteWithRateLimitAsync(IRateLimiter limiter, Func<Task> action)
         {
             while (!limiter.TryAcquire())
             {
-                await Task.Delay(limiter.GetWaitTime());
+                await Task.Delay(limiter.GetWaitTime()).ConfigureAwait(false);
             }
-            await action();
+            await action().ConfigureAwait(false);
         }
     }
 
@@ -302,7 +374,16 @@ namespace EasyTool.ToolCategory
     /// </summary>
     public interface IRateLimiter
     {
+        /// <summary>
+        /// 尝试获取许可
+        /// </summary>
+        /// <returns>如果获取成功返回 true，否则返回 false</returns>
         bool TryAcquire();
+
+        /// <summary>
+        /// 获取需要等待的时间
+        /// </summary>
+        /// <returns>等待时间跨度</returns>
         TimeSpan GetWaitTime();
     }
 

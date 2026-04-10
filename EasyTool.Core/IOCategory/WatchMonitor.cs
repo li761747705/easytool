@@ -13,10 +13,29 @@ namespace EasyTool.IOCategory
         private readonly FileSystemWatcher watcher;
 
         // 定义事件，用于通知外部监听器
+        /// <summary>
+        /// 文件修改事件
+        /// </summary>
         public event EventHandler<FileEventArgs>? FileChanged;
+
+        /// <summary>
+        /// 文件创建事件
+        /// </summary>
         public event EventHandler<FileEventArgs>? FileCreated;
+
+        /// <summary>
+        /// 文件删除事件
+        /// </summary>
         public event EventHandler<FileEventArgs>? FileDeleted;
+
+        /// <summary>
+        /// 文件丢失事件（重命名时触发）
+        /// </summary>
         public event EventHandler<FileEventArgs>? FileMissing;
+
+        /// <summary>
+        /// 文件错误事件
+        /// </summary>
         public event EventHandler<FileEventArgs>? FileError;
 
         /// <summary>

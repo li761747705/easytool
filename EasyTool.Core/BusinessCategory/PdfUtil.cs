@@ -110,6 +110,7 @@ namespace EasyTool.BusinessCategory
         /// }
         /// </code>
         /// </remarks>
+        [Obsolete("此功能尚未实现，请安装 iTextSharp 或 PdfSharp NuGet 包")]
         public static bool MergePdf(List<string> pdfFiles, string outputPath)
         {
             if (pdfFiles == null || pdfFiles.Count == 0)
@@ -119,16 +120,9 @@ namespace EasyTool.BusinessCategory
             if (!pdfFiles.All(File.Exists))
                 return false;
 
-            try
-            {
-                // 需要引入第三方库实现
-                // 建议安装：Install-Package iTextSharp 或 Install-Package PdfSharp
-                throw new NotImplementedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
-            }
-            catch
-            {
-                return false;
-            }
+            throw new NotSupportedException(
+                "请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能。" +
+                "建议安装：Install-Package iTextSharp 或 Install-Package PdfSharp");
         }
 
         #endregion
@@ -142,6 +136,7 @@ namespace EasyTool.BusinessCategory
         /// <param name="outputDirectory">输出目录</param>
         /// <param name="pagesPerFile">每个文件的页数</param>
         /// <returns>拆分后的文件列表</returns>
+        [Obsolete("此功能尚未实现，请安装 iTextSharp 或 PdfSharp NuGet 包")]
         public static List<string> SplitPdf(string sourcePath, string outputDirectory, int pagesPerFile = 1)
         {
             var result = new List<string>();
@@ -149,16 +144,8 @@ namespace EasyTool.BusinessCategory
             if (!File.Exists(sourcePath))
                 return result;
 
-            try
-            {
-                Directory.CreateDirectory(outputDirectory);
-                // 需要引入第三方库实现
-                throw new NotImplementedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
-            }
-            catch
-            {
-                return result;
-            }
+            Directory.CreateDirectory(outputDirectory);
+            throw new NotSupportedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
         }
 
         /// <summary>
@@ -169,6 +156,7 @@ namespace EasyTool.BusinessCategory
         /// <param name="startPage">起始页码</param>
         /// <param name="endPage">结束页码</param>
         /// <returns>是否成功</returns>
+        [Obsolete("此功能尚未实现，请安装 iTextSharp 或 PdfSharp NuGet 包")]
         public static bool ExtractPages(string sourcePath, string outputPath, int startPage, int endPage)
         {
             if (!File.Exists(sourcePath))
@@ -177,15 +165,7 @@ namespace EasyTool.BusinessCategory
             if (startPage < 1 || endPage < startPage)
                 return false;
 
-            try
-            {
-                // 需要引入第三方库实现
-                throw new NotImplementedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
-            }
-            catch
-            {
-                return false;
-            }
+            throw new NotSupportedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
         }
 
         #endregion
@@ -202,6 +182,7 @@ namespace EasyTool.BusinessCategory
         /// <param name="opacity">透明度（0-1）</param>
         /// <param name="rotation">旋转角度</param>
         /// <returns>是否成功</returns>
+        [Obsolete("此功能尚未实现，请安装 iTextSharp 或 PdfSharp NuGet 包")]
         public static bool AddTextWatermark(
             string sourcePath,
             string outputPath,
@@ -216,15 +197,7 @@ namespace EasyTool.BusinessCategory
             if (string.IsNullOrEmpty(watermarkText))
                 return false;
 
-            try
-            {
-                // 需要引入第三方库实现
-                throw new NotImplementedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
-            }
-            catch
-            {
-                return false;
-            }
+            throw new NotSupportedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
         }
 
         /// <summary>
@@ -235,6 +208,7 @@ namespace EasyTool.BusinessCategory
         /// <param name="watermarkImagePath">水印图片路径</param>
         /// <param name="opacity">透明度（0-1）</param>
         /// <returns>是否成功</returns>
+        [Obsolete("此功能尚未实现，请安装 iTextSharp 或 PdfSharp NuGet 包")]
         public static bool AddImageWatermark(
             string sourcePath,
             string outputPath,
@@ -244,15 +218,7 @@ namespace EasyTool.BusinessCategory
             if (!File.Exists(sourcePath) || !File.Exists(watermarkImagePath))
                 return false;
 
-            try
-            {
-                // 需要引入第三方库实现
-                throw new NotImplementedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
-            }
-            catch
-            {
-                return false;
-            }
+            throw new NotSupportedException("请安装 iTextSharp 或 PdfSharp NuGet 包以启用此功能");
         }
 
         #endregion
@@ -267,6 +233,7 @@ namespace EasyTool.BusinessCategory
         /// <param name="imageFormat">图片格式</param>
         /// <param name="dpi">分辨率</param>
         /// <returns>生成的图片路径列表</returns>
+        [Obsolete("此功能尚未实现，请安装 PdfiumViewer 或 Ghostscript NuGet 包")]
         public static List<string> ToImages(
             string pdfPath,
             string outputDirectory,
@@ -278,16 +245,8 @@ namespace EasyTool.BusinessCategory
             if (!File.Exists(pdfPath))
                 return result;
 
-            try
-            {
-                Directory.CreateDirectory(outputDirectory);
-                // 需要引入第三方库实现（如 PdfiumViewer 或 Ghostscript）
-                throw new NotImplementedException("请安装 PdfiumViewer 或 Ghostscript NuGet 包以启用此功能");
-            }
-            catch
-            {
-                return result;
-            }
+            Directory.CreateDirectory(outputDirectory);
+            throw new NotSupportedException("请安装 PdfiumViewer 或 Ghostscript NuGet 包以启用此功能");
         }
 
         #endregion
@@ -299,20 +258,13 @@ namespace EasyTool.BusinessCategory
         /// </summary>
         /// <param name="pdfPath">PDF文件路径</param>
         /// <returns>文本内容</returns>
+        [Obsolete("此功能尚未实现，请安装 iTextSharp NuGet 包")]
         public static string ExtractText(string pdfPath)
         {
             if (!File.Exists(pdfPath))
                 return string.Empty;
 
-            try
-            {
-                // 需要引入第三方库实现
-                throw new NotImplementedException("请安装 iTextSharp NuGet 包以启用此功能");
-            }
-            catch
-            {
-                return string.Empty;
-            }
+            throw new NotSupportedException("请安装 iTextSharp NuGet 包以启用此功能");
         }
 
         #endregion

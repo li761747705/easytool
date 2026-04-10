@@ -43,7 +43,7 @@ namespace EasyTool.IOCategory
 
             encoding ??= Encoding.UTF8;
             using var reader = new StreamReader(filePath, encoding);
-            var content = await reader.ReadToEndAsync();
+            var content = await reader.ReadToEndAsync().ConfigureAwait(false);
             var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             return ParseLines(lines);
         }
@@ -152,7 +152,7 @@ namespace EasyTool.IOCategory
             encoding ??= Encoding.UTF8;
             var content = BuildContent(properties, comment);
             using var writer = new StreamWriter(filePath, false, encoding);
-            await writer.WriteAsync(content);
+            await writer.WriteAsync(content).ConfigureAwait(false);
         }
 
         /// <summary>

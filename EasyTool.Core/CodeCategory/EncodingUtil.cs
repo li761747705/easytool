@@ -40,9 +40,9 @@ namespace EasyTool.CodeCategory
             int index = 0;
             for (int i = 0; i < length; i += 5)
             {
-                int val = (bytes[i] << 32) + ((i + 1 < length ? bytes[i + 1] : 0) << 24) +
-                          ((i + 2 < length ? bytes[i + 2] : 0) << 16) + ((i + 3 < length ? bytes[i + 3] : 0) << 8) +
-                          ((i + 4 < length ? bytes[i + 4] : 0) << 0);
+                long val = ((long)bytes[i] << 32) + ((i + 1 < length ? (long)bytes[i + 1] : 0) << 24) +
+                          ((i + 2 < length ? (long)bytes[i + 2] : 0) << 16) + ((i + 3 < length ? (long)bytes[i + 3] : 0) << 8) +
+                          ((i + 4 < length ? (long)bytes[i + 4] : 0) << 0);
                 chars[index++] = BASE32_CHARS[(val >> 35) & 0x1F];
                 chars[index++] = BASE32_CHARS[(val >> 30) & 0x1F];
                 chars[index++] = BASE32_CHARS[(val >> 25) & 0x1F];
@@ -97,7 +97,7 @@ namespace EasyTool.CodeCategory
             int length = str.Length;
             if (length % 8 != 0)
             {
-                throw new ArgumentException("Invalid length of input string: " + length, nameof(str));
+                throw new ArgumentException("输入字符串长度无效: " + length, nameof(str));
             }
 
             int paddingCount = 0;
@@ -130,15 +130,19 @@ namespace EasyTool.CodeCategory
             int index = 0;
             for (int i = 0; i < length; i += 8)
             {
-                int val = (DecodeBase32Char(str[i]) << 35) +
-                          (DecodeBase32Char(str[i + 1]) << 30) +
-                          (DecodeBase32Char(str[i + 2]) << 25) +
-                          (DecodeBase32Char(str[i + 3]) << 20) +
-                          (DecodeBase32Char(str[i + 4]) << 15) +
-                          (DecodeBase32Char(str[i + 5]) << 10) +
-                          (DecodeBase32Char(str[i + 6]) << 5) +
+                long val = ((long)DecodeBase32Char(str[i]) << 35) +
+                          ((long)DecodeBase32Char(str[i + 1]) << 30) +
+                          ((long)DecodeBase32Char(str[i + 2]) << 25) +
+                          ((long)DecodeBase32Char(str[i + 3]) << 20) +
+                          ((long)DecodeBase32Char(str[i + 4]) << 15) +
+                          ((long)DecodeBase32Char(str[i + 5]) << 10) +
+                          ((long)DecodeBase32Char(str[i + 6]) << 5) +
                           DecodeBase32Char(str[i + 7]);
-                bytes[index++] = (byte)(val >> 24);
+                bytes[index++] = (byte)(val >> 32);
+                if (index < bytes.Length)
+                {
+                    bytes[index++] = (byte)(val >> 24);
+                }
                 if (index < bytes.Length)
                 {
                     bytes[index++] = (byte)(val >> 16);
@@ -172,7 +176,7 @@ namespace EasyTool.CodeCategory
             {
                 return c - '2' + 26;
             }
-            throw new ArgumentException("Invalid character in input string: " + c, nameof(c));
+            throw new ArgumentException("输入字符串包含无效字符: " + c, nameof(c));
         }
 
         #endregion
@@ -311,7 +315,7 @@ namespace EasyTool.CodeCategory
             {'U', "..-"},
             {'V', "...-"},
             {'W', ".--"},
-            {'X', "-.."},
+            {'X', "-..-"},
             {'Y', "-.--"},
             {'Z', "--.."},
             {'0', "-----"},
@@ -324,7 +328,7 @@ namespace EasyTool.CodeCategory
             {'7', "--..."},
             {'8', "---.."},
             {'9', "----."},
-            {' ', " "}
+            {' ', "/"}
         };
 
         // Morse 反向电码表，用于解码优化性能
