@@ -394,9 +394,11 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-# JetBrains Rider
+# JetBrains Rider / IntelliJ IDEA
+.idea/
 *.sln.iml
 
 # Claude Code and OMC tool state
 .omc/
 .claude/
+.spec-workflow/
