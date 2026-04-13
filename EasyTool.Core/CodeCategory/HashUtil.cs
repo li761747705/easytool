@@ -7,7 +7,7 @@ namespace EasyTool.CodeCategory
     /// <summary>
     /// hash算法工具类
     /// </summary>
-    public class HashUtil
+    public static class HashUtil
     {
         /// <summary>
         /// 加法hash

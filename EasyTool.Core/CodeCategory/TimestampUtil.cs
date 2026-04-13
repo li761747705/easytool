@@ -365,7 +365,16 @@ namespace EasyTool.CodeCategory
                 var dt = FromTimestamp(timestamp);
                 return dt.Year >= 1970 && dt.Year <= 2100;
             }
-            catch
+            // 捕获时间戳解析格式异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (OverflowException)
             {
                 return false;
             }

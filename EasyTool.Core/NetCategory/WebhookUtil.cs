@@ -41,7 +41,8 @@ namespace EasyTool.NetCategory
                     Body = responseBody
                 };
             }
-            catch (Exception ex)
+            // 捕获 HTTP 请求和 JSON 序列化异常
+            catch (HttpRequestException ex)
             {
                 return new WebhookResponse { Success = false, Error = ex.Message };
             }

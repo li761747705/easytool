@@ -9,6 +9,9 @@ namespace EasyTool.CollectionsCategory
     /// 一种空间效率很高的概率型数据结构，用于判断元素是否在集合中
     /// 可能存在假阳性（误报），但不存在假阴性
     /// </summary>
+    /// <remarks>
+    /// 线程安全：读操作线程安全。并发写入需要外部同步。
+    /// </remarks>
     public static class BloomFilterUtil
     {
         /// <summary>

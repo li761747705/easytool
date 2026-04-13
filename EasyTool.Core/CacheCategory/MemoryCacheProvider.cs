@@ -25,6 +25,9 @@ namespace EasyTool.CacheCategory
     /// 内存缓存提供者
     /// 提供高性能的内存缓存实现，支持过期策略和优先级
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 ConcurrentDictionary 和 Interlocked 保护内部状态。
+    /// </remarks>
     public class MemoryCacheProvider : ICacheProvider, IDisposable
     {
         private readonly ConcurrentDictionary<string, MemoryCacheItem> _cache;

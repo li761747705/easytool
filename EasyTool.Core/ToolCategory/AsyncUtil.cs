@@ -102,6 +102,7 @@ namespace EasyTool.ToolCategory
                 {
                     return await func().ConfigureAwait(false);
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     lastException = ex;
@@ -368,6 +369,7 @@ namespace EasyTool.ToolCategory
                 {
                     return (Success: true, Result: await taskFactory().ConfigureAwait(false), Exception: (Exception?)null);
                 }
+                // 捕获所有异常以收集失败结果（并行任务需容忍部分失败）
                 catch (Exception ex)
                 {
                     return (Success: false, Result: default(T), Exception: ex);

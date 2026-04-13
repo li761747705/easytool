@@ -118,7 +118,14 @@ namespace EasyTool.SystemCategory
                     return (long)(totalMemoryKB * 1024); // 转换为字节
                 }
             }
-            catch { }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                // 调用原生内存查询失败，使用备用方法
+            }
+            catch (System.Runtime.InteropServices.SEHException)
+            {
+                // 原生方法调用异常，使用备用方法
+            }
 
             // 备用方法
             using var memCounter = new PerformanceCounter("Memory", "Available MBytes");
@@ -452,7 +459,14 @@ namespace EasyTool.SystemCategory
                         counter.Dispose();
                     }
                 }
-                catch { }
+                catch (System.ComponentModel.Win32Exception)
+                {
+                    // 进程已退出，无法访问性能计数器
+                }
+                catch (System.InvalidOperationException)
+                {
+                    // 进程已终止或性能计数器不可用
+                }
                 finally
                 {
                     p.Dispose();
@@ -483,7 +497,14 @@ namespace EasyTool.SystemCategory
                         MemoryUsage = p.WorkingSet64
                     });
                 }
-                catch { }
+                catch (System.ComponentModel.Win32Exception)
+                {
+                    // 进程已退出，无法访问进程信息
+                }
+                catch (System.InvalidOperationException)
+                {
+                    // 进程已终止或信息不可用
+                }
                 finally
                 {
                     p.Dispose();

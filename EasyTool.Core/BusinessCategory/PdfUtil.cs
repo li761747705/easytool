@@ -36,8 +36,9 @@ namespace EasyTool.BusinessCategory
                     ModifyTime = fileInfo.LastWriteTime
                 };
             }
-            catch
+            catch (IOException)
             {
+                // 文件信息读取失败时返回null
                 return null;
             }
         }

@@ -27,6 +27,9 @@ namespace EasyTool.IdentifierCategory
     /// <summary>
     /// 唯一ID工具
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。内部使用 Interlocked 原子操作。
+    /// </remarks>
     public static class IdUtil
     {
         private static readonly DateTime epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

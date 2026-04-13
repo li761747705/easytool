@@ -229,8 +229,9 @@ namespace EasyTool.BusinessCategory
                     UpdateTime = DateTime.Parse(root.GetProperty("updateTime").GetString() ?? DateTime.Now.ToString())
                 };
             }
-            catch
+            catch (Exception)
             {
+                // 网络请求、JSON解析或数据转换失败时返回null
                 return null;
             }
         }
@@ -278,8 +279,9 @@ namespace EasyTool.BusinessCategory
 
                 return result;
             }
-            catch
+            catch (Exception)
             {
+                // 网络请求、JSON解析或数据转换失败时返回空列表
                 return result;
             }
         }
@@ -316,8 +318,9 @@ namespace EasyTool.BusinessCategory
                     Pm25 = double.Parse(now.GetProperty("pm2p5").GetString() ?? "0")
                 };
             }
-            catch
+            catch (Exception)
             {
+                // 网络请求、JSON解析或数据转换失败时返回null
                 return null;
             }
         }
@@ -409,8 +412,9 @@ namespace EasyTool.BusinessCategory
 
                 return result;
             }
-            catch
+            catch (Exception)
             {
+                // 网络请求、JSON解析或数据转换失败时返回空列表
                 return result;
             }
         }

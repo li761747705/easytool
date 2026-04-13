@@ -128,7 +128,16 @@ namespace EasyTool.CodeCategory
                 var hashAlgo = GetHashAlgorithm(hashAlgorithm);
                 return ecdsa.VerifyData(data, signature, hashAlgo);
             }
-            catch
+            // 捕获密钥导入和签名验证异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (System.Security.Cryptography.CryptographicException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
             {
                 return false;
             }

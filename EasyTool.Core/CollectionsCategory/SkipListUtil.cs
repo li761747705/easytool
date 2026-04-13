@@ -9,6 +9,9 @@ namespace EasyTool.CollectionsCategory
     /// 一种随机化的数据结构，基于并联的链表，实现高效查找、插入、删除
     /// 平均时间复杂度 O(log n)
     /// </summary>
+    /// <remarks>
+    /// 线程安全：否。外部需要同步访问。
+    /// </remarks>
     public static class SkipListUtil
     {
         /// <summary>

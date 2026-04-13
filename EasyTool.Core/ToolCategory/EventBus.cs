@@ -42,6 +42,10 @@ namespace EasyTool.ToolCategory
     /// 事件总线
     /// 提供发布/订阅模式的实现，支持令牌取消订阅
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 lock 保护订阅/取消订阅操作。
+    /// 异常隔离：单个 handler 抛出异常不会影响其他 handler 的执行。
+    /// </remarks>
     public static class EventBus
     {
         private static readonly Dictionary<Type, List<(Guid id, Delegate handler)>> _handlers = new();
@@ -127,6 +131,7 @@ namespace EasyTool.ToolCategory
         /// </summary>
         /// <typeparam name="T">事件数据类型</typeparam>
         /// <param name="eventData">事件数据</param>
+        /// <exception cref="AggregateException">当一个或多个 handler 抛出异常时，汇总所有异常</exception>
         public static void Publish<T>(T eventData)
         {
             List<Delegate>? handlerDelegates;
@@ -137,13 +142,25 @@ namespace EasyTool.ToolCategory
                 handlerDelegates = handlers.ConvertAll(h => h.handler);
             }
 
+            var exceptions = new List<Exception>();
             foreach (var handler in handlerDelegates)
             {
                 if (handler is Action<T> typedHandler)
                 {
-                    typedHandler(eventData);
+                    try
+                    {
+                        typedHandler(eventData);
+                    }
+                    // 捕获所有异常以隔离事件处理器（防止一个处理器失败影响其他处理器）
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex);
+                    }
                 }
             }
+
+            if (exceptions.Count > 0)
+                throw new AggregateException("一个或多个事件处理器执行失败", exceptions);
         }
 
         /// <summary>
@@ -162,20 +179,52 @@ namespace EasyTool.ToolCategory
                 handlerDelegates = handlers.ConvertAll(h => h.handler);
             }
 
+            var exceptions = new List<Exception>();
             var tasks = new List<Task>();
             foreach (var handler in handlerDelegates)
             {
                 if (handler is Action<T> typedHandler)
                 {
-                    tasks.Add(Task.Run(() => typedHandler(eventData)));
+                    tasks.Add(Task.Run(() =>
+                    {
+                        try
+                        {
+                            typedHandler(eventData);
+                        }
+                        // 捕获所有异常以隔离事件处理器（并行执行时防止一个失败影响其他）
+                        catch (Exception ex)
+                        {
+                            lock (exceptions)
+                            {
+                                exceptions.Add(ex);
+                            }
+                        }
+                    }));
                 }
                 else if (handler is Func<T, Task> asyncHandler)
                 {
-                    tasks.Add(asyncHandler(eventData));
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await asyncHandler(eventData).ConfigureAwait(false);
+                        }
+                        // 捕获所有异常以隔离异步事件处理器
+                        catch (Exception ex)
+                        {
+                            lock (exceptions)
+                            {
+                                exceptions.Add(ex);
+                            }
+                        }
+                    }));
                 }
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            if (exceptions.Count > 0)
+                throw new AggregateException("一个或多个事件处理器执行失败", exceptions);
         }
 
         /// <summary>
@@ -357,6 +406,7 @@ namespace EasyTool.ToolCategory
         /// 发布事件
         /// </summary>
         /// <param name="eventData">事件数据</param>
+        /// <exception cref="AggregateException">当一个或多个 handler 抛出异常时，汇总所有异常</exception>
         public void Publish(T eventData)
         {
             List<Action<T>> handlersCopy;
@@ -365,10 +415,22 @@ namespace EasyTool.ToolCategory
                 handlersCopy = _handlers.ConvertAll(h => h.Item2);
             }
 
+            var exceptions = new List<Exception>();
             foreach (var handler in handlersCopy)
             {
-                handler(eventData);
+                try
+                {
+                    handler(eventData);
+                }
+                // 捕获所有异常以隔离事件处理器（防止一个处理器失败影响其他处理器）
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
             }
+
+            if (exceptions.Count > 0)
+                throw new AggregateException("一个或多个事件处理器执行失败", exceptions);
         }
 
         /// <summary>
@@ -387,18 +449,50 @@ namespace EasyTool.ToolCategory
                 asyncHandlersCopy = _asyncHandlers.ConvertAll(h => h.Item2);
             }
 
+            var exceptions = new List<Exception>();
             var tasks = new List<Task>();
             foreach (var handler in handlersCopy)
             {
-                tasks.Add(Task.Run(() => handler(eventData)));
+                tasks.Add(Task.Run(() =>
+                {
+                    try
+                    {
+                        handler(eventData);
+                    }
+                    // 捕获所有异常以隔离事件处理器（并行执行时防止一个失败影响其他）
+                    catch (Exception ex)
+                    {
+                        lock (exceptions)
+                        {
+                            exceptions.Add(ex);
+                        }
+                    }
+                }));
             }
 
             foreach (var handler in asyncHandlersCopy)
             {
-                tasks.Add(handler(eventData));
+                tasks.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        await handler(eventData).ConfigureAwait(false);
+                    }
+                    // 捕获所有异常以隔离异步事件处理器
+                    catch (Exception ex)
+                    {
+                        lock (exceptions)
+                        {
+                            exceptions.Add(ex);
+                        }
+                    }
+                }));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            if (exceptions.Count > 0)
+                throw new AggregateException("一个或多个事件处理器执行失败", exceptions);
         }
 
         /// <summary>

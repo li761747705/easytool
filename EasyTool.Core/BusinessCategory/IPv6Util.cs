@@ -44,8 +44,9 @@ namespace EasyTool.BusinessCategory
                 var ip = System.Net.IPAddress.Parse(address);
                 return ip.IsIPv6LinkLocal ? address : ip.ToString();
             }
-            catch
+            catch (FormatException)
             {
+                // IP地址解析失败时返回原始地址
                 return address;
             }
         }
@@ -74,8 +75,9 @@ namespace EasyTool.BusinessCategory
 
                 return result.ToString();
             }
-            catch
+            catch (FormatException)
             {
+                // IP地址解析失败时返回原始地址
                 return address;
             }
         }
@@ -95,8 +97,9 @@ namespace EasyTool.BusinessCategory
                 var ip = System.Net.IPAddress.Parse(address);
                 return ip.IsIPv6LinkLocal;
             }
-            catch
+            catch (FormatException)
             {
+                // IP地址解析失败时返回false
                 return false;
             }
         }
@@ -162,8 +165,9 @@ namespace EasyTool.BusinessCategory
                 }
                 return null;
             }
-            catch
+            catch (FormatException)
             {
+                // IP地址解析失败时返回null
                 return null;
             }
         }
@@ -187,8 +191,9 @@ namespace EasyTool.BusinessCategory
                 }
                 return null;
             }
-            catch
+            catch (FormatException)
             {
+                // IP地址解析失败时返回null
                 return null;
             }
         }

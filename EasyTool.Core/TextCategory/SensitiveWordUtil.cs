@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace EasyTool.TextCategory
 {
@@ -10,9 +11,14 @@ namespace EasyTool.TextCategory
     /// 敏感词过滤工具类
     /// 使用 DFA（Deterministic Finite Automaton）算法实现高效敏感词检测
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 ReaderWriterLockSlim 保护并发读写。
+    /// 读操作（Contains、FindAll、Filter 等）可并发执行，写操作（Init、AddWord 等）互斥。
+    /// 时间复杂度：O(n)，n 为文本长度。
+    /// </remarks>
     public static class SensitiveWordUtil
     {
-        private static readonly object _lock = new();
+        private static readonly ReaderWriterLockSlim _rwLock = new();
         private static Dictionary<char, object> _sensitiveWordsMap = new();
         private static HashSet<string> _sensitiveWords = new();
         private static char[] _separatorChars = { ',', '，', '\n', '\r', ';' };
@@ -28,10 +34,15 @@ namespace EasyTool.TextCategory
             if (words == null)
                 return;
 
-            lock (_lock)
+            _rwLock.EnterWriteLock();
+            try
             {
                 _sensitiveWords = new HashSet<string>(words.Where(w => !string.IsNullOrWhiteSpace(w)));
                 _sensitiveWordsMap = BuildDFA(_sensitiveWords);
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
             }
         }
 
@@ -40,6 +51,7 @@ namespace EasyTool.TextCategory
         /// </summary>
         /// <param name="filePath">文件路径</param>
         /// <param name="encoding">编码（默认UTF-8）</param>
+        /// <exception cref="FileNotFoundException">文件不存在时抛出</exception>
         public static void InitFromFile(string filePath, Encoding? encoding = null)
         {
             if (!File.Exists(filePath))
@@ -60,10 +72,15 @@ namespace EasyTool.TextCategory
             if (string.IsNullOrWhiteSpace(word))
                 return;
 
-            lock (_lock)
+            _rwLock.EnterWriteLock();
+            try
             {
                 _sensitiveWords.Add(word);
                 _sensitiveWordsMap = BuildDFA(_sensitiveWords);
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
             }
         }
 
@@ -76,7 +93,8 @@ namespace EasyTool.TextCategory
             if (words == null)
                 return;
 
-            lock (_lock)
+            _rwLock.EnterWriteLock();
+            try
             {
                 foreach (var word in words)
                 {
@@ -84,6 +102,10 @@ namespace EasyTool.TextCategory
                         _sensitiveWords.Add(word);
                 }
                 _sensitiveWordsMap = BuildDFA(_sensitiveWords);
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
             }
         }
 
@@ -96,10 +118,15 @@ namespace EasyTool.TextCategory
             if (string.IsNullOrWhiteSpace(word))
                 return;
 
-            lock (_lock)
+            _rwLock.EnterWriteLock();
+            try
             {
                 _sensitiveWords.Remove(word);
                 _sensitiveWordsMap = BuildDFA(_sensitiveWords);
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
             }
         }
 
@@ -108,17 +135,36 @@ namespace EasyTool.TextCategory
         /// </summary>
         public static void Clear()
         {
-            lock (_lock)
+            _rwLock.EnterWriteLock();
+            try
             {
                 _sensitiveWords.Clear();
                 _sensitiveWordsMap.Clear();
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
             }
         }
 
         /// <summary>
         /// 获取敏感词数量
         /// </summary>
-        public static int Count => _sensitiveWords.Count;
+        public static int Count
+        {
+            get
+            {
+                _rwLock.EnterReadLock();
+                try
+                {
+                    return _sensitiveWords.Count;
+                }
+                finally
+                {
+                    _rwLock.ExitReadLock();
+                }
+            }
+        }
 
         #endregion
 
@@ -171,15 +217,27 @@ namespace EasyTool.TextCategory
         /// <returns>是否包含敏感词</returns>
         public static bool Contains(string text)
         {
-            if (string.IsNullOrEmpty(text) || _sensitiveWordsMap.Count == 0)
+            if (string.IsNullOrEmpty(text))
                 return false;
 
-            for (int i = 0; i < text.Length; i++)
+            _rwLock.EnterReadLock();
+            try
             {
-                if (CheckSensitiveWord(text, i, out _))
+                if (_sensitiveWordsMap.Count == 0)
+                    return false;
+
+                var snapshot = _sensitiveWordsMap;
+                for (int i = 0; i < text.Length; i++)
                 {
-                    return true;
+                    if (CheckSensitiveWord(snapshot, text, i, out _))
+                    {
+                        return true;
+                    }
                 }
+            }
+            finally
+            {
+                _rwLock.ExitReadLock();
             }
 
             return false;
@@ -194,16 +252,28 @@ namespace EasyTool.TextCategory
         {
             var result = new List<string>();
 
-            if (string.IsNullOrEmpty(text) || _sensitiveWordsMap.Count == 0)
+            if (string.IsNullOrEmpty(text))
                 return result;
 
-            for (int i = 0; i < text.Length; i++)
+            _rwLock.EnterReadLock();
+            try
             {
-                if (CheckSensitiveWord(text, i, out int length))
+                if (_sensitiveWordsMap.Count == 0)
+                    return result;
+
+                var snapshot = _sensitiveWordsMap;
+                for (int i = 0; i < text.Length; i++)
                 {
-                    result.Add(text.Substring(i, length));
-                    i += length - 1;
+                    if (CheckSensitiveWord(snapshot, text, i, out int length))
+                    {
+                        result.Add(text.Substring(i, length));
+                        i += length - 1;
+                    }
                 }
+            }
+            finally
+            {
+                _rwLock.ExitReadLock();
             }
 
             return result;
@@ -218,16 +288,28 @@ namespace EasyTool.TextCategory
         {
             var result = new List<(int, string)>();
 
-            if (string.IsNullOrEmpty(text) || _sensitiveWordsMap.Count == 0)
+            if (string.IsNullOrEmpty(text))
                 return result;
 
-            for (int i = 0; i < text.Length; i++)
+            _rwLock.EnterReadLock();
+            try
             {
-                if (CheckSensitiveWord(text, i, out int length))
+                if (_sensitiveWordsMap.Count == 0)
+                    return result;
+
+                var snapshot = _sensitiveWordsMap;
+                for (int i = 0; i < text.Length; i++)
                 {
-                    result.Add((i, text.Substring(i, length)));
-                    i += length - 1;
+                    if (CheckSensitiveWord(snapshot, text, i, out int length))
+                    {
+                        result.Add((i, text.Substring(i, length)));
+                        i += length - 1;
+                    }
                 }
+            }
+            finally
+            {
+                _rwLock.ExitReadLock();
             }
 
             return result;
@@ -242,24 +324,44 @@ namespace EasyTool.TextCategory
         {
             var result = new Dictionary<string, int>();
 
-            if (string.IsNullOrEmpty(text) || _sensitiveWordsMap.Count == 0)
+            if (string.IsNullOrEmpty(text))
                 return result;
 
-            foreach (var word in FindAll(text))
+            _rwLock.EnterReadLock();
+            try
             {
-                if (result.ContainsKey(word))
-                    result[word]++;
-                else
-                    result[word] = 1;
+                if (_sensitiveWordsMap.Count == 0)
+                    return result;
+
+                var snapshot = _sensitiveWordsMap;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (CheckSensitiveWord(snapshot, text, i, out int length))
+                    {
+                        var word = text.Substring(i, length);
+                        if (result.ContainsKey(word))
+                            result[word]++;
+                        else
+                            result[word] = 1;
+                        i += length - 1;
+                    }
+                }
+            }
+            finally
+            {
+                _rwLock.ExitReadLock();
             }
 
             return result;
         }
 
-        private static bool CheckSensitiveWord(string text, int beginIndex, out int length)
+        /// <summary>
+        /// 检查敏感词（使用指定的 DFA 快照，保证线程安全）
+        /// </summary>
+        private static bool CheckSensitiveWord(Dictionary<char, object> dfaMap, string text, int beginIndex, out int length)
         {
             length = 0;
-            var currentMap = _sensitiveWordsMap;
+            var currentMap = dfaMap;
             bool found = false;
 
             for (int i = beginIndex; i < text.Length; i++)
@@ -295,24 +397,37 @@ namespace EasyTool.TextCategory
         /// <returns>过滤后的文本</returns>
         public static string Filter(string text, char replaceChar = '*')
         {
-            if (string.IsNullOrEmpty(text) || _sensitiveWordsMap.Count == 0)
+            if (string.IsNullOrEmpty(text))
                 return text ?? string.Empty;
 
-            var result = new StringBuilder(text);
-
-            for (int i = 0; i < result.Length; i++)
+            _rwLock.EnterReadLock();
+            try
             {
-                if (CheckSensitiveWord(result.ToString(), i, out int length))
-                {
-                    for (int j = i; j < i + length && j < result.Length; j++)
-                    {
-                        result[j] = replaceChar;
-                    }
-                    i += length - 1;
-                }
-            }
+                if (_sensitiveWordsMap.Count == 0)
+                    return text;
 
-            return result.ToString();
+                var snapshot = _sensitiveWordsMap;
+                var result = new StringBuilder(text);
+
+                for (int i = 0; i < result.Length; i++)
+                {
+                    // 使用原始文本进行 DFA 查找，避免循环内 ToString() 的 O(n²) 开销
+                    if (CheckSensitiveWord(snapshot, text, i, out int length))
+                    {
+                        for (int j = i; j < i + length && j < result.Length; j++)
+                        {
+                            result[j] = replaceChar;
+                        }
+                        i += length - 1;
+                    }
+                }
+
+                return result.ToString();
+            }
+            finally
+            {
+                _rwLock.ExitReadLock();
+            }
         }
 
         /// <summary>
@@ -321,38 +436,63 @@ namespace EasyTool.TextCategory
         /// <param name="text">待过滤文本</param>
         /// <param name="replacer">替换函数（参数为敏感词，返回替换后的文本）</param>
         /// <returns>过滤后的文本</returns>
+        /// <remarks>replacer 为 null 时返回原始文本</remarks>
         public static string Filter(string text, Func<string, string> replacer)
         {
-            if (string.IsNullOrEmpty(text) || _sensitiveWordsMap.Count == 0 || replacer == null)
+            if (string.IsNullOrEmpty(text))
                 return text ?? string.Empty;
-
-            var positions = FindAllWithPosition(text);
-            if (positions.Count == 0)
+            if (replacer == null)
                 return text;
 
-            var result = new StringBuilder();
-            int lastIndex = 0;
-
-            foreach (var (startIndex, word) in positions)
+            _rwLock.EnterReadLock();
+            try
             {
-                result.Append(text.Substring(lastIndex, startIndex - lastIndex));
-                result.Append(replacer(word));
-                lastIndex = startIndex + word.Length;
-            }
+                if (_sensitiveWordsMap.Count == 0)
+                    return text;
 
-            if (lastIndex < text.Length)
+                var snapshot = _sensitiveWordsMap;
+                var positions = new List<(int StartIndex, int Length)>();
+
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (CheckSensitiveWord(snapshot, text, i, out int length))
+                    {
+                        positions.Add((i, length));
+                        i += length - 1;
+                    }
+                }
+
+                if (positions.Count == 0)
+                    return text;
+
+                var result = new StringBuilder();
+                int lastIndex = 0;
+
+                foreach (var (startIndex, len) in positions)
+                {
+                    result.Append(text.Substring(lastIndex, startIndex - lastIndex));
+                    result.Append(replacer(text.Substring(startIndex, len)));
+                    lastIndex = startIndex + len;
+                }
+
+                if (lastIndex < text.Length)
+                {
+                    result.Append(text.Substring(lastIndex));
+                }
+
+                return result.ToString();
+            }
+            finally
             {
-                result.Append(text.Substring(lastIndex));
+                _rwLock.ExitReadLock();
             }
-
-            return result.ToString();
         }
 
         /// <summary>
         /// 高亮显示敏感词
         /// </summary>
         /// <param name="text">文本</param>
-        /// <param name="prefix">高亮前缀（如 &lt;span style=\"color:red\"&gt;）</param>
+        /// <param name="prefix">高亮前缀（如 &lt;span style="color:red"&gt;）</param>
         /// <param name="suffix">高亮后缀（如 &lt;/span&gt;）</param>
         /// <returns>处理后的文本</returns>
         public static string Highlight(string text, string prefix = "<em>", string suffix = "</em>")

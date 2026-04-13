@@ -117,6 +117,7 @@ namespace EasyTool.NetCategory
             {
                 // 正常取消，不触发错误
             }
+            // 捕获所有其他异常（连接/读取可能抛出任意网络异常）
             catch (Exception ex)
             {
                 OnError(ex);
@@ -216,6 +217,7 @@ namespace EasyTool.NetCategory
                 {
                     break;
                 }
+                // 捕获所有其他异常（事件流读取可能抛出任意网络异常）
                 catch (Exception ex)
                 {
                     OnError(ex);

@@ -240,6 +240,7 @@ namespace EasyTool.ToolCategory
                 action();
                 return Result.Success();
             }
+            // 捕获所有异常以转换为 Result（Try 模式需处理用户委托的任意异常）
             catch (Exception ex)
             {
                 return Result.FromException(ex);
@@ -255,6 +256,7 @@ namespace EasyTool.ToolCategory
             {
                 return Result.Success(func());
             }
+            // 捕获所有异常以转换为 Result（Try 模式需处理用户委托的任意异常）
             catch (Exception ex)
             {
                 return Result.FromException<T>(ex);
@@ -271,6 +273,7 @@ namespace EasyTool.ToolCategory
                 await action().ConfigureAwait(false);
                 return Result.Success();
             }
+            // 捕获所有异常以转换为 Result（Try 模式需处理用户委托的任意异常）
             catch (Exception ex)
             {
                 return Result.FromException(ex);
@@ -286,6 +289,7 @@ namespace EasyTool.ToolCategory
             {
                 return Result.Success(await func().ConfigureAwait(false));
             }
+            // 捕获所有异常以转换为 Result（Try 模式需处理用户委托的任意异常）
             catch (Exception ex)
             {
                 return Result.FromException<T>(ex);

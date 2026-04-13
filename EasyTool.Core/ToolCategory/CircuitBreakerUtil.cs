@@ -59,6 +59,9 @@ namespace EasyTool.ToolCategory
     /// <summary>
     /// 熔断器
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 Interlocked 和 lock 保护状态转换。
+    /// </remarks>
     public class CircuitBreaker
     {
         private readonly CircuitBreakerOptions _options;
@@ -143,6 +146,7 @@ namespace EasyTool.ToolCategory
                 OnSuccess();
                 return result;
             }
+            // 捕获所有异常以更新熔断器状态（用户委托可能抛出任意异常）
             catch (Exception ex) when (ShouldTrackException(ex))
             {
                 OnFailure();
@@ -172,6 +176,7 @@ namespace EasyTool.ToolCategory
                 var result = await ExecuteAsync(action).ConfigureAwait(false);
                 return (true, result, null);
             }
+            // 捕获所有异常以返回失败结果（熔断器可能已打开）
             catch (Exception ex)
             {
                 return (false, default, ex);

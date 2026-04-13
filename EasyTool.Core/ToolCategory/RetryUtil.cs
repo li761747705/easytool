@@ -54,6 +54,7 @@ namespace EasyTool.ToolCategory
                     action();
                     return;
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     // 判断是否应该重试此异常
@@ -114,6 +115,7 @@ namespace EasyTool.ToolCategory
                 {
                     return func();
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     // 判断是否应该重试此异常
@@ -179,6 +181,7 @@ namespace EasyTool.ToolCategory
                     await action().ConfigureAwait(false);
                     return;
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     // 判断是否应该重试此异常
@@ -245,6 +248,7 @@ namespace EasyTool.ToolCategory
                 {
                     return await func().ConfigureAwait(false);
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     // 判断是否应该重试此异常
@@ -314,6 +318,7 @@ namespace EasyTool.ToolCategory
                     await action().ConfigureAwait(false);
                     return;
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     // 判断是否应该重试此异常
@@ -412,6 +417,7 @@ namespace EasyTool.ToolCategory
                 {
                     return await func().ConfigureAwait(false);
                 }
+                // 捕获所有异常以支持重试策略（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     if (!policy.ShouldRetry(ex))

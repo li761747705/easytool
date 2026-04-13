@@ -201,7 +201,14 @@ namespace EasyTool.SystemCategory
                 {
                     process.Kill();
                 }
-                catch { }
+                catch (System.ComponentModel.Win32Exception)
+                {
+                    // 进程已退出，无法终止
+                }
+                catch (System.InvalidOperationException)
+                {
+                    // 进程尚未启动或已经释放
+                }
                 tcs.TrySetCanceled(cancellationToken);
             }))
             {

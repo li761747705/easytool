@@ -257,7 +257,8 @@ namespace EasyTool.CodeCategory
                 bytes = Decode(value);
                 return true;
             }
-            catch
+            // 捕获 Base58 解码格式异常
+            catch (FormatException)
             {
                 return false;
             }

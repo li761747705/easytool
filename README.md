@@ -871,6 +871,59 @@ EasyTool/
 | `PutAsync<T>()` | PUT 请求并反序列化 |
 | `DeleteAsync()` | DELETE 请求 |
 
+## 🔗 最佳搭配
+
+EasyTool 专注于工具类和中国特色功能，以下场景推荐与成熟库搭配使用：
+
+| 场景 | 推荐方案 | 说明 |
+|------|----------|------|
+| 重试/熔断/限流 | **EasyTool + Polly** | EasyTool 内置基础重试和断路器，生产级场景推荐 Polly |
+| 结构化日志 | **EasyTool + Serilog** | 日志领域 Serilog 是 .NET 事实标准 |
+| 规则验证 | **EasyTool + FluentValidation** | EasyTool 提供 40+ 业务验证器（身份证/银行卡等），FluentValidation 补充规则链验证 |
+| 对象映射 | **EasyTool.EmitMapper 或 Mapster** | EmitMapper 零依赖集成，Mapster 性能极致（5-17x faster） |
+| Excel 大数据量 | **EasyTool.NPOI 或 ClosedXML** | NPOI 覆盖全面，ClosedXML 大数据量性能更优 |
+| JSON 高级场景 | **System.Text.Json** | EasyTool.JsonUtil 已封装常用操作，复杂场景直接使用原生 API |
+| 定时任务 | **Quartz.NET / Hangfire** | EasyTool 提供 Cron 表达式验证，调度框架使用专业库 |
+| 分布式缓存 | **EasyCaching / StackExchange.Redis** | EasyTool 内置 MemoryCacheProvider，分布式场景用专业缓存库 |
+
+### 示例：EasyTool + Polly 组合
+
+```csharp
+// 使用 EasyTool 的 HTTP 客户端构建器
+var client = HttpClientBuilder.Create()
+    .WithBaseUrl("https://api.example.com")
+    .WithTimeout(TimeSpan.FromSeconds(30))
+    .Build();
+
+// 结合 Polly 的重试策略
+var response = await Policy
+    .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
+    .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
+    .ExecuteAsync(() => client.GetAsync("/data"));
+
+// 使用 EasyTool 的 JSON 工具处理响应
+var data = JsonUtil.Deserialize<MyData>(await response.Content.ReadAsStringAsync());
+```
+
+### 示例：EasyTool + FluentValidation 组合
+
+```csharp
+// EasyTool 负责业务格式验证
+var isIdCardValid = IdCardUtil.IsValid("110101199003077654");
+var isBankCardValid = BankCardUtil.IsValid("6222021234567890123");
+
+// FluentValidation 负责规则链验证
+public class UserValidator : AbstractValidator<User>
+{
+    public UserValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty().Length(2, 20);
+        RuleFor(x => x.IdCard).Must(id => IdCardUtil.IsValid(id)).WithMessage("身份证号无效");
+        RuleFor(x => x.Phone).Must(phone => PhoneNumberUtil.IsValid(phone)).WithMessage("手机号无效");
+    }
+}
+```
+
 ## ❌ 我们不做
 
 | 功能 | 成熟替代方案 |

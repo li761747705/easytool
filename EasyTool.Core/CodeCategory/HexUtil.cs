@@ -73,7 +73,8 @@ namespace EasyTool.CodeCategory
                 }
                 return true;
             }
-            catch
+            // 捕获十六进制字符串解析异常
+            catch (FormatException)
             {
                 return false;
             }

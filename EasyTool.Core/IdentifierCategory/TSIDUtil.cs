@@ -8,6 +8,9 @@ namespace EasyTool.IdentifierCategory
     /// TSID（Time-Sorted Identifier）生成器
     /// 生成可按时间排序的唯一标识符，支持分布式环境
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 lock 保护计数器。
+    /// </remarks>
     public static class TsidUtil
     {
         private static readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();

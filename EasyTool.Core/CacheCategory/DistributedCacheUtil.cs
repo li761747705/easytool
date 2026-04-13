@@ -10,6 +10,9 @@ namespace EasyTool.CacheCategory
     /// 分布式缓存工具类
     /// 提供多级缓存支持，包括本地缓存和分布式缓存
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。依赖底层 IDistributedCache 实现。
+    /// </remarks>
     public static class DistributedCacheUtil
     {
         private static readonly ConcurrentDictionary<string, ICacheProvider> _providers = new();

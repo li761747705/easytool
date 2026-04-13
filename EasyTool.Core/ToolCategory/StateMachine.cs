@@ -6,6 +6,9 @@ namespace EasyTool.ToolCategory
     /// <summary>
     /// 状态机工具类
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 lock 保护状态转换。
+    /// </remarks>
     /// <typeparam name="TState">状态类型</typeparam>
     /// <typeparam name="TTrigger">触发器类型</typeparam>
     public class StateMachine<TState, TTrigger> where TState : notnull where TTrigger : notnull

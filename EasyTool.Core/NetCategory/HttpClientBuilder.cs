@@ -531,7 +531,12 @@ namespace EasyTool.NetCategory
                         return response;
                     }
                 }
-                catch (Exception ex)
+                // 捕获 HTTP 请求异常用于重试
+                catch (HttpRequestException ex)
+                {
+                    lastException = ex;
+                }
+                catch (TaskCanceledException ex)
                 {
                     lastException = ex;
                 }
@@ -603,7 +608,14 @@ namespace EasyTool.NetCategory
 
                 return response;
             }
-            catch (Exception ex)
+            // 捕获 HTTP 请求异常用于日志记录后重新抛出
+            catch (HttpRequestException ex)
+            {
+                stopwatch.Stop();
+                _logger($"[{DateTime.UtcNow:HH:mm:ss.fff}] HTTP {request.Method} {request.RequestUri} -> ERROR: {ex.Message} ({stopwatch.ElapsedMilliseconds}ms)");
+                throw;
+            }
+            catch (TaskCanceledException ex)
             {
                 stopwatch.Stop();
                 _logger($"[{DateTime.UtcNow:HH:mm:ss.fff}] HTTP {request.Method} {request.RequestUri} -> ERROR: {ex.Message} ({stopwatch.ElapsedMilliseconds}ms)");

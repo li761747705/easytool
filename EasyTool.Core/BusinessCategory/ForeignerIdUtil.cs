@@ -277,8 +277,9 @@ namespace EasyTool.BusinessCategory
             {
                 return new DateTime(year, month, day);
             }
-            catch
+            catch (ArgumentException)
             {
+                // 日期参数无效（如月份或日期超出范围）时返回null
                 return null;
             }
         }

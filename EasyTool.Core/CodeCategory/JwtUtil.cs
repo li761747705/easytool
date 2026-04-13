@@ -152,7 +152,16 @@ namespace EasyTool.CodeCategory
                     IsValid = true
                 };
             }
-            catch (Exception ex)
+            // 捕获 Base64 解码和 JSON 反序列化异常
+            catch (FormatException ex)
+            {
+                return new JwtDecodeResult
+                {
+                    IsValid = false,
+                    ErrorMessage = ex.Message
+                };
+            }
+            catch (System.Text.Json.JsonException ex)
             {
                 return new JwtDecodeResult
                 {

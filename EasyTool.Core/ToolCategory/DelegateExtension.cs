@@ -23,6 +23,7 @@ namespace EasyTool.ToolCategory
             {
                 action();
             }
+            // 捕获所有异常（用户委托可能抛出任意异常）
             catch (Exception ex)
             {
                 onError?.Invoke(ex);
@@ -41,6 +42,7 @@ namespace EasyTool.ToolCategory
             {
                 return func();
             }
+            // 捕获所有异常（用户委托可能抛出任意异常）
             catch (Exception ex)
             {
                 onError?.Invoke(ex);
@@ -69,6 +71,7 @@ namespace EasyTool.ToolCategory
                     action();
                     return;
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     lastException = ex;
@@ -99,6 +102,7 @@ namespace EasyTool.ToolCategory
                 {
                     return func();
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     lastException = ex;
@@ -130,6 +134,7 @@ namespace EasyTool.ToolCategory
                     await action().ConfigureAwait(false);
                     return;
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     lastException = ex;
@@ -160,6 +165,7 @@ namespace EasyTool.ToolCategory
                 {
                     return await func().ConfigureAwait(false);
                 }
+                // 捕获所有异常以支持重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     lastException = ex;

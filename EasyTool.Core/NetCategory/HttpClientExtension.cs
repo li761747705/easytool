@@ -87,7 +87,16 @@ namespace EasyTool.NetCategory
 
                 return result;
             }
-            catch (Exception ex)
+            // 捕获 HTTP 请求和 JSON 反序列化异常
+            catch (HttpRequestException ex)
+            {
+                return new Result(ex.Message, false);
+            }
+            catch (TaskCanceledException ex)
+            {
+                return new Result(ex.Message, false);
+            }
+            catch (System.Text.Json.JsonException ex)
             {
                 return new Result(ex.Message, false);
             }
@@ -112,7 +121,16 @@ namespace EasyTool.NetCategory
 
                 return result;
             }
-            catch (Exception ex)
+            // 捕获 HTTP 请求和 JSON 反序列化异常
+            catch (HttpRequestException ex)
+            {
+                return new Result<TRsp>(ex.Message, false);
+            }
+            catch (TaskCanceledException ex)
+            {
+                return new Result<TRsp>(ex.Message, false);
+            }
+            catch (System.Text.Json.JsonException ex)
             {
                 return new Result<TRsp>(ex.Message, false);
             }
@@ -144,7 +162,16 @@ namespace EasyTool.NetCategory
                     return new Result($"{(int)httpResponse.StatusCode} {httpResponse.ReasonPhrase}", false);
                 }
             }
-            catch (Exception ex)
+            // 捕获 HTTP 请求和 JSON 序列化异常
+            catch (HttpRequestException ex)
+            {
+                return new Result(ex.Message, false);
+            }
+            catch (TaskCanceledException ex)
+            {
+                return new Result(ex.Message, false);
+            }
+            catch (System.Text.Json.JsonException ex)
             {
                 return new Result(ex.Message, false);
             }
@@ -176,7 +203,16 @@ namespace EasyTool.NetCategory
                     return new Result<TRsp>($"{(int)httpResponse.StatusCode} {httpResponse.ReasonPhrase}", false);
                 }
             }
-            catch (Exception ex)
+            // 捕获 HTTP 请求和 JSON 序列化异常
+            catch (HttpRequestException ex)
+            {
+                return new Result<TRsp>(ex.Message, false);
+            }
+            catch (TaskCanceledException ex)
+            {
+                return new Result<TRsp>(ex.Message, false);
+            }
+            catch (System.Text.Json.JsonException ex)
             {
                 return new Result<TRsp>(ex.Message, false);
             }

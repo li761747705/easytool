@@ -65,7 +65,12 @@ namespace EasyTool.CodeCategory
 
                 return ConstantTimeEquals(computedHash, expectedHash);
             }
-            catch
+            // 捕获密钥派生和格式解析异常
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (System.Security.Cryptography.CryptographicException)
             {
                 return false;
             }
@@ -136,7 +141,8 @@ namespace EasyTool.CodeCategory
                 var (oldN, oldR, oldP, _, _) = ParseHash(hash);
                 return oldN != n || oldR != r || oldP != p;
             }
-            catch
+            // 捕获哈希格式解析异常（格式无效时需要重新哈希）
+            catch (FormatException)
             {
                 return true;
             }

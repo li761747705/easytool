@@ -9,6 +9,9 @@ namespace EasyTool.ToolCategory
     /// 对象池
     /// 用于重用对象，减少GC压力
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 lock 保护池操作。
+    /// </remarks>
     /// <typeparam name="T">对象类型</typeparam>
     public class ObjectPool<T> where T : class
     {

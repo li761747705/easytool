@@ -8,6 +8,9 @@ namespace EasyTool.IdentifierCategory
     /// ULID（Universally Unique Lexicographically Sortable Identifier）生成器
     /// ULID 是一种可排序的唯一标识符，由 48 位时间戳和 80 位随机数组成
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 lock 保护时间戳和计数器。
+    /// </remarks>
     public static class UlidUtil
     {
         private static readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();

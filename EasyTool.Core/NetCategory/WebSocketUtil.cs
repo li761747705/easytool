@@ -270,6 +270,7 @@ namespace EasyTool.NetCategory
             {
                 // 正常取消
             }
+            // 捕获所有其他异常（WebSocket 接收可能抛出任意网络异常）
             catch (Exception ex)
             {
                 OnError?.Invoke(ex);
@@ -304,6 +305,7 @@ namespace EasyTool.NetCategory
             {
                 // 正常取消
             }
+            // 捕获所有其他异常（WebSocket 发送可能抛出任意网络异常）
             catch (Exception ex)
             {
                 OnError?.Invoke(ex);

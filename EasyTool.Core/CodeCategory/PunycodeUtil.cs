@@ -300,7 +300,12 @@ namespace EasyTool.CodeCategory
                 string reencoded = Encode(decoded);
                 return true;
             }
-            catch
+            // 捕获 Punycode 编解码格式异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
             {
                 return false;
             }
@@ -327,7 +332,12 @@ namespace EasyTool.CodeCategory
                 result = Decode(input);
                 return true;
             }
-            catch
+            // 捕获 Punycode 解码格式异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
             {
                 return false;
             }

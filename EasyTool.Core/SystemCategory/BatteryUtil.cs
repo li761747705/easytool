@@ -255,7 +255,18 @@ namespace EasyTool.SystemCategory
                     return output;
                 }
             }
-            catch { }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                // 命令不存在或无法执行（如 macOS 上 pmset 未找到）
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                // 没有权限执行该命令
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                // 指定的命令文件不存在
+            }
 
             return string.Empty;
         }

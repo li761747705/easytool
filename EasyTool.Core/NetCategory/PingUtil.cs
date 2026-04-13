@@ -237,7 +237,8 @@ namespace EasyTool.NetCategory
                     result.BufferSize = reply.Buffer.Length;
                 }
             }
-            catch (Exception ex)
+            // 捕获 Ping 操作异常（网络不可达、超时等）
+            catch (PingException ex)
             {
                 result.Success = false;
                 result.ErrorMessage = ex.Message;
@@ -307,7 +308,8 @@ namespace EasyTool.NetCategory
                     result.BufferSize = reply.Buffer.Length;
                 }
             }
-            catch (Exception ex)
+            // 捕获 Ping 操作异常（网络不可达、超时等）
+            catch (PingException ex)
             {
                 result.Success = false;
                 result.ErrorMessage = ex.Message;

@@ -135,7 +135,12 @@ namespace EasyTool.NetCategory
                         Send(config, msg);
                         return new SendResult { Success = true, Recipients = msg.To };
                     }
-                    catch (Exception ex)
+                    // 捕获 SMTP 发送异常和配置无效异常
+                    catch (SmtpException ex)
+                    {
+                        return new SendResult { Success = false, Recipients = msg.To, Error = ex.Message };
+                    }
+                    catch (InvalidOperationException ex)
                     {
                         return new SendResult { Success = false, Recipients = msg.To, Error = ex.Message };
                     }
@@ -153,7 +158,12 @@ namespace EasyTool.NetCategory
                         Send(config, msg);
                         results.Add(new SendResult { Success = true, Recipients = msg.To });
                     }
-                    catch (Exception ex)
+                    // 捕获 SMTP 发送异常和配置无效异常
+                    catch (SmtpException ex)
+                    {
+                        results.Add(new SendResult { Success = false, Recipients = msg.To, Error = ex.Message });
+                    }
+                    catch (InvalidOperationException ex)
                     {
                         results.Add(new SendResult { Success = false, Recipients = msg.To, Error = ex.Message });
                     }
@@ -183,7 +193,12 @@ namespace EasyTool.NetCategory
                     await SendAsync(config, msg).ConfigureAwait(false);
                     return new SendResult { Success = true, Recipients = msg.To };
                 }
-                catch (Exception ex)
+                // 捕获异步 SMTP 发送异常和配置无效异常
+                catch (SmtpException ex)
+                {
+                    return new SendResult { Success = false, Recipients = msg.To, Error = ex.Message };
+                }
+                catch (InvalidOperationException ex)
                 {
                     return new SendResult { Success = false, Recipients = msg.To, Error = ex.Message };
                 }

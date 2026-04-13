@@ -5,6 +5,9 @@ namespace EasyTool.IdentifierCategory
     /// <summary>
     /// 雪花算法ID生成器
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 lock 保护 ID 生成。
+    /// </remarks>
     public class SnowflakeIdGenerator
     {
         private long _workerId;

@@ -172,7 +172,8 @@ namespace EasyTool.TextCategory
                 var lines = System.IO.File.ReadAllLines(filePath);
                 AddToDictionary(lines);
             }
-            catch (Exception)
+            // 捕获文件读取异常（文件不存在或无权限时静默忽略）
+            catch (IOException)
             {
                 // 忽略错误
             }

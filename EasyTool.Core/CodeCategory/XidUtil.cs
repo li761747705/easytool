@@ -286,7 +286,8 @@ namespace EasyTool.CodeCategory
                 bytes = Decode(xid);
                 return true;
             }
-            catch
+            // 捕获 XID 解码格式异常
+            catch (FormatException)
             {
                 return false;
             }

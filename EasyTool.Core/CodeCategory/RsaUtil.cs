@@ -228,7 +228,16 @@ namespace EasyTool.CodeCategory
                 var padding = GetSignaturePadding();
                 return rsa.VerifyData(data, signature, hashAlgo, padding);
             }
-            catch
+            // 捕获密钥导入和签名验证异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (System.Security.Cryptography.CryptographicException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
             {
                 return false;
             }

@@ -7,6 +7,9 @@ namespace EasyTool.CollectionsCategory
     /// LRU 缓存工具类
     /// 最近最少使用淘汰策略的缓存
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。内部使用 ConcurrentDictionary。
+    /// </remarks>
     public static class LRUCacheUtil
     {
         /// <summary>

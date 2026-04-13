@@ -114,10 +114,11 @@ namespace EasyTool.ToolCategory
                 {
                     return await action().ConfigureAwait(false);
                 }
+                // 捕获所有异常以支持退避重试（用户委托可能抛出任意异常）
                 catch (Exception ex)
                 {
                     lastException = ex;
-                    
+
                     if (attempt == maxRetries || (shouldRetry != null && !shouldRetry(ex, attempt)))
                         break;
 

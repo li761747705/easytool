@@ -68,7 +68,16 @@ namespace EasyTool.CodeCategory
                 using var rsa = CreateRsaFromKey(publicKey);
                 return rsa.VerifyData(data, signature, hashAlgorithm, padding);
             }
-            catch
+            // 捕获 RSA 密钥导入和签名验证异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (System.Security.Cryptography.CryptographicException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
             {
                 return false;
             }
@@ -147,7 +156,16 @@ namespace EasyTool.CodeCategory
                 using var ecdsa = CreateEcdsaFromKey(publicKey);
                 return ecdsa.VerifyData(data, signature, hashAlgorithm);
             }
-            catch
+            // 捕获 ECDSA 密钥导入和签名验证异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (System.Security.Cryptography.CryptographicException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
             {
                 return false;
             }
@@ -186,7 +204,16 @@ namespace EasyTool.CodeCategory
                 using var dsa = CreateDsaFromKey(publicKey);
                 return dsa.VerifyData(data, signature, hashAlgorithm);
             }
-            catch
+            // 捕获 DSA 密钥导入和签名验证异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (System.Security.Cryptography.CryptographicException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
             {
                 return false;
             }

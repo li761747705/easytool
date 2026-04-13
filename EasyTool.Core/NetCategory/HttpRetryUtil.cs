@@ -233,6 +233,7 @@ namespace EasyTool.NetCategory
                     OnSuccess();
                     return result;
                 }
+                // 记录失败次数后重新抛出（需捕获所有异常以统计）
                 catch (Exception)
                 {
                     OnFailure();

@@ -361,7 +361,12 @@ namespace EasyTool.CodeCategory
                 // 常量时间比较
                 return ConstantTimeEquals(hash, computedHash);
             }
-            catch
+            // 捕获哈希计算和格式解析异常
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (System.Security.Cryptography.CryptographicException)
             {
                 return false;
             }
@@ -383,7 +388,8 @@ namespace EasyTool.CodeCategory
                 var (cost, _, _) = ParseHash(hash);
                 return cost != newCost;
             }
-            catch
+            // 捕获哈希格式解析异常（格式无效时需要重新哈希）
+            catch (FormatException)
             {
                 return true;
             }

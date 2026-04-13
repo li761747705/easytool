@@ -315,6 +315,9 @@ namespace EasyTool.ToolCategory
     /// <summary>
     /// 限流器工具类
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 Interlocked 原子操作实现令牌桶。
+    /// </remarks>
     public static class RateLimiter
     {
         /// <summary>

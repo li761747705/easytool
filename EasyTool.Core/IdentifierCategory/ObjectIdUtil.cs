@@ -9,6 +9,9 @@ namespace EasyTool.IdentifierCategory
     /// MongoDB ObjectId 生成器
     /// ObjectId 是一个 12 字节的唯一标识符，由时间戳、机器标识、进程 ID 和计数器组成
     /// </summary>
+    /// <remarks>
+    /// 线程安全：是。使用 Interlocked 原子操作。
+    /// </remarks>
     public static class ObjectIdUtil
     {
         private static readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();

@@ -240,7 +240,8 @@ namespace EasyTool.CodeCategory
                 result = Decode(encoded, format);
                 return true;
             }
-            catch
+            // 捕获 Base32 解码格式异常
+            catch (FormatException)
             {
                 return false;
             }

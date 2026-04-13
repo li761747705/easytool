@@ -127,6 +127,7 @@ namespace EasyTool.ToolCategory
                 {
                     await next(context).ConfigureAwait(false);
                 }
+                // 捕获所有异常以传递给异常处理器（管道中间件可能抛出任意异常）
                 catch (Exception ex)
                 {
                     if (handler != null)
