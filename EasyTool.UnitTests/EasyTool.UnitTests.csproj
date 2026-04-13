@@ -34,6 +34,10 @@
 		<ProjectReference Include="..\EasyTool.Media\EasyTool.Media.csproj" />
 		<ProjectReference Include="..\EasyTool.AI\EasyTool.AI.csproj" />
 		<ProjectReference Include="..\EasyTool.System\EasyTool.System.csproj" />
+		<ProjectReference Include="..\EasyTool.Image\EasyTool.Image.csproj" />
+		<ProjectReference Include="..\EasyTool.NPOI\EasyTool.NPOI.csproj" />
+		<ProjectReference Include="..\EasyTool.EmitMapper\EasyTool.EmitMapper.csproj" />
+		<ProjectReference Include="..\EasyTool.Web\EasyTool.Web.csproj" />
 		<ProjectReference Include="..\EasyTool.All\EasyTool.All.csproj" />
 	</ItemGroup>
 

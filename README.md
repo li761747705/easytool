@@ -7,7 +7,7 @@
 [![pull_request](https://github.com/li761747705/easytool/actions/workflows/pull_request.yml/badge.svg)](https://github.com/li761747705/easytool/actions/workflows/pull_request.yml)
 [![](https://img.shields.io/nuget/v/EasyTool.Core.svg)](https://www.nuget.org/packages/EasyTool.Core)
 [![](https://img.shields.io/badge/.NET-netstandard2.1-blue)](https://learn.microsoft.com/dotnet/standard/net-standard)
-[![](https://img.shields.io/badge/测试-1069+-brightgreen)](https://github.com/li761747705/easytool)
+[![](https://img.shields.io/badge/测试-2000+-brightgreen)](https://github.com/li761747705/easytool)
 [![](https://img.shields.io/badge/工具类-300+-orange)](https://github.com/li761747705/easytool)
 <p>
     <span>中文</span> | <a href="README.EN-US.md">English</a>
@@ -23,7 +23,7 @@ EasyTool 是一个**轻量级、功能全面、中文友好**的 .NET 工具库�
 - ✅ **轻量级** - 核心包零外部依赖
 - ✅ **全覆盖** - 300+ 工具类，涵盖编码、加密、集合、文本、网络、IO 等所有常见场景
 - ✅ **中文友好** - 拼音转换、敏感词过滤、身份证/银行卡/手机号验证、农历节气等中国特色功能
-- ✅ **高可靠** - 1069+ 单元测试，线程安全设计，ConfigureAwait(false) 全量覆盖
+- ✅ **高可靠** - 2000+ 单元测试，线程安全设计，ConfigureAwait(false) 全量覆盖
 - ✅ **零侵入** - 基于 netstandard2.1，兼容 .NET Core 3.0+、.NET 5/6/7/8/9/10
 
 ### 📦 NuGet 包一览

@@ -54,8 +54,47 @@ namespace EasyTool.CacheCategory
 
     /// <summary>
     /// Redis 缓存提供者
-    /// 注意：此类提供 Redis 缓存的抽象接口，实际使用需要引入 StackExchange.Redis 包
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>重要说明：</b>此类为抽象扩展点，核心功能需要引入 StackExchange.Redis 包并继承实现。
+    /// EasyTool.Core 遵循零外部依赖原则，因此 Redis 相关依赖需要用户自行引入。
+    /// </para>
+    /// <para>
+    /// <b>使用方式：</b>
+    /// 1. 安装 NuGet 包：Install-Package StackExchange.Redis
+    /// 2. 创建子类继承 RedisCacheProvider，实现 Redis 连接逻辑
+    /// 3. 或使用 <see cref="MemoryCacheProvider"/> 作为零依赖的替代方案
+    /// </para>
+    /// <para>
+    /// <b>子类实现示例：</b>
+    /// <code>
+    /// public class MyRedisCacheProvider : RedisCacheProvider
+    /// {
+    ///     private readonly ConnectionMultiplexer _connection;
+    ///     private readonly IDatabase _db;
+    ///
+    ///     public MyRedisCacheProvider(RedisCacheOptions options) : base(options)
+    ///     {
+    ///         _connection = ConnectionMultiplexer.Connect(options.ConnectionString);
+    ///         _db = _connection.GetDatabase(options.DefaultDatabase);
+    ///     }
+    ///
+    ///     public override async Task&lt;T?&gt; GetAsync&lt;T&gt;(string key, CancellationToken ct = default)
+    ///     {
+    ///         var value = await _db.StringGetAsync(GetFullKey(key));
+    ///         return value.HasValue ? JsonSerializer.Deserialize&lt;T&gt;(value) : default;
+    ///     }
+    ///
+    ///     // 实现其他方法...
+    /// }
+    /// </code>
+    /// </para>
+    /// <para>
+    /// <b>推荐替代方案：</b>如果不需要分布式缓存，建议使用 <see cref="MemoryCacheProvider"/>，
+    /// 它是完整实现的本地内存缓存，无需任何外部依赖。
+    /// </para>
+    /// </remarks>
     public class RedisCacheProvider : ICacheProvider, IAsyncDisposable, IDisposable
     {
         private readonly RedisCacheOptions _options;
